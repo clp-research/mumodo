@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>analysis.py &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../index.html" />
+    <link rel="next" title="xiofile.py" href="XIOFile.html" />
+    <link rel="prev" title="mumodoIO.py" href="IO.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="XIOFile.html" title="xiofile.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="IO.html" title="mumodoIO.py"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="analysis-py">
+<h1>analysis.py<a class="headerlink" href="#analysis-py" title="Permalink to this headline">¶</a></h1>
+<p>Basic toolkit for analysing data with mumodo</p>
+<span class="target" id="module-mumodo.analysis"></span><p>analyis.py &#8211; analysis and plotting functions</p>
+<p>Functions for analyis of streamframes, intervalframes and pointframes</p>
+<dl class="function">
+<dt id="mumodo.analysis.intervalframe_overlaps">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">intervalframe_overlaps</tt><big>(</big><em>frame1</em>, <em>frame2</em>, <em>concatdelimiter='/'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#intervalframe_overlaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.intervalframe_overlaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intersection of two interval frames</p>
+<p>Return an IntervalFrame with the intersection  of two intervalframes
+An intersection is defined as an AND function on the intervals of both
+sources (regardless of text). HINT: Input Intervalframes should
+be imported without empty intervals</p>
+<p>Arguments:
+frame1,frame2   &#8211; IntervalFrames.</p>
+<p>Keyword arguments:</p>
+<dl class="docutils">
+<dt>concatdelimiter  &#8211;  Concatenate the labels of the overlapping intervals</dt>
+<dd>to create labels of the new dataframe intervals.
+If empty string is given, the intervals are simply
+labeled with &#8216;overlap&#8217; instead.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.intervalframe_union">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">intervalframe_union</tt><big>(</big><em>frame1</em>, <em>frame2</em>, <em>concatdelimiter='/'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#intervalframe_union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.intervalframe_union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Union of two interval frames</p>
+<p>Return an IntervalFrame with the union of two intervalframes
+A union is defined as an OR function on the intervals of both
+sources (regardless of text). Optionally, the labels of overlapping
+intervals can be concatenated to create the labels of the new
+dataframe intervals. HINT: Input Intervalframes should
+be imported without empty intervals</p>
+<p>Arguments:
+frame1,frame2   &#8211; IntervalFrames.</p>
+<dl class="docutils">
+<dt>concatdelimiter  &#8211;  Concatenate the labels of the overlapping intervals</dt>
+<dd>to create labels of the new dataframe intervals.
+If empty string is given, the intervals are simply
+labeled with &#8216;overlap&#8217; instead.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.invert_intervalframe">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">invert_intervalframe</tt><big>(</big><em>inversion</em>, <em>st=None</em>, <em>en=None</em>, <em>label=None</em>, <em>concat_delimiter='/'</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#invert_intervalframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.invert_intervalframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the negative of an interval frame</p>
+<p>Return the inversion of an interval frame.
+An inversion is defined as a NOT function of the original
+interval frame. The labels of inverted intervals are by default
+a concatenation of the labels of surrounding intervals. Any other
+preferred label can be passed to the function.
+HINT: Input Intervalframes should be imported without empty intervals</p>
+<p>Arguments:
+frame            &#8211; IntervalFrame.</p>
+<dl class="docutils">
+<dt>label            &#8211; The labels of the intervals of the inverted frame</dt>
+<dd>are concatenations of the labels of the surrounding
+intervals in the original frame when the default
+value None is not changed. Any string that is
+given instead will become the label of the
+inverted frame&#8217;s intervals.</dd>
+<dt>st               &#8211; The time at which the inverted frame shall start.</dt>
+<dd>If st is None, the inverted frame will start at the
+end_time of the first interval of the original frame.</dd>
+<dt>en               &#8211; The time at which the inverted frame shall end. If en is</dt>
+<dd>None, the inverted frame will end at the start_time of
+the last interval of the original frame.</dd>
+<dt>concat_delimiter &#8211; the character by which the labels of the surrounding</dt>
+<dd>intervals of the original frame are to be concatenated.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.create_intervalframe_from_streamframe">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">create_intervalframe_from_streamframe</tt><big>(</big><em>streamframe</em>, <em>column</em>, <em>function</em>, <em>intervalwidth</em>, <em>text='True'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#create_intervalframe_from_streamframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.create_intervalframe_from_streamframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an Intervalframe from a streamframe based on a condition.</p>
+<p>Arguments:</p>
+<p>streamFrame   &#8211; The Streamframe that contains the data.
+column        &#8211; The column to evaluate (function evaluates each</p>
+<blockquote>
+<div>item of this column).</div></blockquote>
+<dl class="docutils">
+<dt>function      &#8211; A lambda function that evaluates to true or false</dt>
+<dd>depending on a condition
+e.g. lambda x: True if x&gt;0 else False.</dd>
+<dt>intervalWidth &#8211; Minimum distance between intervals (setting higher</dt>
+<dd>results in less, bigger intervals).</dd>
+</dl>
+<p>Keyword arguments:
+text          &#8211; Text for the Intervalframe labels (default True).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.create_streamframe_from_intervalframe">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">create_streamframe_from_intervalframe</tt><big>(</big><em>frame</em>, <em>relative=False</em>, <em>start_label_appendix=''</em>, <em>end_label_appendix=''</em>, <em>fillstep=0</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#create_streamframe_from_intervalframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.create_streamframe_from_intervalframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a streamframe from an intervalframe</p>
+<p>Arguments:
+frame                 &#8211; The IntervalFrame that contains the data
+relative              &#8211; If set to True, relative will make the</p>
+<blockquote>
+<div>timestampfs that serve as index values relative
+to the frist timestamp</div></blockquote>
+<dl class="docutils">
+<dt>start_label_appendix  &#8211; Appends a suffix to the first event of the</dt>
+<dd>respective type.</dd>
+<dt>end_label_appendix    &#8211; Appends a suffix to the last event of the</dt>
+<dd>respective type</dd>
+<dt>fillstep              &#8211; If greater than the default value 0, then in the</dt>
+<dd>streamframe
+there will be inserted events of the respective
+type of each
+interval at regular steps between the start and
+the end of
+that interval. The stepwidth is the value of
+fillstep.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.slice_streamframe_on_intervals">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">slice_streamframe_on_intervals</tt><big>(</big><em>streamframe</em>, <em>intervalframe</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#slice_streamframe_on_intervals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.slice_streamframe_on_intervals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a sliced streamFrame.</p>
+<p>Slice a streamframe&#8217;s index on the intervals of the intervalframe,
+regardless of the text. HINT: Intervalframe should not have
+empty intervals.
+The intervalframe gives the needed intervals from the &#8216;original&#8217;
+streamframe, to be included in the new, sliced streamframe.</p>
+<p>Arguments:
+streamFrame     &#8211;   The streamFrame that contains the data.
+intervalFrame   &#8211;   The intervalFrame that contains the intervals,</p>
+<blockquote>
+<div>needed for the sliced streamFrame.</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.slice_intervalframe_by_time">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">slice_intervalframe_by_time</tt><big>(</big><em>intervalframe</em>, <em>start_time</em>, <em>end_time</em>, <em>method='truncate'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#slice_intervalframe_by_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.slice_intervalframe_by_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a temporal slice of an intervalframe</p>
+<p>Slice an intervalframe, so that only intervals within the
+limits defined will be kept, regardless of the text labels</p>
+<p>Arguments:
+intervalframe &#8211; the input intervalframe to be sliced
+start_time, end_time &#8211; define a time region</p>
+<p>Keyword arguments:
+method &#8211; Defines how to deal with intervals that cross the</p>
+<blockquote>
+<div><blockquote>
+<div>temporal boundaries. Possible values:</div></blockquote>
+<p>&#8216;truncate&#8217; (default): Cut the intervals at the boundaries
+&#8216;include&#8217;: Include intervals crossing the boundaries
+&#8216;exclude&#8217;: Exclude intervals crossing the boundaries</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.slice_pointframe_by_time">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">slice_pointframe_by_time</tt><big>(</big><em>pointframe</em>, <em>start_time</em>, <em>end_time</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#slice_pointframe_by_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.slice_pointframe_by_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a temporal slice of a pointframe</p>
+<p>Slice a pointframe, so that only points within the
+limits defined will be kept, regardless of the text labels</p>
+<p>Arguments:
+pointframe &#8211; the input pointframe to be sliced
+start_time, end_time &#8211; define a time region</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.convert_times_of_tier">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">convert_times_of_tier</tt><big>(</big><em>tier</em>, <em>function</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#convert_times_of_tier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.convert_times_of_tier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the times of a tier using a specified function</p>
+<p>tier &#8212; a tier, either intervalframe or point tier</p>
+<p>An IntervalFrame is a Pandas DataFrame that represents a Praat interval
+tier. The columns must be [&#8216;start_time&#8217;, &#8216;end_time&#8217;, text&#8217;]. A PointTier
+is a Pandas DataFrame that represents a Praat point tier. The columns must
+be [&#8216;time&#8217;, &#8216;mark&#8217;].</p>
+<dl class="docutils">
+<dt>function &#8211; all times will be replaced by the output of this function. A</dt>
+<dd>lamda function should be used, e.g. lambda x: int(1000 * x)
+converts from (float) seconds to (int) milliseconds.
+Conversely, lambda x: float(x)/1000 ( or x / 1000. ) converts
+back to (float) seconds.
+It is possible to do custom conversions such as shifts, etc.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.convert_times_of_tiers">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">convert_times_of_tiers</tt><big>(</big><em>tierdict</em>, <em>function</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#convert_times_of_tiers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.convert_times_of_tiers" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Convert the times of all tiers in a dictionary using a specified</dt>
+<dd>function</dd>
+</dl>
+<p>tierdict  &#8212; a dictionary of tiers, either intervalframes or point tiers</p>
+<p>An IntervalFrame is a Pandas DataFrame that represents a Praat interval
+tier. The columns must be [&#8216;start_time&#8217;, &#8216;end_time&#8217;, text&#8217;]. A PointTier
+is a Pandas DataFrame that represents a Praat point tier. The columns must
+be [&#8216;time&#8217;, &#8216;mark&#8217;].</p>
+<dl class="docutils">
+<dt>function &#8211; all times will be replaced by the output of this function. A</dt>
+<dd>lamda function should be used, e.g. lambda x: int(1000 * x)
+converts from (float) seconds to (int) milliseconds.
+Conversely, lambda x: float(x)/1000 ( or x / 1000. ) converts
+back to (float) seconds.
+It is possible to do custom conversions such as shifts, etc.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.shift_tier">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">shift_tier</tt><big>(</big><em>tier</em>, <em>offset</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#shift_tier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.shift_tier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shift a tier by a specified time offset</p>
+<p>tier  &#8212; a tier, either an intervalframes or a point tier</p>
+<p>An IntervalFrame is a Pandas DataFrame that represents a Praat interval
+tier. The columns must be [&#8216;start_time&#8217;, &#8216;end_time&#8217;, text&#8217;]. A PointTier
+is a Pandas DataFrame that represents a Praat point tier. The columns must
+be [&#8216;time&#8217;, &#8216;mark&#8217;].</p>
+<p>offset &#8211; amount of time to shift the textgrid by in seconds. Can also be
+negative</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.shift_tiers">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">shift_tiers</tt><big>(</big><em>tierdict</em>, <em>offset</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#shift_tiers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.shift_tiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shift all tiers in a dictionary by a specified time offset</p>
+<p>tierdict  &#8212; a dictionary of tiers, either intervalframes or point tiers</p>
+<p>An IntervalFrame is a Pandas DataFrame that represents a Praat interval
+tier. The columns must be [&#8216;start_time&#8217;, &#8216;end_time&#8217;, text&#8217;]. A PointTier
+is a Pandas DataFrame that represents a Praat point tier. The columns must
+be [&#8216;time&#8217;, &#8216;mark&#8217;]</p>
+<p>offset &#8211; amount of time to shift the textgrid by in seconds. Can also be
+negative</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.get_tier_type">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">get_tier_type</tt><big>(</big><em>tier</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#get_tier_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.get_tier_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discover the type of a tier</p>
+<p>A tier can be one of IntevalTier or PointTier. Discovery is
+based on the presence of a particular column ordering and
+naming.</p>
+<p>For IntervalTiers (or IntervalFrames) the columns are
+[&#8216;start_time&#8217;, &#8216;end_time&#8217;, &#8216;text&#8217;] in that order. The times
+are in seconds (and should be floats, but this is not strictly
+enforced)</p>
+<p>For PointTiers (or PointFrames) the columns are [&#8216;time&#8217;, &#8216;mark&#8217;],
+with the time again in seconds.</p>
+<p>Both need to be instances of pandas.DataFrame</p>
+<p>The function returns the string &#8216;interval&#8217; or &#8216;point&#8217;, depending
+on the type of tier, or None if no conditions are satified</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.get_tier_boundaries">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">get_tier_boundaries</tt><big>(</big><em>tier</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#get_tier_boundaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.get_tier_boundaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum and maximum times of this tier</p>
+<p>Returns a tuple (min, max) with the minimum and maximum
+times of the tier.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.join_intervals_by_label">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">join_intervals_by_label</tt><big>(</big><em>intervalframe</em>, <em>maximum_gap=inf</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#join_intervals_by_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.join_intervals_by_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join near-adjacent intervals with the same label</p>
+<p>When (near) adjacent intervals in an intervalframe have the same label,
+they are concatenated into a single interval, starting at the start time
+of the first interval and ending at the end time of the adjacent interval</p>
+<p>If more than two adjacent intervals have the same label, the function
+chains them all together (the end time of last interval in the chain
+will be the end time of the new, single interval)</p>
+<p>WARNING: By default, this function does not check if the intervals
+are adjacent temporally. It only checks the labels. You can use the
+maximum_gap kwarg to add temporal constraints to the joining</p>
+<p>Arguments:</p>
+<dl class="docutils">
+<dt>intervalframe  &#8211; An IntervalFrame: Pandas Dataframe with a standard</dt>
+<dd>index and columns &#8216;start_time&#8217;, &#8216;end_time&#8217; (floats)
+and &#8216;text&#8217; (can be of any type but is normally
+str or unicode)</dd>
+</dl>
+<p>kwargs:</p>
+<dl class="docutils">
+<dt>maximum_gap &#8211; Do not join intervals that are more apart than this gap</dt>
+<dd>(in seconds). If None (default), the gap is ignored and
+all interval are joined</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.analysis.join_intervals_by_time">
+<tt class="descclassname">mumodo.analysis.</tt><tt class="descname">join_intervals_by_time</tt><big>(</big><em>intervalframe</em>, <em>minimum_gap=0</em>, <em>concat_delimiter=' '</em><big>)</big><a class="reference internal" href="../_modules/mumodo/analysis.html#join_intervals_by_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.analysis.join_intervals_by_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join near-adjacent intervals by time</p>
+<p>When adjacent intervals in an intervalframe are close to each other,
+they are concatenated in to a single interval, starting at the start
+time of the first interval and ending at the end time of the
+adjacent interval.</p>
+<p>If more than two adjacent intervals are near each other, the function
+chains them all together (the end time of last interval in the chain
+will be the end time of the new, single interval)</p>
+<p>The closeness is defined by the minimum_gap kwarg. By default, only
+directly adjacent intervals (that share a boundary) are concatenated
+The labels of the concatenated intervals are also concatenated,
+separated by a configurable delimiter (by default a space).</p>
+<p>Arguments:</p>
+<dl class="docutils">
+<dt>intervalframe  &#8211; An IntervalFrame: Pandas Dataframe with a standard</dt>
+<dd>index and columns &#8216;start_time&#8217;, &#8216;end_time&#8217; (floats)
+and &#8216;text&#8217; (can be of any type but is normally str
+or unicode)</dd>
+</dl>
+<p>kwargs:</p>
+<dl class="docutils">
+<dt>minimum_gap &#8211; Do not join intervals that are more apart than this</dt>
+<dd>gap (in seconds).</dd>
+<dt>concat_delimiter &#8211; A string inserted between the concatenated interval</dt>
+<dd>labels</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="IO.html"
+                        title="previous chapter">mumodoIO.py</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="XIOFile.html"
+                        title="next chapter">xiofile.py</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/mumodo/Analysis.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="XIOFile.html" title="xiofile.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="IO.html" title="mumodoIO.py"
+             >previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

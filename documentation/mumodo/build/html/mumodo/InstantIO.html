@@ -1,0 +1,711 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>InstantIO.py &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../index.html" />
+    <link rel="next" title="plotting.py" href="Plotting.html" />
+    <link rel="prev" title="corpus.py" href="Corpus.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Plotting.html" title="plotting.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Corpus.html" title="corpus.py"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="instantio-py">
+<h1>InstantIO.py<a class="headerlink" href="#instantio-py" title="Permalink to this headline">¶</a></h1>
+<p>Define data types inspired by the InstantIO protocol</p>
+<span class="target" id="module-mumodo.InstantIO"></span><p>InstantIO.py - implementation of InstantIO types in Python</p>
+<p>This module implements some of the InstantIO types [more info
+on these can be found at www.instantreality.org]</p>
+<p>The types are defined in two flavors:</p>
+<p>Single field types (SF) are implemented as classes, with accessors
+for the individual attributes</p>
+<p>Multiple field types (MF) are implemented as functions that return
+lists of the respective SF objects</p>
+<p>Accessing individual objects requires nothing more then ordinary
+list item access, hence no need to define a new class</p>
+<p>The constructors of the classes (as well as the mf functions) take
+string input and pack the data as (in case of MF, lists of) objects.
+The opposite transformation is achieved by str for the objects. Lists
+need to be iterated over and printed if one doesn&#8217;t want the brackets
+in the produced string  [ str(mylist)[1:-1]  ]</p>
+<dl class="class">
+<dt id="mumodo.InstantIO.SFVec3f">
+<em class="property">class </em><tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">SFVec3f</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#SFVec3f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.SFVec3f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse and return SFVec3f values from Instant Reality.</p>
+<dl class="method">
+<dt id="mumodo.InstantIO.SFVec3f.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#SFVec3f.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.SFVec3f.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new SFVec3f object.</p>
+<p>Arguments:
+Can be called either with string inputs (space separated):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">SFVec3f</span><span class="p">(</span><span class="s">&#39;3 5 9&#39;</span><span class="p">)</span>
+<span class="go">3.0 5.0 9.0</span>
+</pre></div>
+</div>
+<p>or with three float arguments:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFVec3f</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+<span class="go">[1.2, 3.4, 1.3]</span>
+</pre></div>
+</div>
+<p>if the input consists of a wrong number of arguments (neither 1
+nor 3), or any of the arguments is not a float,
+the &#8216;error&#8217; object (-1 -1 -1) is constructed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">SFVec3f</span><span class="p">(</span><span class="s">&#39;a b&#39;</span><span class="p">))</span>
+<span class="go">-1.0 -1.0 -1.0</span>
+</pre></div>
+</div>
+<p>the error object is also constructed if the number of arguments in
+the string does not equal 3:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFVec3f</span><span class="p">(</span><span class="s">&#39;hallo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+<span class="go">[-1.0, -1.0, -1.0]</span>
+</pre></div>
+</div>
+<p>the single positions of the constructed object can be indexed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFVec3f</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.9</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span><span class="o">.</span><span class="n">x</span>
+<span class="go">1.2</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFVec3f</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.9</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span><span class="o">.</span><span class="n">y</span>
+<span class="go">2.9</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFVec3f</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.9</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span><span class="o">.</span><span class="n">z</span>
+<span class="go">2.4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec3f.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec3f.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec3f.v">
+<tt class="descname">v</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec3f.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>v</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec3f.x">
+<tt class="descname">x</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec3f.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>x</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec3f.y">
+<tt class="descname">y</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec3f.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec3f.z">
+<tt class="descname">z</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec3f.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>z</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.InstantIO.SFVec2f">
+<em class="property">class </em><tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">SFVec2f</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#SFVec2f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.SFVec2f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse and return SFVec2f values from Instant Reality.</p>
+<dl class="method">
+<dt id="mumodo.InstantIO.SFVec2f.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#SFVec2f.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.SFVec2f.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new SFVec2f object.</p>
+<p>Arguments:
+Can be called either with string inputs (space separated):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFVec2f</span><span class="p">(</span><span class="s">&#39;1 2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+<span class="go">[1.0, 2.0]</span>
+</pre></div>
+</div>
+<p>or with two floats:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">SFVec2f</span><span class="p">(</span><span class="mf">3.4</span><span class="p">,</span> <span class="mf">5.6</span><span class="p">))</span>
+<span class="go">3.4 5.6</span>
+</pre></div>
+</div>
+<p>if the input consists of a wrong number of arguments (neither 1
+nor 2), or any of the arguments is not a float,
+the &#8216;error&#8217; object (-1 -1) is constructed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">SFVec2f</span><span class="p">(</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">5.6</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">))</span>
+<span class="go">-1.0 -1.0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">SFVec2f</span><span class="p">(</span><span class="mf">1.3</span><span class="p">,</span><span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">))</span>
+<span class="go">-1.0 -1.0</span>
+</pre></div>
+</div>
+<p>the single positions of the created object can be indexed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFVec2f</span><span class="p">(</span><span class="mf">1.3</span><span class="p">,</span><span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span><span class="o">.</span><span class="n">x</span>
+<span class="go">-1.0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFVec2f</span><span class="p">(</span><span class="s">&#39;3.5 4.2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">y</span>
+<span class="go">4.2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec2f.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec2f.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec2f.v">
+<tt class="descname">v</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec2f.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>v</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec2f.x">
+<tt class="descname">x</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec2f.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>x</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFVec2f.y">
+<tt class="descname">y</tt><a class="headerlink" href="#mumodo.InstantIO.SFVec2f.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.InstantIO.SFRotation">
+<em class="property">class </em><tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">SFRotation</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#SFRotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.SFRotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>parse and return SFRotation values from Instant Reality</p>
+<dl class="method">
+<dt id="mumodo.InstantIO.SFRotation.__convert_to_euler__">
+<tt class="descname">__convert_to_euler__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#SFRotation.__convert_to_euler__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.SFRotation.__convert_to_euler__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert Quaternion to Euler angles</p>
+<p>Performs a transformation of the quaternion into Euler angles,
+by means of the atan2 function. Checks for singularties
+in order to avoid division by zero errors.</p>
+<p>The function sets the attributtes __heading, __bank, and
+__attitude, without returning anything</p>
+<p>The computed angles are in radians</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.InstantIO.SFRotation.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#SFRotation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.SFRotation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a new SFRotation object in quaternion notation</p>
+<p>arguments:
+can be called with a space separated string (4 tokens)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">SFRotation</span><span class="p">(</span><span class="s">&#39;2.5 -3 0 5&#39;</span><span class="p">)</span>
+<span class="go">2.5 -3.0 0.0 5.0</span>
+</pre></div>
+</div>
+<p>or four float arguments</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">SFRotation</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">2.5 -3.0 0.0 5.0</span>
+</pre></div>
+</div>
+<p>if the number of arguments is not 4 (in the string also) or
+any of the arguments is not a float, the &#8216;error&#8217; object (-1 -1 -1 -1)
+is constructed</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">SFRotation</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">)</span>
+<span class="go">-1.0 -1.0 -1.0 -1.0</span>
+</pre></div>
+</div>
+<p>You can get elements of the quaternion (qx, qy, qz, qw)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFRotation</span><span class="p">(</span><span class="s">&#39;2.5 -3 0 5&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">qx</span>
+<span class="go">2.5</span>
+</pre></div>
+</div>
+<p>Or get Euler angles in radians (heading, bank, attitude)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFRotation</span><span class="p">(</span><span class="s">&#39;0 0 0 1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bank</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+<p>Or the entire quaternion in &#8216;vector&#8217; form</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">SFRotation</span><span class="p">(</span><span class="s">&#39;0 0 0 1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+<span class="go">[0.0, 0.0, 0.0, 1.0]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.attitude">
+<tt class="descname">attitude</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.attitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>attitude</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.bank">
+<tt class="descname">bank</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.bank" title="Permalink to this definition">¶</a></dt>
+<dd><p>bank</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.heading">
+<tt class="descname">heading</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.heading" title="Permalink to this definition">¶</a></dt>
+<dd><p>heading</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.qw">
+<tt class="descname">qw</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.qw" title="Permalink to this definition">¶</a></dt>
+<dd><p>qw</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.qx">
+<tt class="descname">qx</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.qx" title="Permalink to this definition">¶</a></dt>
+<dd><p>qx</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.qy">
+<tt class="descname">qy</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.qy" title="Permalink to this definition">¶</a></dt>
+<dd><p>qy</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.qz">
+<tt class="descname">qz</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.qz" title="Permalink to this definition">¶</a></dt>
+<dd><p>qz</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.SFRotation.v">
+<tt class="descname">v</tt><a class="headerlink" href="#mumodo.InstantIO.SFRotation.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>v</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.InstantIO.MFVec3f">
+<em class="property">class </em><tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">MFVec3f</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFVec3f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFVec3f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse and return MFVec3f values from Instant Reality.</p>
+<dl class="method">
+<dt id="mumodo.InstantIO.MFVec3f.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFVec3f.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFVec3f.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new MFVec3f object.</p>
+<p>An MFVec3f object is an array (list) of SFVec3f objects. The
+MFVec3f class encapsulates the list allowing accessing of the
+elements, while checking that each element is of the correct
+type (SFVec3f)</p>
+<p>arguments:
+Can be called with a string corresponding to the mfvec3f-type:
+Each comma separated sub-string has 3 space-separated floats,
+and becomes an SFVec3f object, which can be accessed by its
+index in the (MFVec3f) array:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec3f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0 6.0, 3.0 5.0 7.0]&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">3.0 5.0 7.0</span>
+</pre></div>
+</div>
+<p>A list of SFVec3f objects can also be used to construct an
+instance of MFVec3f:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec3f</span><span class="p">([</span><span class="n">SFVec3f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">2.0 2.0 2.0</span>
+</pre></div>
+</div>
+<p>A list of strings that represent SFVec3f objects can also
+be used:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec3f</span><span class="p">([</span><span class="s">&#39;1 0 0&#39;</span><span class="p">,</span> <span class="s">&#39;2 0 0&#39;</span><span class="p">,</span> <span class="s">&#39;-1 0 0&#39;</span><span class="p">])[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">-1.0 0.0 0.0</span>
+</pre></div>
+</div>
+<p>If any of the tokens using any of the three input methods
+is not an instance of or cannot be parsed into an SFVec3f
+(incorrect number/type of arguments, wrong object type),
+that token is parsed into the SFVec3f error object
+SFVec3f(&#8216;-1.0 -1.0 -1.0&#8217;), e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec3f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0 6.0 4.0, 3.0 5.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">-1.0 -1.0 -1.0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec3f</span><span class="p">(</span><span class="s">&quot;[a 4.0 6.0, 3.0 b 5.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">-1.0 -1.0 -1.0</span>
+</pre></div>
+</div>
+<p>As each item is a SFVec3f object, you can access its own
+elements as usual:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec3f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0 6.0, 3.0 5.0 7.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">z</span>
+<span class="go">6.0</span>
+</pre></div>
+</div>
+<p>The length of an MFVec3f object can be queried:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">MFVec3f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0 6.0, 3.0 5.0 7.0]&quot;</span><span class="p">))</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<p>The str function of an MFVec3f object yields an MFVec3f
+formatted string, rather than a list of object refs, e.g:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec3f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0 6.0, 3.0 5.0 7.0]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+<span class="go">&#39;[2.0 4.0 6.0, 3.0 5.0 7.0]&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec3f</span><span class="p">([</span><span class="n">SFVec3f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="go">[0.0 0.0 0.0, 1.0 1.0 1.0, 2.0 2.0 2.0]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.MFVec3f.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.InstantIO.MFVec3f.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.InstantIO.MFVec2f">
+<em class="property">class </em><tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">MFVec2f</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFVec2f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFVec2f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse and return MFVec2f values from Instant Reality.</p>
+<dl class="method">
+<dt id="mumodo.InstantIO.MFVec2f.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFVec2f.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFVec2f.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new MFVec2f object.</p>
+<p>An MFVec2f object is an array (list) of SFVec2f objects. The
+MFVec2f class encapsulates the list allowing accessing of the
+elements, while checking that each element is of the correct
+type (SFVec2f)</p>
+<p>arguments:
+Can be called with a string corresponding to the mfvec2f-type:
+Each comma separated sub-string has 3 space-separated floats,
+and becomes an SFVec2f object, which can be accessed by its
+index in the (MFVec2f) array:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec2f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0, 3.0 5.0]&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">3.0 5.0</span>
+</pre></div>
+</div>
+<p>A list of SFVec2f objects can also be used to construct an
+instance of MFVec2f:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec2f</span><span class="p">([</span><span class="n">SFVec2f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">2.0 2.0</span>
+</pre></div>
+</div>
+<p>A list of strings that represent SFVec2f objects can also
+be used:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec2f</span><span class="p">([</span><span class="s">&#39;1 0&#39;</span><span class="p">,</span> <span class="s">&#39;2 0&#39;</span><span class="p">,</span> <span class="s">&#39;-1 0&#39;</span><span class="p">])[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">-1.0 0.0</span>
+</pre></div>
+</div>
+<p>If any of the tokens using any of the three input methods
+is not an instance of or cannot be parsed into an SFVec2f
+(incorrect number/type of arguments, wrong object type),
+that token is parsed into the SFVec2f error object
+SFVec2f(&#8216;-1.0 -1.0&#8217;), e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec2f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0 6.0 4.0, 3.0 5.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">-1.0 -1.0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec2f</span><span class="p">(</span><span class="s">&quot;[a 4.0, 3.0 5.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">-1.0 -1.0</span>
+</pre></div>
+</div>
+<p>As each item is a SFVec2f object, you can access its own
+elements as usual:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec2f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0, 3.0 5.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+<span class="go">4.0</span>
+</pre></div>
+</div>
+<p>The length of an MFVec2f object can be queried:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">MFVec2f</span><span class="p">(</span><span class="s">&quot;[2.0 4.0, 3.0 5.0]&quot;</span><span class="p">))</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<p>The str function of an MFVec2f object yields an MFVec2f
+formatted string, rather than a list of object refs, e.g:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFVec2f</span><span class="p">([</span><span class="n">SFVec2f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="go">[0.0 0.0, 1.0 1.0, 2.0 2.0]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.MFVec2f.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.InstantIO.MFVec2f.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.InstantIO.MFRotation">
+<em class="property">class </em><tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">MFRotation</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFRotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFRotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse and return MFRotation values from Instant Reality.</p>
+<dl class="method">
+<dt id="mumodo.InstantIO.MFRotation.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFRotation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFRotation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new MFRotation object.</p>
+<p>An MFRotation object is an array (list) of SFRotation objects. The
+MFRotation class encapsulates the list allowing accessing of the
+elements, while checking that each element is of the correct
+type (SFRotation)</p>
+<p>arguments:
+Can be called with a string corresponding to the mfrotation-type:
+Each comma separated sub-string has 3 space-separated floats,
+and becomes an SFRotation object, which can be accessed by its
+index in the (MFRotation) array:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFRotation</span><span class="p">(</span><span class="s">&quot;[1.0 2.0 3.0 4.0, 5.0 6.0 7.0 8.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">1.0 2.0 3.0 4.0</span>
+</pre></div>
+</div>
+<p>A list of SFRotation objects can also be used to construct an
+instance of MFRotation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFRotation</span><span class="p">([</span><span class="n">SFRotation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">2.0 2.0 2.0 2.0</span>
+</pre></div>
+</div>
+<p>A list of strings that represent SFRotation objects can also
+be used:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFRotation</span><span class="p">([</span><span class="s">&#39;1 0 0 1&#39;</span><span class="p">,</span> <span class="s">&#39;2 0 0 1&#39;</span><span class="p">,</span> <span class="s">&#39;-1 0 0 1&#39;</span><span class="p">])[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">-1.0 0.0 0.0 1.0</span>
+</pre></div>
+</div>
+<p>If any of the tokens using any of the three input methods
+is not an instance of or cannot be parsed into an SFRotation
+(incorrect number/type of arguments, wrong object type),
+that token is parsed into the SFRotation error object
+SFRotation(&#8216;-1.0 -1.0 -1.0 -1.0&#8217;), e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFRotation</span><span class="p">(</span><span class="s">&quot;[2.0 4.0 6.0, 5.0 6.0 7.0 8.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">-1.0 -1.0 -1.0 -1.0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFRotation</span><span class="p">(</span><span class="s">&quot;[a 4.0,  5.0 6.0 7.0 8.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">-1.0 -1.0 -1.0 -1.0</span>
+</pre></div>
+</div>
+<p>As each item is a SFRotation object, you can access its own
+elements as usual:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFRotation</span><span class="p">(</span><span class="s">&quot;[1.0 2.0 3.0 4.0, 5.0 6.0 7.0 8.0]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">qy</span>
+<span class="go">2.0</span>
+</pre></div>
+</div>
+<p>The length of an MFRotation object can be queried:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">MFRotation</span><span class="p">(</span><span class="s">&quot;[1.0 2.0 3.0 4.0, 5.0 6.0 7.0 8.0]&quot;</span><span class="p">))</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<p>The str function of an MFRotation object yields an MFRotation
+formatted string, rather than a list of object refs, e.g:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">MFRotation</span><span class="p">([</span><span class="n">SFRotation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)])</span>
+<span class="go">[0.0 0.0 0.0 0.0, 1.0 1.0 1.0 1.0]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.MFRotation.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.InstantIO.MFRotation.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.InstantIO.MFString">
+<em class="property">class </em><tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">MFString</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an InstantIO mfstring.</p>
+<dl class="method">
+<dt id="mumodo.InstantIO.MFString.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFString.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFString.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an MFString object</p>
+<p>arguments:
+A single string with items separated by comma-space, enclosed
+in square brackets, or</p>
+<p>A list of objects, which will be cast into strings</p>
+<p>The object holds the strings internally as a list</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">MFString</span><span class="p">(</span><span class="s">&quot;[a, b, c]&quot;</span><span class="p">))</span>
+<span class="go">[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</span>
+</pre></div>
+</div>
+<p>The length of an MFString object can be queried:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">MFString</span><span class="p">(</span><span class="s">&quot;[a, b, c]&quot;</span><span class="p">))</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>The string representaion of the object is the InstantIO style:
+&gt;&gt;&gt; print  MFString(&#8220;[a, b, c]&#8221;)
+&#8216;[a, b, c]&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.MFString.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.InstantIO.MFString.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.InstantIO.MFFloat">
+<em class="property">class </em><tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">MFFloat</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFFloat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an InstantIO mfstring.</p>
+<dl class="method">
+<dt id="mumodo.InstantIO.MFFloat.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#MFFloat.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.MFFloat.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an MFFloat object</p>
+<p>arguments:
+A single string with items separated by comma-space, enclosed
+in square brackets, or</p>
+<p>A list of floats (or numbers that will be cast to floats)</p>
+<p>The object holds the floats internally as a list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">MFFloat</span><span class="p">(</span><span class="s">&quot;[0, 1.2, 2]&quot;</span><span class="p">))</span>
+<span class="go">[0, 1.2, 2]</span>
+</pre></div>
+</div>
+<p>Items that cannot be cast to floats yield NaN:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">MFFloat</span><span class="p">(</span><span class="s">&#39;[a, 5, f]&#39;</span><span class="p">))</span>
+<span class="go">[nan, 5.0, nan]</span>
+</pre></div>
+</div>
+<p>Element access, slicing and iteration are supported:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">MFFloat</span><span class="p">(</span><span class="s">&quot;[0, 1.2, 2]&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">MFFloat</span><span class="p">(</span><span class="s">&quot;[0, 1.2, 2]&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">[0, 1.2]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">MFFloat</span><span class="p">(</span><span class="s">&quot;[1, 2, 3]&quot;</span><span class="p">)]</span>
+<span class="go">[1, 4, 9]</span>
+</pre></div>
+</div>
+<p>The lenght of an MFFloat object can be queried:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">MFFloat</span><span class="p">(</span><span class="s">&quot;[0, 1.2, 2]&quot;</span><span class="p">))</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>The string representaion of the object is the InstantIO style:
+&gt;&gt;&gt; print MFFloat(&#8220;[0, 1.2, 2])
+&#8216;[0, 1.2, 2]&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.InstantIO.MFFloat.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.InstantIO.MFFloat.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.InstantIO.sfbool">
+<tt class="descclassname">mumodo.InstantIO.</tt><tt class="descname">sfbool</tt><big>(</big><em>string</em><big>)</big><a class="reference internal" href="../_modules/mumodo/InstantIO.html#sfbool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.InstantIO.sfbool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a string into a boolean value</p>
+<p>The string &#8220;true&#8221; regradless of case  parses to True.
+Everything else parses to False.</p>
+<p>If anything other than a string is passed, an
+exception (ValueError) is raised.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Corpus.html"
+                        title="previous chapter">corpus.py</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Plotting.html"
+                        title="next chapter">plotting.py</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/mumodo/InstantIO.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Plotting.html" title="plotting.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Corpus.html" title="corpus.py"
+             >previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

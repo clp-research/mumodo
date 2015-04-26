@@ -1,0 +1,1877 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 180 
+tiers? <exists> 
+size = 7 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "E" 
+        xmin = 0 
+        xmax = 180 
+        intervals: size = 1 
+        intervals [1]:
+            xmin = 0 
+            xmax = 180 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "A" 
+        xmin = 0 
+        xmax = 180 
+        intervals: size = 109 
+        intervals [1]:
+            xmin = 0 
+            xmax = 2.8048196425429524 
+            text = "" 
+        intervals [2]:
+            xmin = 2.8048196425429524 
+            xmax = 3.4713477599328826 
+            text = "achso mei ja" 
+        intervals [3]:
+            xmin = 3.4713477599328826 
+            xmax = 3.7223778301187167 
+            text = "" 
+        intervals [4]:
+            xmin = 3.7223778301187167 
+            xmax = 3.87818959782021 
+            text = "ja" 
+        intervals [5]:
+            xmin = 3.87818959782021 
+            xmax = 6.909525450004253 
+            text = "" 
+        intervals [6]:
+            xmin = 6.909525450004253 
+            xmax = 7.31636728789158 
+            text = "ja" 
+        intervals [7]:
+            xmin = 7.31636728789158 
+            xmax = 7.4029293810591525 
+            text = "" 
+        intervals [8]:
+            xmin = 7.4029293810591525 
+            xmax = 7.59336598602772 
+            text = "ja" 
+        intervals [9]:
+            xmin = 7.59336598602772 
+            xmax = 10.87406931707676 
+            text = "" 
+        intervals [10]:
+            xmin = 10.87406931707676 
+            xmax = 11.6444719462678 
+            text = "ja ich glaub ich" 
+        intervals [11]:
+            xmin = 11.6444719462678 
+            xmax = 13.107371320798961 
+            text = "" 
+        intervals [12]:
+            xmin = 13.107371320798961 
+            xmax = 15.03936858975544 
+            text = "da nen Zimmer da da und dann da ja" 
+        intervals [13]:
+            xmin = 15.03936858975544 
+            xmax = 15.376960753108847 
+            text = "" 
+        intervals [14]:
+            xmin = 15.376960753108847 
+            xmax = 15.558741148760646 
+            text = "ja" 
+        intervals [15]:
+            xmin = 15.558741148760646 
+            xmax = 17.064921569875537 
+            text = "" 
+        intervals [16]:
+            xmin = 17.064921569875537 
+            xmax = 17.31595164006137 
+            text = "ja" 
+        intervals [17]:
+            xmin = 17.31595164006137 
+            xmax = 17.445794779812672 
+            text = "" 
+        intervals [18]:
+            xmin = 17.445794779812672 
+            xmax = 17.67951243136497 
+            text = "doch" 
+        intervals [19]:
+            xmin = 17.67951243136497 
+            xmax = 17.81801178043304 
+            text = "" 
+        intervals [20]:
+            xmin = 17.81801178043304 
+            xmax = 17.99979217608484 
+            text = "ja" 
+        intervals [21]:
+            xmin = 17.99979217608484 
+            xmax = 19.49731638788296 
+            text = "" 
+        intervals [22]:
+            xmin = 19.49731638788296 
+            xmax = 19.705065411485066 
+            text = "ja" 
+        intervals [23]:
+            xmin = 19.705065411485066 
+            xmax = 25.24670196552745 
+            text = "" 
+        intervals [24]:
+            xmin = 25.24670196552745 
+            xmax = 27.843564760553136 
+            text = "also ich würde schon gerne nen grosses Zimmer haben" 
+        intervals [25]:
+            xmin = 27.843564760553136 
+            xmax = 28.98618439036443 
+            text = "" 
+        intervals [26]:
+            xmin = 28.98618439036443 
+            xmax = 29.21124583260007 
+            text = "ja" 
+        intervals [27]:
+            xmin = 29.21124583260007 
+            xmax = 29.453619693469136 
+            text = "" 
+        intervals [28]:
+            xmin = 29.453619693469136 
+            xmax = 29.7479308102387 
+            text = "ja" 
+        intervals [29]:
+            xmin = 29.7479308102387 
+            xmax = 30.017935890378794 
+            text = "" 
+        intervals [30]:
+            xmin = 30.017935890378794 
+            xmax = 30.26030975124786 
+            text = "ja ja" 
+        intervals [31]:
+            xmin = 30.26030975124786 
+            xmax = 30.47671498416662 
+            text = "" 
+        intervals [32]:
+            xmin = 30.47671498416662 
+            xmax = 32.49361175496995 
+            text = "(dann haben wir fünf +) . dann haben wir fünfzig schon mal weg " 
+        intervals [33]:
+            xmin = 32.49361175496995 
+            xmax = 35.16838043384644 
+            text = "" 
+        intervals [34]:
+            xmin = 35.16838043384644 
+            xmax = 36.3196562729745 
+            text = "puh" 
+        intervals [35]:
+            xmin = 36.3196562729745 
+            xmax = 37.06409027421523 
+            text = "" 
+        intervals [36]:
+            xmin = 37.06409027421523 
+            xmax = 37.574806623903555 
+            text = "ja" 
+        intervals [37]:
+            xmin = 37.574806623903555 
+            xmax = 38.31224700714847 
+            text = "" 
+        intervals [38]:
+            xmin = 38.31224700714847 
+            xmax = 39.264430031991196 
+            text = "auch fünfundzwanzig" 
+        intervals [39]:
+            xmin = 39.264430031991196 
+            xmax = 45.62674387980417 
+            text = "" 
+        intervals [40]:
+            xmin = 45.62674387980417 
+            xmax = 45.97299225247434 
+            text = "ja" 
+        intervals [41]:
+            xmin = 45.97299225247434 
+            xmax = 46.095841774229484 
+            text = "" 
+        intervals [42]:
+            xmin = 46.095841774229484 
+            xmax = 46.24299733261432 
+            text = "ja" 
+        intervals [43]:
+            xmin = 46.24299733261432 
+            xmax = 46.31224700714836 
+            text = "" 
+        intervals [44]:
+            xmin = 46.31224700714836 
+            xmax = 46.59790191460115 
+            text = "ja" 
+        intervals [45]:
+            xmin = 46.59790191460115 
+            xmax = 47.16055552019009 
+            text = "" 
+        intervals [46]:
+            xmin = 47.16055552019009 
+            xmax = 47.37696075310885 
+            text = "ja" 
+        intervals [47]:
+            xmin = 47.37696075310885 
+            xmax = 48.28586273136784 
+            text = "" 
+        intervals [48]:
+            xmin = 48.28586273136784 
+            xmax = 51.86087717918656 
+            text = "okay dann brauchen wir noch ... Badezimmer können wir . zwanzig" 
+        intervals [49]:
+            xmin = 51.86087717918656 
+            xmax = 56.29451894068461 
+            text = "" 
+        intervals [50]:
+            xmin = 56.29451894068461 
+            xmax = 60.32831248229115 
+            text = "<laughter/>" 
+        intervals [51]:
+            xmin = 60.32831248229115 
+            xmax = 66.15560394378645 
+            text = "" 
+        intervals [52]:
+            xmin = 66.15560394378645 
+            xmax = 72.68404835993852 
+            text = "<laughter> also meinst du das ist Strafe genug oder was </laughter>" 
+        intervals [53]:
+            xmin = 72.68404835993852 
+            xmax = 74.11232289720272 
+            text = "" 
+        intervals [54]:
+            xmin = 74.11232289720272 
+            xmax = 76.17250071458977 
+            text = "also wir waren jetzt (gr +) bei wieviel Quadratm" 
+        intervals [55]:
+            xmin = 76.17250071458977 
+            xmax = 76.9169347158304 
+            text = "achtzig genau" 
+        intervals [56]:
+            xmin = 76.9169347158304 
+            xmax = 77.7582496108763 
+            text = "" 
+        intervals [57]:
+            xmin = 77.7582496108763 
+            xmax = 79.33367970652523 
+            text = "dann brauchen wir also gut dann ma" 
+        intervals [58]:
+            xmin = 79.33367970652523 
+            xmax = 85.38437001893521 
+            text = "" 
+        intervals [59]:
+            xmin = 85.38437001893521 
+            xmax = 85.85180532203981 
+            text = "ja" 
+        intervals [60]:
+            xmin = 85.85180532203981 
+            xmax = 86.21702870466402 
+            text = "" 
+        intervals [61]:
+            xmin = 86.21702870466402 
+            xmax = 89.8786052456503 
+            text = "ja ja aber das wär dann ja . ja so nen Wohnzimmer-Küche-Mix" 
+        intervals [62]:
+            xmin = 89.8786052456503 
+            xmax = 98.4499150605559 
+            text = "" 
+        intervals [63]:
+            xmin = 98.4499150605559 
+            xmax = 98.657664084158 
+            text = "<laughter/>" 
+        intervals [64]:
+            xmin = 98.657664084158 
+            xmax = 99.75700266738556 
+            text = "" 
+        intervals [65]:
+            xmin = 99.75700266738556 
+            xmax = 100.6053111804273 
+            text = "ja ja ja ja" 
+        intervals [66]:
+            xmin = 100.6053111804273 
+            xmax = 100.96887197173089 
+            text = "okay" 
+        intervals [67]:
+            xmin = 100.96887197173089 
+            xmax = 101.55915679659097 
+            text = "" 
+        intervals [68]:
+            xmin = 101.55915679659097 
+            xmax = 104.29451894068472 
+            text = "sagen wir ... vierzig Quadratmeter das . Wo" 
+        intervals [69]:
+            xmin = 104.29451894068472 
+            xmax = 105.40251373322906 
+            text = "" 
+        intervals [70]:
+            xmin = 105.40251373322906 
+            xmax = 106.74422617732557 
+            text = "nee wir hatten gerade achtzig" 
+        intervals [71]:
+            xmin = 106.74422617732557 
+            xmax = 114.36335296738844 
+            text = "" 
+        intervals [72]:
+            xmin = 114.36335296738844 
+            xmax = 115.45403534129935 
+            text = "oh der Timer läuft garnicht" 
+        intervals [73]:
+            xmin = 115.45403534129935 
+            xmax = 116.93590972578488 
+            text = "" 
+        intervals [74]:
+            xmin = 116.93590972578488 
+            xmax = 120.58017384813763 
+            text = "<laughter> naja gut </laughter> ähm .. gut ich guck mal so grob auf die Uhr" 
+        intervals [75]:
+            xmin = 120.58017384813763 
+            xmax = 125.74959340155942 
+            text = "" 
+        intervals [76]:
+            xmin = 125.74959340155942 
+            xmax = 126.67580779845196 
+            text = "nee da läuft nix" 
+        intervals [77]:
+            xmin = 126.67580779845196 
+            xmax = 126.82296335683668 
+            text = "" 
+        intervals [78]:
+            xmin = 126.82296335683668 
+            xmax = 127.77514638167952 
+            text = "da steht fünfzehn Minuten" 
+        intervals [79]:
+            xmin = 127.77514638167952 
+            xmax = 129.86129282701677 
+            text = "" 
+        intervals [80]:
+            xmin = 129.86129282701677 
+            xmax = 130.80481964254284 
+            text = "ja äh äh ja" 
+        intervals [81]:
+            xmin = 130.80481964254284 
+            xmax = 133.87078033199396 
+            text = "" 
+        intervals [82]:
+            xmin = 133.87078033199396 
+            xmax = 134.2516535419311 
+            text = "gut wo" 
+        intervals [83]:
+            xmin = 134.2516535419311 
+            xmax = 134.60655812391792 
+            text = "" 
+        intervals [84]:
+            xmin = 134.60655812391792 
+            xmax = 134.95280649658798 
+            text = "ja" 
+        intervals [85]:
+            xmin = 134.95280649658798 
+            xmax = 135.92230194006424 
+            text = "" 
+        intervals [86]:
+            xmin = 135.92230194006424 
+            xmax = 137.5669817102472 
+            text = "(zwei +) zwei mal fünfundzwanzig" 
+        intervals [87]:
+            xmin = 137.5669817102472 
+            xmax = 138.48453989782297 
+            text = "" 
+        intervals [88]:
+            xmin = 138.48453989782297 
+            xmax = 139.09047454999563 
+            text = "und dann" 
+        intervals [89]:
+            xmin = 139.09047454999563 
+            xmax = 142.63252675186823 
+            text = "" 
+        intervals [90]:
+            xmin = 142.63252675186823 
+            xmax = 143.02205617112213 
+            text = "genau" 
+        intervals [91]:
+            xmin = 143.02205617112213 
+            xmax = 145.3938575239123 
+            text = "" 
+        intervals [92]:
+            xmin = 145.3938575239123 
+            xmax = 146.00844838540172 
+            text = "Gott ja" 
+        intervals [93]:
+            xmin = 146.00844838540172 
+            xmax = 146.25947845558744 
+            text = "" 
+        intervals [94]:
+            xmin = 146.25947845558744 
+            xmax = 149.9140613785778 
+            text = "<laughter> so viel Platz </laughter>" 
+        intervals [95]:
+            xmin = 149.9140613785778 
+            xmax = 150.19106007671382 
+            text = "" 
+        intervals [96]:
+            xmin = 150.19106007671382 
+            xmax = 150.83161956615356 
+            text = "äh ja" 
+        intervals [97]:
+            xmin = 150.83161956615356 
+            xmax = 155.23763010838047 
+            text = "" 
+        intervals [98]:
+            xmin = 155.23763010838047 
+            xmax = 155.91281443508717 
+            text = "nen An" 
+        intervals [99]:
+            xmin = 155.91281443508717 
+            xmax = 157.80852427545597 
+            text = "" 
+        intervals [100]:
+            xmin = 157.80852427545597 
+            xmax = 158.26896596056463 
+            text = "nee" 
+        intervals [101]:
+            xmin = 158.26896596056463 
+            xmax = 158.77968231025295 
+            text = "" 
+        intervals [102]:
+            xmin = 158.77968231025295 
+            xmax = 159.80977121894648 
+            text = "nee das brauchen wir nicht" 
+        intervals [103]:
+            xmin = 159.80977121894648 
+            xmax = 165.940030006528 
+            text = "" 
+        intervals [104]:
+            xmin = 165.940030006528 
+            xmax = 168.75329803447255 
+            text = "<laughter/>" 
+        intervals [105]:
+            xmin = 168.75329803447255 
+            xmax = 174.52865224006712 
+            text = "" 
+        intervals [106]:
+            xmin = 174.52865224006712 
+            xmax = 178.2941032928544 
+            text = "häh wir haben doch unsere Zimmer jewei also Flur ist hier und unsere Zimmer hier" 
+        intervals [107]:
+            xmin = 178.2941032928544 
+            xmax = 178.41529022328893 
+            text = "" 
+        intervals [108]:
+            xmin = 178.41529022328893 
+            xmax = 179.47134775993277 
+            text = "wie willst du da noch nen " 
+        intervals [109]:
+            xmin = 179.47134775993277 
+            xmax = 180 
+            text = "" 
+    item [3]:
+        class = "IntervalTier" 
+        name = "B" 
+        xmin = 0 
+        xmax = 180 
+        intervals: size = 116 
+        intervals [1]:
+            xmin = 0 
+            xmax = 2.5191647350901576 
+            text = "und das vom Flur jeweils rechts und links ähm zwei Zimmer abgeben einmal Wohnzimmer einmal dein Zimmer auf der linken Seite zum Beispiel (und +) und die Küche und mein Zimmer ist auf der rechten Seite" 
+        intervals [2]:
+            xmin = 2.5191647350901576 
+            xmax = 3.4540353412993454 
+            text = "" 
+        intervals [3]:
+            xmin = 3.4540353412993454 
+            xmax = 6.1304666114965585 
+            text = "genau und ganz am Ende des Flurs ist einfach das Badezimmer" 
+        intervals [4]:
+            xmin = 6.1304666114965585 
+            xmax = 6.7796823102529515 
+            text = "" 
+        intervals [5]:
+            xmin = 6.7796823102529515 
+            xmax = 9.566981710247205 
+            text = "das man quasi sowas hat so zack zack zack" 
+        intervals [6]:
+            xmin = 9.566981710247205 
+            xmax = 10.752882386642227 
+            text = "" 
+        intervals [7]:
+            xmin = 10.752882386642227 
+            xmax = 11.168380433846437 
+            text = "weisste ?" 
+        intervals [8]:
+            xmin = 11.168380433846437 
+            xmax = 11.28956736428097 
+            text = "" 
+        intervals [9]:
+            xmin = 11.28956736428097 
+            xmax = 14.892213031370716 
+            text = "wenn das der Flur ist hier nen Zimmer da nen Zimmer da nen Zimmer da und oben" 
+        intervals [10]:
+            xmin = 14.892213031370716 
+            xmax = 15.281742450624506 
+            text = "" 
+        intervals [11]:
+            xmin = 15.281742450624506 
+            xmax = 16.16467580093331 
+            text = "das ist perfekt" 
+        intervals [12]:
+            xmin = 16.16467580093331 
+            xmax = 17.445794779812672 
+            text = "" 
+        intervals [13]:
+            xmin = 17.445794779812672 
+            xmax = 17.45445098912944 
+            text = "" 
+        intervals [14]:
+            xmin = 17.45445098912944 
+            xmax = 17.71413726863193 
+            text = "ja" 
+        intervals [15]:
+            xmin = 17.71413726863193 
+            xmax = 17.826667989749808 
+            text = "" 
+        intervals [16]:
+            xmin = 17.826667989749808 
+            xmax = 19.393441876081965 
+            text = "wollen wir uns da jetzt einfach drauf einigen" 
+        intervals [17]:
+            xmin = 19.393441876081965 
+            xmax = 20.241750389123695 
+            text = "" 
+        intervals [18]:
+            xmin = 20.241750389123695 
+            xmax = 22.303590797831703 
+            text = "okay wir haben zweihundert Quadratmeter zur Verfügung" 
+        intervals [19]:
+            xmin = 22.303590797831703 
+            xmax = 24.90045359285739 
+            text = "jetzt müssen wir erstmal uns über die Quadratmeterzahl einigen" 
+        intervals [20]:
+            xmin = 24.90045359285739 
+            xmax = 27.549253643783572 
+            text = "" 
+        intervals [21]:
+            xmin = 27.549253643783572 
+            xmax = 28.44084320340903 
+            text = "fünfundzwanzig" 
+        intervals [22]:
+            xmin = 28.44084320340903 
+            xmax = 28.80440399471263 
+            text = "" 
+        intervals [23]:
+            xmin = 28.80440399471263 
+            xmax = 29.661368717071127 
+            text = "können wir uns ja mal gönnen" 
+        intervals [24]:
+            xmin = 29.661368717071127 
+            xmax = 30.182403867397056 
+            text = "" 
+        intervals [25]:
+            xmin = 30.182403867397056 
+            xmax = 31.930958149381013 
+            text = "okay dann nehm ich auch fünfundzwanzig" 
+        intervals [26]:
+            xmin = 31.930958149381013 
+            xmax = 32.77061045310609 
+            text = "" 
+        intervals [27]:
+            xmin = 32.77061045310609 
+            xmax = 34.27679087422098 
+            text = "genau dann haben wir fünfzig weg" 
+        intervals [28]:
+            xmin = 34.27679087422098 
+            xmax = 34.77019480527588 
+            text = "" 
+        intervals [29]:
+            xmin = 34.77019480527588 
+            xmax = 37.886430159306656 
+            text = "dann würd ich sagen das Wohnzimmer sollte auch auf jeden Fall gross sein" 
+        intervals [30]:
+            xmin = 37.886430159306656 
+            xmax = 39.24711761335777 
+            text = "" 
+        intervals [31]:
+            xmin = 39.24711761335777 
+            xmax = 40.528236592237135 
+            text = "oder wollen wir dreissig nehmen" 
+        intervals [32]:
+            xmin = 40.528236592237135 
+            xmax = 42.32007192080482 
+            text = "" 
+        intervals [33]:
+            xmin = 42.32007192080482 
+            xmax = 43.61850331831772 
+            text = "dann haben wir schon mal achtzig weg" 
+        intervals [34]:
+            xmin = 43.61850331831772 
+            xmax = 46.41612151894935 
+            text = "" 
+        intervals [35]:
+            xmin = 46.41612151894935 
+            xmax = 46.97877512453829 
+            text = "ja ne" 
+        intervals [36]:
+            xmin = 46.97877512453829 
+            xmax = 47.57605356739418 
+            text = "" 
+        intervals [37]:
+            xmin = 47.57605356739418 
+            xmax = 48.086769917082506 
+            text = "achtzig" 
+        intervals [38]:
+            xmin = 48.086769917082506 
+            xmax = 48.13870717298312 
+            text = "" 
+        intervals [39]:
+            xmin = 48.13870717298312 
+            xmax = 48.56286142950398 
+            text = "genau" 
+        intervals [40]:
+            xmin = 48.56286142950398 
+            xmax = 51.748346458068795 
+            text = "" 
+        intervals [41]:
+            xmin = 51.748346458068795 
+            xmax = 56.805235290372934 
+            text = "nee das muss grösser sein weil (w+) wir haben viel Geld zur Verfügung und ich hätte da gerne so ne kleine Wellness-Oase" 
+        intervals [42]:
+            xmin = 56.805235290372934 
+            xmax = 58.36335296738844 
+            text = "<laughter/>" 
+        intervals [43]:
+            xmin = 58.36335296738844 
+            xmax = 58.3979778046554 
+            text = "" 
+        intervals [44]:
+            xmin = 58.3979778046554 
+            xmax = 62.56327707733419 
+            text = "also so vielleicht ne Sauna könnte man da ja noch reinstellen und vielleicht so nen kleinen Whirlpool" 
+        intervals [45]:
+            xmin = 62.56327707733419 
+            xmax = 62.952806496588096 
+            text = "" 
+        intervals [46]:
+            xmin = 62.952806496588096 
+            xmax = 65.55832550093055 
+            text = "das wär super wenn wir das Geld schon haben können wir es ja auch verballern" 
+        intervals [47]:
+            xmin = 65.55832550093055 
+            xmax = 71.0047437524886 
+            text = "ich mein ich muss <laughter> mit dir zusammen wohnen ich bitte dich </laughter>" 
+        intervals [48]:
+            xmin = 71.0047437524886 
+            xmax = 71.03071238043879 
+            text = "" 
+        intervals [49]:
+            xmin = 71.03071238043879 
+            xmax = 72.32914377795169 
+            text = "könnte man sich das ja mal gönnen" 
+        intervals [50]:
+            xmin = 72.32914377795169 
+            xmax = 72.77061045310609 
+            text = "" 
+        intervals [51]:
+            xmin = 72.77061045310609 
+            xmax = 73.11685882577615 
+            text = "n ja" 
+        intervals [52]:
+            xmin = 73.11685882577615 
+            xmax = 73.22938954689391 
+            text = "" 
+        intervals [53]:
+            xmin = 73.22938954689391 
+            xmax = 73.80935557111638 
+            text = "ähm" 
+        intervals [54]:
+            xmin = 73.80935557111638 
+            xmax = 75.61850331831761 
+            text = "" 
+        intervals [55]:
+            xmin = 75.61850331831761 
+            xmax = 76.3196562729745 
+            text = "achtzig" 
+        intervals [56]:
+            xmin = 76.3196562729745 
+            xmax = 78.9008692406876 
+            text = "" 
+        intervals [57]:
+            xmin = 78.9008692406876 
+            xmax = 84.93424713446404 
+            text = "die Küche kann man gut zu ner Wohnküche da kann man dann trotzdem auch irgendwie noch nen Tisch gross reinstellen dass alle kommen können und immer alle mit uns essen können" 
+        intervals [58]:
+            xmin = 84.93424713446404 
+            xmax = 85.18693979597049 
+            text = "" 
+        intervals [59]:
+            xmin = 85.18693979597049 
+            xmax = 86.79699472888649 
+            text = "unsere Familien oder so auch " 
+        intervals [60]:
+            xmin = 86.79699472888649 
+            xmax = 89.48041961707975 
+            text = "" 
+        intervals [61]:
+            xmin = 89.48041961707975 
+            xmax = 98.54513336304024 
+            text = "ja aber das kann man ja quasi so Esszimmer-mässig machen oder wir machen das Wohnzimmer einfach noch grösser mit fünfunddreissig Quadratmetern und dann passt da auch noch  nen grosser E oder gleich vierzig Quadratmeter" 
+        intervals [62]:
+            xmin = 98.54513336304024 
+            xmax = 98.761538595959 
+            text = "" 
+        intervals [63]:
+            xmin = 98.761538595959 
+            xmax = 100.10325104005562 
+            text = "kann ja gross sein ist ja egal" 
+        intervals [64]:
+            xmin = 100.10325104005562 
+            xmax = 100.97752818104766 
+            text = "" 
+        intervals [65]:
+            xmin = 100.97752818104766 
+            xmax = 101.41899485620195 
+            text = "okay" 
+        intervals [66]:
+            xmin = 101.41899485620195 
+            xmax = 103.73186533509579 
+            text = "" 
+        intervals [67]:
+            xmin = 103.73186533509579 
+            xmax = 105.11685882577615 
+            text = "dann sind wir bei neunzig" 
+        intervals [68]:
+            xmin = 105.11685882577615 
+            xmax = 106.5018523164565 
+            text = "" 
+        intervals [69]:
+            xmin = 106.5018523164565 
+            xmax = 107.93878306303748 
+            text = "ja aber jetzt sind wir bei neunzig" 
+        intervals [70]:
+            xmin = 107.93878306303748 
+            xmax = 108.72649811086194 
+            text = "" 
+        intervals [71]:
+            xmin = 108.72649811086194 
+            xmax = 111.24711761335766 
+            text = "wenn wir die wir hatten ja vorhin das Wohnzimmer besprochen" 
+        intervals [72]:
+            xmin = 111.24711761335766 
+            xmax = 116.15518829595624 
+            text = "" 
+        intervals [73]:
+            xmin = 116.15518829595624 
+            xmax = 116.371593528875 
+            text = "oh" 
+        intervals [74]:
+            xmin = 116.371593528875 
+            xmax = 120.6927045692554 
+            text = "" 
+        intervals [75]:
+            xmin = 120.6927045692554 
+            xmax = 121.22073333757726 
+            text = "okay" 
+        intervals [76]:
+            xmin = 121.22073333757726 
+            xmax = 124.04265757483859 
+            text = "" 
+        intervals [77]:
+            xmin = 124.04265757483859 
+            xmax = 125.40168243756864 
+            text = "läuft da auch nix Kleines" 
+        intervals [78]:
+            xmin = 125.40168243756864 
+            xmax = 129.23804575621068 
+            text = "" 
+        intervals [79]:
+            xmin = 129.23804575621068 
+            xmax = 131.41941050403227 
+            text = "ja gut weiter egal das irritiert uns jetzt nicht" 
+        intervals [80]:
+            xmin = 131.41941050403227 
+            xmax = 131.80893992328606 
+            text = "" 
+        intervals [81]:
+            xmin = 131.80893992328606 
+            xmax = 132.30234385434096 
+            text = "hm" 
+        intervals [82]:
+            xmin = 132.30234385434096 
+            xmax = 133.90540516926092 
+            text = "" 
+        intervals [83]:
+            xmin = 133.90540516926092 
+            xmax = 134.95280649658798 
+            text = "wir hatten jetzt neunzig ne" 
+        intervals [84]:
+            xmin = 134.95280649658798 
+            xmax = 138.2421660369539 
+            text = "vier zwei fünfundzwanzig fünfundzwanzig sind fünfzig" 
+        intervals [85]:
+            xmin = 138.2421660369539 
+            xmax = 138.2941032928544 
+            text = "" 
+        intervals [86]:
+            xmin = 138.2941032928544 
+            xmax = 141.86046153135635 
+            text = "dann nochmal vierzig dazu fürs Wohnzimmer sind wir bei neunzig" 
+        intervals [87]:
+            xmin = 141.86046153135635 
+            xmax = 143.37696075310896 
+            text = "" 
+        intervals [88]:
+            xmin = 143.37696075310896 
+            xmax = 145.32460784937825 
+            text = "haben wir noch hundertzehn Quadratmeter über" 
+        intervals [89]:
+            xmin = 145.32460784937825 
+            xmax = 145.9565111295011 
+            text = "" 
+        intervals [90]:
+            xmin = 145.9565111295011 
+            xmax = 149.48990712205693 
+            text = "<laughter/>" 
+        intervals [91]:
+            xmin = 149.48990712205693 
+            xmax = 150.57193328665096 
+            text = "" 
+        intervals [92]:
+            xmin = 150.57193328665096 
+            xmax = 152.90910980217416 
+            text = "oh wir machen noch nen Ankleidezimmer wie logisch" 
+        intervals [93]:
+            xmin = 152.90910980217416 
+            xmax = 154.49319610713974 
+            text = "" 
+        intervals [94]:
+            xmin = 154.49319610713974 
+            xmax = 157.08140269284877 
+            text = "<laughter> ist das so klar ja na klar </laughter>" 
+        intervals [95]:
+            xmin = 157.08140269284877 
+            xmax = 158.32090321646513 
+            text = "" 
+        intervals [96]:
+            xmin = 158.32090321646513 
+            xmax = 159.0566810083891 
+            text = "dohoch" 
+        intervals [97]:
+            xmin = 159.0566810083891 
+            xmax = 159.27308624130785 
+            text = "" 
+        intervals [98]:
+            xmin = 159.27308624130785 
+            xmax = 160.94373463944112 
+            text = "das ist zwischen unseren beiden Zimmern" 
+        intervals [99]:
+            xmin = 160.94373463944112 
+            xmax = 161.21207712826038 
+            text = "" 
+        intervals [100]:
+            xmin = 161.21207712826038 
+            xmax = 161.9305425015508 
+            text = "dann hat man da noch" 
+        intervals [101]:
+            xmin = 161.9305425015508 
+            xmax = 162.12097910651937 
+            text = "" 
+        intervals [102]:
+            xmin = 162.12097910651937 
+            xmax = 162.5278209444068 
+            text = "dohoch" 
+        intervals [103]:
+            xmin = 162.5278209444068 
+            xmax = 162.70094513074184 
+            text = "" 
+        intervals [104]:
+            xmin = 162.70094513074184 
+            xmax = 165.7219621822884 
+            text = "dann kannst du deine ähm zwei Paar Schuhe dahin packen und ich den Rest " 
+        intervals [105]:
+            xmin = 165.7219621822884 
+            xmax = 166.08718556491283 
+            text = "" 
+        intervals [106]:
+            xmin = 166.08718556491283 
+            xmax = 167.52411631149369 
+            text = "und dann ja das ist voll praktisch" 
+        intervals [107]:
+            xmin = 167.52411631149369 
+            xmax = 167.70589670714548 
+            text = "" 
+        intervals [108]:
+            xmin = 167.70589670714548 
+            xmax = 171.5405974344668 
+            text = "und dann ist das quasi noch mal so ähm ... zwischen unsern Zimmern" 
+        intervals [109]:
+            xmin = 171.5405974344668 
+            xmax = 172.09459483073897 
+            text = "" 
+        intervals [110]:
+            xmin = 172.09459483073897 
+            xmax = 172.79574778539586 
+            text = "verstehst du" 
+        intervals [111]:
+            xmin = 172.79574778539586 
+            xmax = 173.0467778555817 
+            text = "" 
+        intervals [112]:
+            xmin = 173.0467778555817 
+            xmax = 174.31224700714836 
+            text = "weil dann ist das auch nochmal so" 
+        intervals [113]:
+            xmin = 174.31224700714836 
+            xmax = 177.21207712826038 
+            text = "" 
+        intervals [114]:
+            xmin = 177.21207712826038 
+            xmax = 177.50638824502994 
+            text = "ja" 
+        intervals [115]:
+            xmin = 177.50638824502994 
+            xmax = 179.31553599223116 
+            text = "" 
+        intervals [116]:
+            xmin = 179.31553599223116 
+            xmax = 180 
+            text = "da kann man doch einfach jetzt eins zwischen prokeln ist doch egal wir machen doch den Bauplan" 
+    item [4]:
+        class = "IntervalTier" 
+        name = "O" 
+        xmin = 0 
+        xmax = 180 
+        intervals: size = 1 
+        intervals [1]:
+            xmin = 0 
+            xmax = 180 
+            text = "" 
+    item [5]:
+        class = "IntervalTier" 
+        name = "A (en)" 
+        xmin = 0 
+        xmax = 180 
+        intervals: size = 99 
+        intervals [1]:
+            xmin = 0 
+            xmax = 2.8048196425429524 
+            text = "" 
+        intervals [2]:
+            xmin = 2.8048196425429524 
+            xmax = 3.4713477599328826 
+            text = "I see yes" 
+        intervals [3]:
+            xmin = 3.4713477599328826 
+            xmax = 3.7223778301187167 
+            text = "" 
+        intervals [4]:
+            xmin = 3.7223778301187167 
+            xmax = 3.87818959782021 
+            text = "yes" 
+        intervals [5]:
+            xmin = 3.87818959782021 
+            xmax = 6.909525450004253 
+            text = "" 
+        intervals [6]:
+            xmin = 6.909525450004253 
+            xmax = 7.31636728789158 
+            text = "yes" 
+        intervals [7]:
+            xmin = 7.31636728789158 
+            xmax = 7.4029293810591525 
+            text = "" 
+        intervals [8]:
+            xmin = 7.4029293810591525 
+            xmax = 7.59336598602772 
+            text = "yes" 
+        intervals [9]:
+            xmin = 7.59336598602772 
+            xmax = 10.87406931707676 
+            text = "" 
+        intervals [10]:
+            xmin = 10.87406931707676 
+            xmax = 11.6444719462678 
+            text = "yes I think I" 
+        intervals [11]:
+            xmin = 11.6444719462678 
+            xmax = 13.107371320798961 
+            text = "" 
+        intervals [12]:
+            xmin = 13.107371320798961 
+            xmax = 15.03936858975544 
+            text = "there a room there there and then there yes" 
+        intervals [13]:
+            xmin = 15.03936858975544 
+            xmax = 15.376960753108847 
+            text = "" 
+        intervals [14]:
+            xmin = 15.376960753108847 
+            xmax = 15.558741148760646 
+            text = "yes" 
+        intervals [15]:
+            xmin = 15.558741148760646 
+            xmax = 17.064921569875537 
+            text = "" 
+        intervals [16]:
+            xmin = 17.064921569875537 
+            xmax = 17.31595164006137 
+            text = "yes" 
+        intervals [17]:
+            xmin = 17.31595164006137 
+            xmax = 17.445794779812672 
+            text = "" 
+        intervals [18]:
+            xmin = 17.445794779812672 
+            xmax = 17.67951243136497 
+            text = "sure" 
+        intervals [19]:
+            xmin = 17.67951243136497 
+            xmax = 19.49731638788296 
+            text = "" 
+        intervals [20]:
+            xmin = 19.49731638788296 
+            xmax = 19.705065411485066 
+            text = "yes" 
+        intervals [21]:
+            xmin = 19.705065411485066 
+            xmax = 25.24670196552745 
+            text = "" 
+        intervals [22]:
+            xmin = 25.24670196552745 
+            xmax = 27.843564760553136 
+            text = "so I would already gladly a large room have" 
+        intervals [23]:
+            xmin = 27.843564760553136 
+            xmax = 28.98618439036443 
+            text = "" 
+        intervals [24]:
+            xmin = 28.98618439036443 
+            xmax = 29.21124583260007 
+            text = "yes" 
+        intervals [25]:
+            xmin = 29.21124583260007 
+            xmax = 29.453619693469136 
+            text = "" 
+        intervals [26]:
+            xmin = 29.453619693469136 
+            xmax = 29.7479308102387 
+            text = "yes" 
+        intervals [27]:
+            xmin = 29.7479308102387 
+            xmax = 30.017935890378794 
+            text = "" 
+        intervals [28]:
+            xmin = 30.017935890378794 
+            xmax = 30.26030975124786 
+            text = "yes yes" 
+        intervals [29]:
+            xmin = 30.26030975124786 
+            xmax = 30.47671498416662 
+            text = "" 
+        intervals [30]:
+            xmin = 30.47671498416662 
+            xmax = 32.49361175496995 
+            text = "(then have we five +) . then have we fifty meanwhile off" 
+        intervals [31]:
+            xmin = 32.49361175496995 
+            xmax = 35.16838043384644 
+            text = "" 
+        intervals [32]:
+            xmin = 35.16838043384644 
+            xmax = 36.3196562729745 
+            text = "puh" 
+        intervals [33]:
+            xmin = 36.3196562729745 
+            xmax = 37.06409027421523 
+            text = "" 
+        intervals [34]:
+            xmin = 37.06409027421523 
+            xmax = 37.574806623903555 
+            text = "yes" 
+        intervals [35]:
+            xmin = 37.574806623903555 
+            xmax = 38.31224700714847 
+            text = "" 
+        intervals [36]:
+            xmin = 38.31224700714847 
+            xmax = 39.264430031991196 
+            text = "also twentyfive" 
+        intervals [37]:
+            xmin = 39.264430031991196 
+            xmax = 45.62674387980417 
+            text = "" 
+        intervals [38]:
+            xmin = 45.62674387980417 
+            xmax = 45.97299225247434 
+            text = "yes" 
+        intervals [39]:
+            xmin = 45.97299225247434 
+            xmax = 46.095841774229484 
+            text = "" 
+        intervals [40]:
+            xmin = 46.095841774229484 
+            xmax = 46.24299733261432 
+            text = "yes" 
+        intervals [41]:
+            xmin = 46.24299733261432 
+            xmax = 46.31224700714836 
+            text = "" 
+        intervals [42]:
+            xmin = 46.31224700714836 
+            xmax = 46.59790191460115 
+            text = "yes" 
+        intervals [43]:
+            xmin = 46.59790191460115 
+            xmax = 47.16055552019009 
+            text = "" 
+        intervals [44]:
+            xmin = 47.16055552019009 
+            xmax = 47.37696075310885 
+            text = "yes" 
+        intervals [45]:
+            xmin = 47.37696075310885 
+            xmax = 48.28586273136784 
+            text = "" 
+        intervals [46]:
+            xmin = 48.28586273136784 
+            xmax = 51.86087717918656 
+            text = "okay then need we still ... bathroom can we . twenty" 
+        intervals [47]:
+            xmin = 51.86087717918656 
+            xmax = 56.29451894068461 
+            text = "" 
+        intervals [48]:
+            xmin = 56.29451894068461 
+            xmax = 60.32831248229115 
+            text = "<laughter/>" 
+        intervals [49]:
+            xmin = 60.32831248229115 
+            xmax = 66.15560394378645 
+            text = "" 
+        intervals [50]:
+            xmin = 66.15560394378645 
+            xmax = 72.68404835993852 
+            text = "<laughter> so mean you that is penalty enough or what </laughter>" 
+        intervals [51]:
+            xmin = 72.68404835993852 
+            xmax = 74.11232289720272 
+            text = "" 
+        intervals [52]:
+            xmin = 74.11232289720272 
+            xmax = 76.17250071458977 
+            text = "so we were now (gr +) at how many squarem" 
+        intervals [53]:
+            xmin = 76.17250071458977 
+            xmax = 76.9169347158304 
+            text = "eighty exactly" 
+        intervals [54]:
+            xmin = 76.9169347158304 
+            xmax = 77.7582496108763 
+            text = "" 
+        intervals [55]:
+            xmin = 77.7582496108763 
+            xmax = 79.33367970652523 
+            text = "then need we so good then " 
+        intervals [56]:
+            xmin = 79.33367970652523 
+            xmax = 85.38437001893521 
+            text = "" 
+        intervals [57]:
+            xmin = 85.38437001893521 
+            xmax = 85.85180532203981 
+            text = "yes" 
+        intervals [58]:
+            xmin = 85.85180532203981 
+            xmax = 86.21702870466402 
+            text = "" 
+        intervals [59]:
+            xmin = 86.21702870466402 
+            xmax = 89.8786052456503 
+            text = "yes yes but that would be then yeah . yeah such a livingroom-kitchen-mix" 
+        intervals [60]:
+            xmin = 89.8786052456503 
+            xmax = 98.4499150605559 
+            text = "" 
+        intervals [61]:
+            xmin = 98.4499150605559 
+            xmax = 98.657664084158 
+            text = "<laughter/>" 
+        intervals [62]:
+            xmin = 98.657664084158 
+            xmax = 99.75700266738556 
+            text = "" 
+        intervals [63]:
+            xmin = 99.75700266738556 
+            xmax = 100.6053111804273 
+            text = "yes yes yes yes" 
+        intervals [64]:
+            xmin = 100.6053111804273 
+            xmax = 100.96887197173089 
+            text = "okay" 
+        intervals [65]:
+            xmin = 100.96887197173089 
+            xmax = 101.55915679659097 
+            text = "" 
+        intervals [66]:
+            xmin = 101.55915679659097 
+            xmax = 104.29451894068472 
+            text = "say we ... fourty square meter that . liv" 
+        intervals [67]:
+            xmin = 104.29451894068472 
+            xmax = 105.40251373322906 
+            text = "" 
+        intervals [68]:
+            xmin = 105.40251373322906 
+            xmax = 106.74422617732557 
+            text = "nope we had just eighty" 
+        intervals [69]:
+            xmin = 106.74422617732557 
+            xmax = 129.86129282701677 
+            text = "" 
+        intervals [70]:
+            xmin = 129.86129282701677 
+            xmax = 130.80481964254284 
+            text = "yes eh eh yes" 
+        intervals [71]:
+            xmin = 130.80481964254284 
+            xmax = 133.87078033199396 
+            text = "" 
+        intervals [72]:
+            xmin = 133.87078033199396 
+            xmax = 134.2516535419311 
+            text = "good where" 
+        intervals [73]:
+            xmin = 134.2516535419311 
+            xmax = 134.60655812391792 
+            text = "" 
+        intervals [74]:
+            xmin = 134.60655812391792 
+            xmax = 134.95280649658798 
+            text = "yes" 
+        intervals [75]:
+            xmin = 134.95280649658798 
+            xmax = 135.92230194006424 
+            text = "" 
+        intervals [76]:
+            xmin = 135.92230194006424 
+            xmax = 137.5669817102472 
+            text = "(two +) two times twentyfive" 
+        intervals [77]:
+            xmin = 137.5669817102472 
+            xmax = 138.48453989782297 
+            text = "" 
+        intervals [78]:
+            xmin = 138.48453989782297 
+            xmax = 139.09047454999563 
+            text = "and then" 
+        intervals [79]:
+            xmin = 139.09047454999563 
+            xmax = 142.63252675186823 
+            text = "" 
+        intervals [80]:
+            xmin = 142.63252675186823 
+            xmax = 143.02205617112213 
+            text = "exactly" 
+        intervals [81]:
+            xmin = 143.02205617112213 
+            xmax = 145.3938575239123 
+            text = "" 
+        intervals [82]:
+            xmin = 145.3938575239123 
+            xmax = 146.00844838540172 
+            text = "god yes" 
+        intervals [83]:
+            xmin = 146.00844838540172 
+            xmax = 146.25947845558744 
+            text = "" 
+        intervals [84]:
+            xmin = 146.25947845558744 
+            xmax = 149.9140613785778 
+            text = "<laughter> so many space </laughter>" 
+        intervals [85]:
+            xmin = 149.9140613785778 
+            xmax = 150.19106007671382 
+            text = "" 
+        intervals [86]:
+            xmin = 150.19106007671382 
+            xmax = 150.83161956615356 
+            text = "eh yes" 
+        intervals [87]:
+            xmin = 150.83161956615356 
+            xmax = 155.23763010838047 
+            text = "" 
+        intervals [88]:
+            xmin = 155.23763010838047 
+            xmax = 155.91281443508717 
+            text = "a dress" 
+        intervals [89]:
+            xmin = 155.91281443508717 
+            xmax = 157.80852427545597 
+            text = "" 
+        intervals [90]:
+            xmin = 157.80852427545597 
+            xmax = 158.26896596056463 
+            text = "nope" 
+        intervals [91]:
+            xmin = 158.26896596056463 
+            xmax = 158.77968231025295 
+            text = "" 
+        intervals [92]:
+            xmin = 158.77968231025295 
+            xmax = 159.80977121894648 
+            text = "nope that need we not" 
+        intervals [93]:
+            xmin = 159.80977121894648 
+            xmax = 165.940030006528 
+            text = "" 
+        intervals [94]:
+            xmin = 165.940030006528 
+            xmax = 168.75329803447255 
+            text = "<laughter/>" 
+        intervals [95]:
+            xmin = 168.75329803447255 
+            xmax = 174.52865224006712 
+            text = "" 
+        intervals [96]:
+            xmin = 174.52865224006712 
+            xmax = 178.2941032928544 
+            text = "huh we have still our rooms ea so corridor is here and our rooms here" 
+        intervals [97]:
+            xmin = 178.2941032928544 
+            xmax = 178.41529022328893 
+            text = "" 
+        intervals [98]:
+            xmin = 178.41529022328893 
+            xmax = 179.47134775993277 
+            text = "how want you there another" 
+        intervals [99]:
+            xmin = 179.47134775993277 
+            xmax = 180 
+            text = "" 
+    item [6]:
+        class = "IntervalTier" 
+        name = "B (en)" 
+        xmin = 0 
+        xmax = 180 
+        intervals: size = 109 
+        intervals [1]:
+            xmin = 0 
+            xmax = 2.5191647350901576 
+            text = "and that from the corridor one each right and left ehm two rooms go off once livingroom once your room on the left side for example (and +) and the kitchen and my room is on the right side" 
+        intervals [2]:
+            xmin = 2.5191647350901576 
+            xmax = 3.4540353412993454 
+            text = "" 
+        intervals [3]:
+            xmin = 3.4540353412993454 
+            xmax = 6.1304666114965585 
+            text = "exactly and at the very end of the corridor is just the bathroom" 
+        intervals [4]:
+            xmin = 6.1304666114965585 
+            xmax = 6.7796823102529515 
+            text = "" 
+        intervals [5]:
+            xmin = 6.7796823102529515 
+            xmax = 9.566981710247205 
+            text = "that you quasi such have so zack zack zack" 
+        intervals [6]:
+            xmin = 9.566981710247205 
+            xmax = 10.752882386642227 
+            text = "" 
+        intervals [7]:
+            xmin = 10.752882386642227 
+            xmax = 11.168380433846437 
+            text = "know you ?" 
+        intervals [8]:
+            xmin = 11.168380433846437 
+            xmax = 11.28956736428097 
+            text = "" 
+        intervals [9]:
+            xmin = 11.28956736428097 
+            xmax = 14.892213031370716 
+            text = "if this the corridor is here a room there a room there a room there and above" 
+        intervals [10]:
+            xmin = 14.892213031370716 
+            xmax = 15.281742450624506 
+            text = "" 
+        intervals [11]:
+            xmin = 15.281742450624506 
+            xmax = 16.16467580093331 
+            text = "that is perfect" 
+        intervals [12]:
+            xmin = 16.16467580093331 
+            xmax = 17.45445098912944 
+            text = "" 
+        intervals [13]:
+            xmin = 17.45445098912944 
+            xmax = 17.71413726863193 
+            text = "yes" 
+        intervals [14]:
+            xmin = 17.71413726863193 
+            xmax = 17.826667989749808 
+            text = "" 
+        intervals [15]:
+            xmin = 17.826667989749808 
+            xmax = 19.393441876081965 
+            text = "want we now just that on agree" 
+        intervals [16]:
+            xmin = 19.393441876081965 
+            xmax = 20.241750389123695 
+            text = "" 
+        intervals [17]:
+            xmin = 20.241750389123695 
+            xmax = 22.303590797831703 
+            text = "okay we have twohundred square meters for disposal" 
+        intervals [18]:
+            xmin = 22.303590797831703 
+            xmax = 24.90045359285739 
+            text = "now must we first on the square meters number agree" 
+        intervals [19]:
+            xmin = 24.90045359285739 
+            xmax = 27.549253643783572 
+            text = "" 
+        intervals [20]:
+            xmin = 27.549253643783572 
+            xmax = 28.44084320340903 
+            text = "twentyfive" 
+        intervals [21]:
+            xmin = 28.44084320340903 
+            xmax = 28.80440399471263 
+            text = "" 
+        intervals [22]:
+            xmin = 28.80440399471263 
+            xmax = 29.661368717071127 
+            text = "can we ourself still once allow" 
+        intervals [23]:
+            xmin = 29.661368717071127 
+            xmax = 30.182403867397056 
+            text = "" 
+        intervals [24]:
+            xmin = 30.182403867397056 
+            xmax = 31.930958149381013 
+            text = "okay then take I also twentyfive" 
+        intervals [25]:
+            xmin = 31.930958149381013 
+            xmax = 32.77061045310609 
+            text = "" 
+        intervals [26]:
+            xmin = 32.77061045310609 
+            xmax = 34.27679087422098 
+            text = "exactly then have we fifty off" 
+        intervals [27]:
+            xmin = 34.27679087422098 
+            xmax = 34.77019480527588 
+            text = "" 
+        intervals [28]:
+            xmin = 34.77019480527588 
+            xmax = 37.886430159306656 
+            text = "then would I say the livingroom should also in any case large be" 
+        intervals [29]:
+            xmin = 37.886430159306656 
+            xmax = 39.24711761335777 
+            text = "" 
+        intervals [30]:
+            xmin = 39.24711761335777 
+            xmax = 40.528236592237135 
+            text = "or want we thirty take" 
+        intervals [31]:
+            xmin = 40.528236592237135 
+            xmax = 42.32007192080482 
+            text = "" 
+        intervals [32]:
+            xmin = 42.32007192080482 
+            xmax = 43.61850331831772 
+            text = "then have we meanwhile eighty off" 
+        intervals [33]:
+            xmin = 43.61850331831772 
+            xmax = 46.41612151894935 
+            text = "" 
+        intervals [34]:
+            xmin = 46.41612151894935 
+            xmax = 46.97877512453829 
+            text = "yes (or)" 
+        intervals [35]:
+            xmin = 46.97877512453829 
+            xmax = 47.57605356739418 
+            text = "" 
+        intervals [36]:
+            xmin = 47.57605356739418 
+            xmax = 48.086769917082506 
+            text = "eighty" 
+        intervals [37]:
+            xmin = 48.086769917082506 
+            xmax = 48.13870717298312 
+            text = "" 
+        intervals [38]:
+            xmin = 48.13870717298312 
+            xmax = 48.56286142950398 
+            text = "exactly" 
+        intervals [39]:
+            xmin = 48.56286142950398 
+            xmax = 51.748346458068795 
+            text = "" 
+        intervals [40]:
+            xmin = 51.748346458068795 
+            xmax = 56.805235290372934 
+            text = "nope that must larger be because (w +) we have much money for disposal and I would have there gladly such a small wellness-oasis " 
+        intervals [41]:
+            xmin = 56.805235290372934 
+            xmax = 58.36335296738844 
+            text = "<laughter/>" 
+        intervals [42]:
+            xmin = 58.36335296738844 
+            xmax = 58.3979778046554 
+            text = "" 
+        intervals [43]:
+            xmin = 58.3979778046554 
+            xmax = 62.56327707733419 
+            text = "so such perhaps a sauna could one there still put in and perhaps such a small whirlpool" 
+        intervals [44]:
+            xmin = 62.56327707733419 
+            xmax = 62.952806496588096 
+            text = "" 
+        intervals [45]:
+            xmin = 62.952806496588096 
+            xmax = 65.55832550093055 
+            text = "that would be super if we the money already have can we it already also use up" 
+        intervals [46]:
+            xmin = 65.55832550093055 
+            xmax = 71.0047437524886 
+            text = "I mean I must <laughter> with you together live I beg you </laughter>" 
+        intervals [47]:
+            xmin = 71.0047437524886 
+            xmax = 71.03071238043879 
+            text = "" 
+        intervals [48]:
+            xmin = 71.03071238043879 
+            xmax = 72.32914377795169 
+            text = "could one himself that even once allow" 
+        intervals [49]:
+            xmin = 72.32914377795169 
+            xmax = 72.77061045310609 
+            text = "" 
+        intervals [50]:
+            xmin = 72.77061045310609 
+            xmax = 73.11685882577615 
+            text = "n yes" 
+        intervals [51]:
+            xmin = 73.11685882577615 
+            xmax = 73.22938954689391 
+            text = "" 
+        intervals [52]:
+            xmin = 73.22938954689391 
+            xmax = 73.80935557111638 
+            text = "ehm" 
+        intervals [53]:
+            xmin = 73.80935557111638 
+            xmax = 75.61850331831761 
+            text = "" 
+        intervals [54]:
+            xmin = 75.61850331831761 
+            xmax = 76.3196562729745 
+            text = "eighty" 
+        intervals [55]:
+            xmin = 76.3196562729745 
+            xmax = 78.9008692406876 
+            text = "" 
+        intervals [56]:
+            xmin = 78.9008692406876 
+            xmax = 84.93424713446404 
+            text = "the kitchen can one good to a kitchen-living-room there can one then nevertheless also somehow still a table large put in so that all come can and always all with us eat can" 
+        intervals [57]:
+            xmin = 84.93424713446404 
+            xmax = 85.18693979597049 
+            text = "" 
+        intervals [58]:
+            xmin = 85.18693979597049 
+            xmax = 86.79699472888649 
+            text = "our families or so too" 
+        intervals [59]:
+            xmin = 86.79699472888649 
+            xmax = 89.48041961707975 
+            text = "" 
+        intervals [60]:
+            xmin = 89.48041961707975 
+            xmax = 98.54513336304024 
+            text = "yes but the can one even quasi such dining-room-like make and we make the livingroom just even larger with thirtyfive square meters and then fits there also still a large E or even fourty square meter" 
+        intervals [61]:
+            xmin = 98.54513336304024 
+            xmax = 98.761538595959 
+            text = "" 
+        intervals [62]:
+            xmin = 98.761538595959 
+            xmax = 100.10325104005562 
+            text = "can even large are does not matter" 
+        intervals [63]:
+            xmin = 100.10325104005562 
+            xmax = 100.97752818104766 
+            text = "" 
+        intervals [64]:
+            xmin = 100.97752818104766 
+            xmax = 101.41899485620195 
+            text = "okay" 
+        intervals [65]:
+            xmin = 101.41899485620195 
+            xmax = 103.73186533509579 
+            text = "" 
+        intervals [66]:
+            xmin = 103.73186533509579 
+            xmax = 105.11685882577615 
+            text = "then are we at ninety" 
+        intervals [67]:
+            xmin = 105.11685882577615 
+            xmax = 106.5018523164565 
+            text = "" 
+        intervals [68]:
+            xmin = 106.5018523164565 
+            xmax = 107.93878306303748 
+            text = "yes but now are we at ninety" 
+        intervals [69]:
+            xmin = 107.93878306303748 
+            xmax = 108.72649811086194 
+            text = "" 
+        intervals [70]:
+            xmin = 108.72649811086194 
+            xmax = 111.24711761335766 
+            text = "if we the we had still earlier the livingroom discussed" 
+        intervals [71]:
+            xmin = 111.24711761335766 
+            xmax = 129.23804575621068 
+            text = "" 
+        intervals [72]:
+            xmin = 129.23804575621068 
+            xmax = 131.41941050403227 
+            text = "yes good further no matter that irritates us now not" 
+        intervals [73]:
+            xmin = 131.41941050403227 
+            xmax = 131.80893992328606 
+            text = "" 
+        intervals [74]:
+            xmin = 131.80893992328606 
+            xmax = 132.30234385434096 
+            text = "hm" 
+        intervals [75]:
+            xmin = 132.30234385434096 
+            xmax = 133.90540516926092 
+            text = "" 
+        intervals [76]:
+            xmin = 133.90540516926092 
+            xmax = 134.95280649658798 
+            text = "we had now ninety right " 
+        intervals [77]:
+            xmin = 134.95280649658798 
+            xmax = 138.2421660369539 
+            text = "four two twentyfive twentyfive are fifty" 
+        intervals [78]:
+            xmin = 138.2421660369539 
+            xmax = 138.2941032928544 
+            text = "" 
+        intervals [79]:
+            xmin = 138.2941032928544 
+            xmax = 141.86046153135635 
+            text = "then again fourty at that for the livingroom are we at ninety" 
+        intervals [80]:
+            xmin = 141.86046153135635 
+            xmax = 143.37696075310896 
+            text = "" 
+        intervals [81]:
+            xmin = 143.37696075310896 
+            xmax = 145.32460784937825 
+            text = "have we still onehundredten square meters left" 
+        intervals [82]:
+            xmin = 145.32460784937825 
+            xmax = 145.9565111295011 
+            text = "" 
+        intervals [83]:
+            xmin = 145.9565111295011 
+            xmax = 149.48990712205693 
+            text = "<laughter/>" 
+        intervals [84]:
+            xmin = 149.48990712205693 
+            xmax = 150.57193328665096 
+            text = "" 
+        intervals [85]:
+            xmin = 150.57193328665096 
+            xmax = 152.90910980217416 
+            text = "oh we make also a dressing room how logical" 
+        intervals [86]:
+            xmin = 152.90910980217416 
+            xmax = 154.49319610713974 
+            text = "" 
+        intervals [87]:
+            xmin = 154.49319610713974 
+            xmax = 157.08140269284877 
+            text = "<laughter> is that so clear yes of course </laughter>" 
+        intervals [88]:
+            xmin = 157.08140269284877 
+            xmax = 158.32090321646513 
+            text = "" 
+        intervals [89]:
+            xmin = 158.32090321646513 
+            xmax = 159.0566810083891 
+            text = "of course" 
+        intervals [90]:
+            xmin = 159.0566810083891 
+            xmax = 159.27308624130785 
+            text = "" 
+        intervals [91]:
+            xmin = 159.27308624130785 
+            xmax = 160.94373463944112 
+            text = "that is between our both rooms" 
+        intervals [92]:
+            xmin = 160.94373463944112 
+            xmax = 161.21207712826038 
+            text = "" 
+        intervals [93]:
+            xmin = 161.21207712826038 
+            xmax = 161.9305425015508 
+            text = "then have you there also" 
+        intervals [94]:
+            xmin = 161.9305425015508 
+            xmax = 162.12097910651937 
+            text = "" 
+        intervals [95]:
+            xmin = 162.12097910651937 
+            xmax = 162.5278209444068 
+            text = "of course" 
+        intervals [96]:
+            xmin = 162.5278209444068 
+            xmax = 162.70094513074184 
+            text = "" 
+        intervals [97]:
+            xmin = 162.70094513074184 
+            xmax = 165.7219621822884 
+            text = "then can you your ehm two pairs shoes there stow and I the rest" 
+        intervals [98]:
+            xmin = 165.7219621822884 
+            xmax = 166.08718556491283 
+            text = "" 
+        intervals [99]:
+            xmin = 166.08718556491283 
+            xmax = 167.52411631149369 
+            text = "and then that is completely functional" 
+        intervals [100]:
+            xmin = 167.52411631149369 
+            xmax = 167.70589670714548 
+            text = "" 
+        intervals [101]:
+            xmin = 167.70589670714548 
+            xmax = 171.5405974344668 
+            text = "und then is that quasi once again so ehm ... between our rooms" 
+        intervals [102]:
+            xmin = 171.5405974344668 
+            xmax = 172.09459483073897 
+            text = "" 
+        intervals [103]:
+            xmin = 172.09459483073897 
+            xmax = 172.79574778539586 
+            text = "understand you" 
+        intervals [104]:
+            xmin = 172.79574778539586 
+            xmax = 173.0467778555817 
+            text = "" 
+        intervals [105]:
+            xmin = 173.0467778555817 
+            xmax = 174.31224700714836 
+            text = "because then is that also once again so" 
+        intervals [106]:
+            xmin = 174.31224700714836 
+            xmax = 177.21207712826038 
+            text = "" 
+        intervals [107]:
+            xmin = 177.21207712826038 
+            xmax = 177.50638824502994 
+            text = "yes" 
+        intervals [108]:
+            xmin = 177.50638824502994 
+            xmax = 179.31553599223116 
+            text = "" 
+        intervals [109]:
+            xmin = 179.31553599223116 
+            xmax = 180 
+            text = "there can you still simple now one between stuff does not matter we make even the construction plan" 
+    item [7]:
+        class = "TextTier" 
+        name = "P" 
+        xmin = 0 
+        xmax = 180 
+        points: size = 29 
+        points [1]:
+            time = 2.8048196425429524 
+            mark = "A" 
+        points [2]:
+            time = 3.4540353412993454 
+            mark = "B" 
+        points [3]:
+            time = 3.7223778301187167 
+            mark = "A" 
+        points [4]:
+            time = 6.7796823102529515 
+            mark = "B" 
+        points [5]:
+            time = 6.909525450004253 
+            mark = "A" 
+        points [6]:
+            time = 7.4029293810591525 
+            mark = "A" 
+        points [7]:
+            time = 10.752882386642227 
+            mark = "B" 
+        points [8]:
+            time = 10.87406931707676 
+            mark = "A" 
+        points [9]:
+            time = 11.28956736428097 
+            mark = "B" 
+        points [10]:
+            time = 13.107371320798961 
+            mark = "A" 
+        points [11]:
+            time = 15.281742450624506 
+            mark = "B" 
+        points [12]:
+            time = 15.376960753108847 
+            mark = "A" 
+        points [13]:
+            time = 17.064921569875537 
+            mark = "A" 
+        points [14]:
+            time = 17.445794779812672 
+            mark = "A" 
+        points [15]:
+            time = 17.45445098912944 
+            mark = "B" 
+        points [16]:
+            time = 17.81801178043304 
+            mark = "A" 
+        points [17]:
+            time = 17.826667989749808 
+            mark = "B" 
+        points [18]:
+            time = 19.49731638788296 
+            mark = "A" 
+        points [19]:
+            time = 20.241750389123695 
+            mark = "B" 
+        points [20]:
+            time = 22.303590797831703 
+            mark = "B" 
+        points [21]:
+            time = 25.24670196552745 
+            mark = "A" 
+        points [22]:
+            time = 27.549253643783572 
+            mark = "B" 
+        points [23]:
+            time = 28.80440399471263 
+            mark = "B" 
+        points [24]:
+            time = 28.98618439036443 
+            mark = "A" 
+        points [25]:
+            time = 29.453619693469136 
+            mark = "A" 
+        points [26]:
+            time = 30.017935890378794 
+            mark = "A" 
+        points [27]:
+            time = 30.182403867397056 
+            mark = "B" 
+        points [28]:
+            time = 30.47671498416662 
+            mark = "A" 
+        points [29]:
+            time = 32.77061045310609 
+            mark = "B" 

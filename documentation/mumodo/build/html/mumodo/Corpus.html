@@ -1,0 +1,681 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>corpus.py &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../index.html" />
+    <link rel="next" title="InstantIO.py" href="InstantIO.html" />
+    <link rel="prev" title="increco.py" href="IncReco.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="InstantIO.html" title="InstantIO.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="IncReco.html" title="increco.py"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="corpus-py">
+<h1>corpus.py<a class="headerlink" href="#corpus-py" title="Permalink to this headline">¶</a></h1>
+<p>Abstract away from data files and use a corpus object instead.</p>
+<span class="target" id="module-mumodo.corpus"></span><dl class="class">
+<dt id="mumodo.corpus.Resource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">Resource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A mumodo resource abstract class</p>
+<p>Resources can be any form of data (e.g. video, audio, motion capture)</p>
+<p>The object describes the resource, how it can be retrieved from a file,
+and a sensible way to display the data, or cut a slice of the data. This
+is is a base class used to derive children for specific resource types.</p>
+<p>However, this class is useful for naming resources that are not covered
+by the children classes (yet) but should neverthelees  be part of a
+mumodo.</p>
+<dl class="method">
+<dt id="mumodo.corpus.Resource.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Resource.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Resource.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default constructor that is always called by all resources</p>
+<p>possible kwargs:</p>
+<dl class="docutils">
+<dt>name &#8211; The name of the resource. It is preferably short and</dt>
+<dd>concise</dd>
+</dl>
+<p>description &#8211; A description of the resource (text)</p>
+<p>filename &#8211; The name of the file this resource can be retrieved from.</p>
+<dl class="docutils">
+<dt>units &#8211; The units used for the time axis of this resource. It is useful</dt>
+<dd>to define this in order to perform slicing</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.corpus.Resource.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.corpus.Resource.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Resource.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Resource.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Resource.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the resource</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Resource.get_path_prefix">
+<tt class="descname">get_path_prefix</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Resource.get_path_prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Resource.get_path_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the path prefix of the resource</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Resource.get_type">
+<tt class="descname">get_type</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Resource.get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Resource.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the type of the resource</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Resource.get_units">
+<tt class="descname">get_units</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Resource.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Resource.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the units of the resource</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Resource.set_path_prefix">
+<tt class="descname">set_path_prefix</tt><big>(</big><em>prefix</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Resource.set_path_prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Resource.set_path_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the path prefix of the resource</p>
+<p>In general, resource filenames are looked for in a path set
+for the mumodo they belong to. This function allows to override
+that setting and instead set another path to the resource&#8217;s
+data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Resource.set_units">
+<tt class="descname">set_units</tt><big>(</big><em>units</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Resource.set_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Resource.set_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the units of the resource</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.CSVResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">CSVResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#CSVResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.CSVResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A CSV resource coming from a CSV file</p>
+<p>The CSV resource represents data stored in CSV files, that are not
+StreamFrames or Tiers. For those you can use CSVStreamResource and
+CSVTierResource, respectively.</p>
+<p>Mumodo uses the Pandas library to handle CSV files, and will load
+any CSV file into a Pandas DataFrame. Check the documentation of
+pandas for more details.</p>
+<p>In addition to the base Resource class constructor, this constructor
+accepts the following additional kwargs:</p>
+<dl class="docutils">
+<dt>kwargs - a dictionary of kwargs that are passed to the Pandas</dt>
+<dd>DataFrame.from_csv constructor</dd>
+</dl>
+<p>The CSV resource cannot be sliced by time</p>
+<dl class="method">
+<dt id="mumodo.corpus.CSVResource.get_table">
+<tt class="descname">get_table</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#CSVResource.get_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.CSVResource.get_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the DataFrame object</p>
+<p>This method returns a Pandas DataFrame with the contents of the CSV</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.CSVResource.show">
+<tt class="descname">show</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#CSVResource.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.CSVResource.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the table</p>
+<p>This method simply prints the DataFrame with CSV data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.ImageResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">ImageResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#ImageResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.ImageResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>An image resource coming from an image file</p>
+<p>The Image resource represents simply an image. Mumodo uses the Python
+Image Library to handle image files. Check the documentation of this
+module for more details</p>
+<p>In addition to the base Resource class constructor, this constructor
+requires no additional kwargs.</p>
+<p>The Image resource cannot be sliced by time</p>
+<dl class="method">
+<dt id="mumodo.corpus.ImageResource.get_image">
+<tt class="descname">get_image</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#ImageResource.get_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.ImageResource.get_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the image object</p>
+<p>This method returns a PIL Image object that represents the image.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.ImageResource.show">
+<tt class="descname">show</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#ImageResource.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.ImageResource.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the image</p>
+<p>This method simply displays the image using the show() method of the
+PIL library</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.TextResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">TextResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#TextResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.TextResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A text resource coming from a text file</p>
+<p>The Text resource represents simply a text.</p>
+<p>In addition to the base Resource class constructor, this constructor
+has  the following optional kwargs:</p>
+<dl class="docutils">
+<dt>encoding &#8211; the encoding of the text file. If not given the</dt>
+<dd>default is utf-8</dd>
+</dl>
+<p>The Text resource cannot be sliced by time</p>
+<dl class="method">
+<dt id="mumodo.corpus.TextResource.get_encoding">
+<tt class="descname">get_encoding</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#TextResource.get_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.TextResource.get_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the encoding of this text resource</p>
+<p>Returns the encoding of the file that this text resource
+is stored in</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.TextResource.get_file_object">
+<tt class="descname">get_file_object</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#TextResource.get_file_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.TextResource.get_file_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file object</p>
+<p>Returns the file object instead of the entire text. This is
+useful for big text files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.TextResource.get_text">
+<tt class="descname">get_text</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#TextResource.get_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.TextResource.get_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the entire text</p>
+<p>Returns the text that is represented by this resource</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.TextResource.show">
+<tt class="descname">show</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#TextResource.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.TextResource.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show text</p>
+<p>Simply print out the entire text</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.BinaryResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">BinaryResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BinaryResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BinaryResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A binary data resource coming from a binary file</p>
+<p>The Binary resource represents binary data</p>
+<p>In addition to the base Resource class constructor, this constructor
+has no additioanl kwargs:</p>
+<p>The binary resource cannot be sliced by time, and cannot be shown, but
+the file object is returned for further operations</p>
+<dl class="method">
+<dt id="mumodo.corpus.BinaryResource.get_file_object">
+<tt class="descname">get_file_object</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BinaryResource.get_file_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BinaryResource.get_file_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file object</p>
+<p>Returns the file object instead of the entire text. This is
+useful for big text files.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.BaseAVResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">BaseAVResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseAVResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseAVResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A base AudioVisual Data Resource Class</p>
+<p>AV data are handled using the moviepy python package. This base class is
+used to derive children that handle specific AV resources, namely audio and
+video. As such, it should never be instantiated.</p>
+<dl class="method">
+<dt id="mumodo.corpus.BaseAVResource.get_channel">
+<tt class="descname">get_channel</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseAVResource.get_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseAVResource.get_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the channel of the resource</p>
+<p>Returns the channel of the resource for multichannel video files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.BaseAVResource.get_player">
+<tt class="descname">get_player</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseAVResource.get_player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseAVResource.get_player" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the external Video player</p>
+<p>Returns the external Video player that has been set</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.BaseAVResource.get_slice">
+<tt class="descname">get_slice</tt><big>(</big><em>t1</em>, <em>t2</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseAVResource.get_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseAVResource.get_slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a slice of the audio/video</p>
+<p>Gets a slice from the audio/video using moviepy&#8217;s subclip method.
+See that method&#8217;s documentation for formatting the times.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.BaseAVResource.set_channel">
+<tt class="descname">set_channel</tt><big>(</big><em>channel</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseAVResource.set_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseAVResource.set_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the channel of the resource</p>
+<p>Set the channel of the resource for multichannel video files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.BaseAVResource.set_player">
+<tt class="descname">set_player</tt><big>(</big><em>player</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseAVResource.set_player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseAVResource.set_player" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the external Video player</p>
+<p>Set the external video player to a different one than the one that
+was defined during construction</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.BaseAVResource.show">
+<tt class="descname">show</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseAVResource.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseAVResource.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the AV resource</p>
+<p>Dis(play) the AV using an external player. The player MUST have
+been set either during construction, or using the specified method</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.BaseStreamResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">BaseStreamResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseStreamResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseStreamResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>An abstract StreamResource class</p>
+<p>This base StreamResource class serves as the parent for
+children with different methods of loading the StreamFrame</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.BaseTierResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">BaseTierResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#BaseTierResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.BaseTierResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base Tier Resource</p>
+<p>The BaseTierResource represents Interval or Point Tier resources,
+and serves as a parent for children that load tiers from different
+file types. IntervalTiers and PointTiers are Pandas DataFrames with
+specific column names and structure. See the documentation of mumodoIO
+for more information.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.AudioResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">AudioResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#AudioResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.AudioResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A mumodo Audio resource object</p>
+<p>An AudioResource is a type of resource based on Audio files. This module
+uses moviepy.editor to handle audio files and is thus limited to the
+formats supported by that package. This is a rich set of formats, as
+moviepy is based on ffmpeg.</p>
+<dl class="method">
+<dt id="mumodo.corpus.AudioResource.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#AudioResource.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.AudioResource.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>AudioResource Constructor</p>
+<p>In addition to the kwargs defined in the base Resource class
+constructor, the following kwargs can also be defined:</p>
+<dl class="docutils">
+<dt>player &#8211; an external player (e.g. VLC, mplayer) that can play</dt>
+<dd>the audio files. The value must be the FULL path to
+the executable, or the executable has to be in the
+PATH</dd>
+<dt>channel &#8211; In case of multi-channel audios, an identifier</dt>
+<dd>(usually a number) of the channel</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.AudioResource.get_audio">
+<tt class="descname">get_audio</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#AudioResource.get_audio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.AudioResource.get_audio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the audio object of this resource</p>
+<p>Returns the data object itself (a moviepy AudioClip instance)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.VideoResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">VideoResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#VideoResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.VideoResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>A mumodo Video resource object</p>
+<p>A VideoResource is a type of resource based on Video files. This module
+uses moviepy.editor to handle video files and is thus limited to the
+formats supported by that package. This is a rich set of formats, as
+moviepy is based on ffmpeg.</p>
+<dl class="method">
+<dt id="mumodo.corpus.VideoResource.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#VideoResource.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.VideoResource.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>VideoResource Constructor</p>
+<p>In addition to the kwargs defined in the base Resource class
+constructor, the following kwargs can also be defined:</p>
+<dl class="docutils">
+<dt>player &#8211; an external player (e.g. VLC, mplayer) that can play</dt>
+<dd>the video files. The value must be the FULL path to
+the executable, or the executable has to be in the
+PATH</dd>
+<dt>channel &#8211; In case of multi-channel videos, an identifier</dt>
+<dd>(usually a number) of the channel</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.VideoResource.get_video">
+<tt class="descname">get_video</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#VideoResource.get_video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.VideoResource.get_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the video object of this resource</p>
+<p>Returns the data object itself (a moviepy VideoClip instance)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.XIOStreamResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">XIOStreamResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#XIOStreamResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.XIOStreamResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>StreamFrame from XIO file</p>
+<p>This class implements a StreamFrame resource that is
+loaded from an XIO file.</p>
+<p>In addition to the base Resource kwargs, the constructor
+accepts additional kwargs:</p>
+<dl class="docutils">
+<dt>sensorname &#8211; the XIO sensorname, which is the only mandatory</dt>
+<dd>argument in order to open a streamframe from
+an XIO file</dd>
+<dt>kwargs  &#8211; a dictonary of kwargs to be passed to the function</dt>
+<dd>that parses the XIO file and returns the StreamFrame.
+Notably, an offset can be one of these. See the
+documentation of mumodo.mumodoIO for more information</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.CSVStreamResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">CSVStreamResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#CSVStreamResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.CSVStreamResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>StreamFrame from CSV file</p>
+<p>This class implements a StreamFrame resource that is
+loaded from a CSV file.</p>
+<p>In addition to the base Resource kwargs, the constructor
+accepts additional kwargs:</p>
+<dl class="docutils">
+<dt>kwargs  &#8211; a dictonary of kwargs to be passed to the pandas</dt>
+<dd>function that parses the CSV file and returns the
+StreamFrame. See Pandas documentation for more
+information (DataFrame.from_csv())</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.PickledStreamResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">PickledStreamResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#PickledStreamResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.PickledStreamResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pickled StreamFrame Resource</p>
+<p>This class implements a previously pickled StreamFrame
+resource that is unpickled from a binary file.</p>
+<p>In addition to the base Resource kwargs, the constructor
+accepts no additional kwargs</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.TextGridTierResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">TextGridTierResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#TextGridTierResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.TextGridTierResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intervalframe or Pointframe from TextGrid</p>
+<p>The TextGridTierResource imports intervalframes or pointframes
+from Praat TextGrids. Additionally to the kwargs defined in the
+base Resource class, the following kwargs are additionaly defined:</p>
+<p>tiername &#8211; the name of the tier for this resource</p>
+<dl class="method">
+<dt id="mumodo.corpus.TextGridTierResource.get_tiername">
+<tt class="descname">get_tiername</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#TextGridTierResource.get_tiername"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.TextGridTierResource.get_tiername" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return  the tiername for this tier resource</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.TextGridTierResource.set_tiername">
+<tt class="descname">set_tiername</tt><big>(</big><em>tiername</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#TextGridTierResource.set_tiername"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.TextGridTierResource.set_tiername" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the tiername for this tier resource</p>
+<p>Arguments:</p>
+<p>tiername &#8211; the name of the tier to be read from the TextGrid</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.CSVTierResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">CSVTierResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#CSVTierResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.CSVTierResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intervalframe or Pointframe from TextGrid</p>
+<p>The TextGridTierResource imports intervalframes or pointframes
+from CSV files. Additionally to the kwargs defined in the
+base Resource class, the following kwargs are additionaly defined:</p>
+<dl class="docutils">
+<dt>kwargs &#8211; a dict of kwargs to be passed to the Pandas function that</dt>
+<dd>imports dataframes from CSV. Check pandas documentation for
+more information.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.PickledTierResource">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">PickledTierResource</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#PickledTierResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.PickledTierResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intervalframe or Pointframe from Pickled data</p>
+<p>The PickledTierResource imports intervalframes or pointframes
+from pickled files. Additionally to the kwargs defined in the
+base Resource class, no additional kwargs are  defined:</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mumodo.corpus.Mumodo">
+<em class="property">class </em><tt class="descclassname">mumodo.corpus.</tt><tt class="descname">Mumodo</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Mumodo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Mumodo" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mumodo corpus object</p>
+<dl class="method">
+<dt id="mumodo.corpus.Mumodo.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Mumodo.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Mumodo.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access a resource by its name</p>
+<p>For convenience, the following expression will store a
+reference of the resource named &#8216;myresource&#8217;</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">mymodo</span><span class="p">[</span><span class="s">&#39;myresource&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Numerical access to resources is not supported, as it is
+not really needed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Mumodo.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Mumodo.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Mumodo.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>The constructor of a Mumodo object</p>
+<p>Possible kwargs</p>
+<p>name &#8211; The corpus name</p>
+<p>description &#8212; A brief description</p>
+<p>url &#8211; A list of remote urls where the corpus can be found.</p>
+<dl class="docutils">
+<dt>localpath &#8211; A local path where the corpus can be found. This will</dt>
+<dd>be a path prefix to all the files of this mumodo on disk</dd>
+</dl>
+<p>files  &#8211; A list of the corpus files</p>
+<p>Other instance variables initialized</p>
+<dl class="docutils">
+<dt>ID &#8211; an ID that is shorter then the name and can be used as a key more</dt>
+<dd>reliably (e.g. has no spaces or special characters)</dd>
+</dl>
+<p>Other instance variables initialized</p>
+<p>resources &#8211; A dictionary of available resources in this Mumodo</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Mumodo.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Mumodo.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Mumodo.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>iterate over the resources of this Mumodo</p>
+<p>Mumodos are also iterable, which is helpful for lookups of
+resources with specific names or types</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.corpus.Mumodo.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.corpus.Mumodo.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Mumodo.add_resource">
+<tt class="descname">add_resource</tt><big>(</big><em>resource</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Mumodo.add_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Mumodo.add_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a resource to this mumodo</p>
+<p>The resource has to be an object of type mumodo.corpus.Resource
+or a derived type. In addition the new resource cannot have the
+same name as an existing resource with the same name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Mumodo.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Mumodo.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Mumodo.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name of this mumodo</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Mumodo.get_resource_names">
+<tt class="descname">get_resource_names</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Mumodo.get_resource_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Mumodo.get_resource_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the names of the resources attached to this Mumodo</p>
+<p>The function returns the names of the resources in alphabetical
+order.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.corpus.Mumodo.set_localpath">
+<tt class="descname">set_localpath</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#Mumodo.set_localpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.Mumodo.set_localpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the local path for this Mumodo</p>
+<p>This function updates each resource with a local path in which
+to look up the file associated with that resource.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.corpus.serialize_mumodo">
+<tt class="descclassname">mumodo.corpus.</tt><tt class="descname">serialize_mumodo</tt><big>(</big><em>mumodo</em>, <em>default_flow_style=False</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#serialize_mumodo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.serialize_mumodo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a human-readable and editable yaml dump</p>
+<p>Arguments:</p>
+<p>mumodo  &#8211; a mumodo object, populated with subcorpora and sessions</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.corpus.build_mumodo">
+<tt class="descclassname">mumodo.corpus.</tt><tt class="descname">build_mumodo</tt><big>(</big><em>stream</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#build_mumodo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.build_mumodo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build and populate Mumodo object(s) from a human-readable yaml dump</p>
+<p>Returns a list of populated mumodo objects</p>
+<p>Arguments</p>
+<p>stream &#8211; a character stream</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.corpus.read_mumodo_from_file">
+<tt class="descclassname">mumodo.corpus.</tt><tt class="descname">read_mumodo_from_file</tt><big>(</big><em>filepath</em>, <em>encoding='utf-8'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#read_mumodo_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.read_mumodo_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read mumodos from a file on disk</p>
+<p>Reads the file and returns a list of mumodos found
+in the file</p>
+<p>Arguments:</p>
+<p>filepath &#8211; a valid filepath</p>
+<p>Kwargs:</p>
+<dl class="docutils">
+<dt>encoding &#8211; a valid encoding supported by the Python codecs</dt>
+<dd>package</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.corpus.write_mumodo_to_file">
+<tt class="descclassname">mumodo.corpus.</tt><tt class="descname">write_mumodo_to_file</tt><big>(</big><em>mumodos</em>, <em>filepath</em>, <em>encoding='utf-8'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/corpus.html#write_mumodo_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.corpus.write_mumodo_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write mumodos to a file on disk</p>
+<p>Write a mumodo or a list of mumodos to the file</p>
+<p>Arguments:</p>
+<p>mumodos &#8211; A list of mumodo objects (may contain a single object)</p>
+<p>filepath &#8211; a valid filepath</p>
+<p>kwargs:</p>
+<dl class="docutils">
+<dt>encoding &#8211; a valid encoding supported by the Python codecs</dt>
+<dd>package</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="IncReco.html"
+                        title="previous chapter">increco.py</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="InstantIO.html"
+                        title="next chapter">InstantIO.py</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/mumodo/Corpus.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="InstantIO.html" title="InstantIO.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="IncReco.html" title="increco.py"
+             >previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

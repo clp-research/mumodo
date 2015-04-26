@@ -1,0 +1,73 @@
+!Mumodo
+ID: null
+description: Two people clapping their hands three times
+files:
+- test.mp4
+- test.wav
+- testimage.png
+- test.xio.gz
+- test.TextGrid
+- test.eaf
+localpath: sampledata/
+name: A test corpus
+parent: null
+url: possible.url.goes.gere
+
+!Resource
+description: the ELAN file accompanying this data
+filename: test.eaf
+name: EAF
+units: null
+
+!AudioResource
+channel: null
+description: Audio of interaction
+filename: test.wav
+name: audio
+player: null
+units: seconds
+
+!TextGridTierResource
+description: point tier with clap events
+filename: test.TextGrid
+name: clap_points
+tiername: CLAPS
+units: seconds
+
+!ImageResource
+description: Image of interaction
+filename: testimage.png
+name: image
+units: null
+
+!XIOStreamResource
+description: Kinect Data of interaction
+filename: test.xio.gz
+kwargs:
+  timestamp_offset: -9616
+name: kinect_body
+sensorname: VeniceHubReplay/Venice/Body1
+units: ms
+
+!TextGridTierResource
+description: transcription of speaker O
+filename: test.TextGrid
+name: transcriptionO
+tiername: O
+units: seconds
+
+!TextGridTierResource
+description: transcription of speaker S
+filename: test.TextGrid
+name: transcriptionS
+tiername: S
+units: seconds
+
+!VideoResource
+channel: null
+description: Video of interaction
+filename: test.mp4
+name: video
+player: /Set/Path/To/A/Player/
+units: seconds
+

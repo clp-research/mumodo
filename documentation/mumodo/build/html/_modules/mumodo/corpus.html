@@ -1,0 +1,1215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>mumodo.corpus &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for mumodo.corpus</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">yaml</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">codecs</span><span class="o">,</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">moviepy.editor</span> <span class="kn">import</span> <span class="n">VideoFileClip</span><span class="p">,</span> <span class="n">AudioFileClip</span>
+<span class="kn">from</span> <span class="nn">mumodo.mumodoIO</span> <span class="kn">import</span> <span class="n">open_streamframe_from_xiofile</span><span class="p">,</span>\
+                            <span class="n">open_intervalframe_from_textgrid</span>
+<span class="kn">from</span> <span class="nn">mumodo.analysis</span> <span class="kn">import</span> <span class="n">slice_intervalframe_by_time</span><span class="p">,</span> <span class="n">get_tier_type</span><span class="p">,</span> \
+                            <span class="n">slice_pointframe_by_time</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c"># Classes</span>
+    <span class="s">&#39;Resource&#39;</span><span class="p">,</span> <span class="s">&#39;CSVResource&#39;</span><span class="p">,</span> <span class="s">&#39;ImageResource&#39;</span><span class="p">,</span> <span class="s">&#39;TextResource&#39;</span><span class="p">,</span>
+    <span class="s">&#39;BinaryResource&#39;</span><span class="p">,</span> <span class="s">&#39;BaseAVResource&#39;</span><span class="p">,</span> <span class="s">&#39;BaseStreamResource&#39;</span><span class="p">,</span>
+    <span class="s">&#39;BaseTierResource&#39;</span><span class="p">,</span> <span class="s">&#39;AudioResource&#39;</span><span class="p">,</span> <span class="s">&#39;VideoResource&#39;</span><span class="p">,</span>
+    <span class="s">&#39;XIOStreamResource&#39;</span><span class="p">,</span> <span class="s">&#39;CSVStreamResource&#39;</span><span class="p">,</span> <span class="s">&#39;PickledStreamResource&#39;</span><span class="p">,</span>
+    <span class="s">&#39;TextGridTierResource&#39;</span><span class="p">,</span> <span class="s">&#39;CSVTierResource&#39;</span><span class="p">,</span> <span class="s">&#39;PickledTierResource&#39;</span><span class="p">,</span>
+    <span class="s">&#39;Mumodo&#39;</span><span class="p">,</span>
+    <span class="c"># Functions</span>
+    <span class="s">&#39;serialize_mumodo&#39;</span><span class="p">,</span> <span class="s">&#39;build_mumodo&#39;</span><span class="p">,</span> <span class="s">&#39;read_mumodo_from_file&#39;</span><span class="p">,</span>
+    <span class="s">&#39;write_mumodo_to_file&#39;</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="Resource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Resource">[docs]</a><span class="k">class</span> <span class="nc">Resource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A mumodo resource abstract class</span>
+
+<span class="sd">    Resources can be any form of data (e.g. video, audio, motion capture)</span>
+
+<span class="sd">    The object describes the resource, how it can be retrieved from a file,</span>
+<span class="sd">    and a sensible way to display the data, or cut a slice of the data. This</span>
+<span class="sd">    is is a base class used to derive children for specific resource types.</span>
+
+<span class="sd">    However, this class is useful for naming resources that are not covered</span>
+<span class="sd">    by the children classes (yet) but should neverthelees  be part of a</span>
+<span class="sd">    mumodo.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Resource.__init__"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Resource.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Default constructor that is always called by all resources</span>
+
+<span class="sd">        possible kwargs:</span>
+
+<span class="sd">        name -- The name of the resource. It is preferably short and</span>
+<span class="sd">                concise</span>
+
+<span class="sd">        description -- A description of the resource (text)</span>
+
+<span class="sd">        filename -- The name of the file this resource can be retrieved from.</span>
+
+<span class="sd">        units -- The units used for the time axis of this resource. It is useful</span>
+<span class="sd">                 to define this in order to perform slicing</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;description&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__description__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;description&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__description__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;filename&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__filename__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;filename&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__filename__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;units&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__units__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;units&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__units__</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;GenericResource&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__path_prefix__</span> <span class="o">=</span> <span class="bp">None</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;{}</span><span class="se">\n</span><span class="s">name: {}</span><span class="se">\n</span><span class="s">description: {}</span><span class="se">\n</span><span class="s">filename: {}</span><span class="se">\n</span><span class="s">units: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span>\
+               <span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">__description__</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">__filename__</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">__units__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__description__</span><span class="p">,</span>
+                <span class="s">&#39;filename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filename__</span><span class="p">,</span> <span class="s">&#39;units&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__units__</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filename__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No filename has been linked to this resource.&quot;</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">()):</span>
+            <span class="k">print</span> <span class="s">&quot;The specified file does not exist&quot;</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Resource.get_name"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Resource.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the name of the resource</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span>
+</div>
+<div class="viewcode-block" id="Resource.get_type"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Resource.get_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the type of the resource</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span>
+</div>
+<div class="viewcode-block" id="Resource.get_units"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Resource.get_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the units of the resource</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__units__</span>
+</div>
+<div class="viewcode-block" id="Resource.set_units"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Resource.set_units">[docs]</a>    <span class="k">def</span> <span class="nf">set_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the units of the resource</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__units__</span> <span class="o">=</span> <span class="n">units</span>
+</div>
+<div class="viewcode-block" id="Resource.set_path_prefix"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Resource.set_path_prefix">[docs]</a>    <span class="k">def</span> <span class="nf">set_path_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the path prefix of the resource</span>
+
+<span class="sd">        In general, resource filenames are looked for in a path set</span>
+<span class="sd">        for the mumodo they belong to. This function allows to override</span>
+<span class="sd">        that setting and instead set another path to the resource&#39;s</span>
+<span class="sd">        data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__path_prefix__</span> <span class="o">=</span> <span class="n">prefix</span>
+</div>
+<div class="viewcode-block" id="Resource.get_path_prefix"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Resource.get_path_prefix">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the path prefix of the resource</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path_prefix__</span>
+</div>
+    <span class="k">def</span> <span class="nf">get_filepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path_prefix__</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__path_prefix__</span><span class="p">,</span>
+                                                          <span class="nb">basestring</span><span class="p">):</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filename__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__path_prefix__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filename__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">filepath</span>
+</div>
+<div class="viewcode-block" id="CSVResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.CSVResource">[docs]</a><span class="k">class</span> <span class="nc">CSVResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A CSV resource coming from a CSV file</span>
+
+<span class="sd">    The CSV resource represents data stored in CSV files, that are not</span>
+<span class="sd">    StreamFrames or Tiers. For those you can use CSVStreamResource and</span>
+<span class="sd">    CSVTierResource, respectively.</span>
+
+<span class="sd">    Mumodo uses the Pandas library to handle CSV files, and will load</span>
+<span class="sd">    any CSV file into a Pandas DataFrame. Check the documentation of</span>
+<span class="sd">    pandas for more details.</span>
+
+<span class="sd">    In addition to the base Resource class constructor, this constructor</span>
+<span class="sd">    accepts the following additional kwargs:</span>
+
+<span class="sd">    kwargs - a dictionary of kwargs that are passed to the Pandas</span>
+<span class="sd">             DataFrame.from_csv constructor</span>
+
+<span class="sd">    The CSV resource cannot be sliced by time</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CSVResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;CSVResource&#39;</span>
+
+        <span class="k">if</span> <span class="s">&#39;kwargs&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;kwargs&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CSVResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="s">&quot;kwargs: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">CSVResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">{</span><span class="s">&#39;kwargs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">CSVResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span>\
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span>
+                                            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="CSVResource.show"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.CSVResource.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Display the table</span>
+
+<span class="sd">        This method simply prints the DataFrame with CSV data</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+</div>
+<div class="viewcode-block" id="CSVResource.get_table"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.CSVResource.get_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the DataFrame object</span>
+
+<span class="sd">        This method returns a Pandas DataFrame with the contents of the CSV</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+
+</div></div>
+<div class="viewcode-block" id="BaseAVResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseAVResource">[docs]</a><span class="k">class</span> <span class="nc">BaseAVResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A base AudioVisual Data Resource Class</span>
+
+<span class="sd">    AV data are handled using the moviepy python package. This base class is</span>
+<span class="sd">    used to derive children that handle specific AV resources, namely audio and</span>
+<span class="sd">    video. As such, it should never be instantiated.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BaseAVResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;AVResource&#39;</span>
+
+        <span class="k">if</span> <span class="s">&#39;player&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__player__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;player&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__player__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__channel__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;channel&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__channel__</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="BaseAVResource.show"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseAVResource.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Display the AV resource</span>
+
+<span class="sd">        Dis(play) the AV using an external player. The player MUST have</span>
+<span class="sd">        been set either during construction, or using the specified method</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__player__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;no player has been set - cannot show video&quot;</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&quot;{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__player__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">()))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;I couldn&#39;t play&quot;</span>
+</div>
+<div class="viewcode-block" id="BaseAVResource.get_slice"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseAVResource.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a slice of the audio/video</span>
+
+<span class="sd">        Gets a slice from the audio/video using moviepy&#39;s subclip method.</span>
+<span class="sd">        See that method&#39;s documentation for formatting the times.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No slice can be returned.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="o">.</span><span class="n">subclip</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BaseAVResource.set_player"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseAVResource.set_player">[docs]</a>    <span class="k">def</span> <span class="nf">set_player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the external Video player</span>
+
+<span class="sd">        Set the external video player to a different one than the one that</span>
+<span class="sd">        was defined during construction</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__player__</span> <span class="o">=</span> <span class="n">player</span>
+</div>
+<div class="viewcode-block" id="BaseAVResource.get_player"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseAVResource.get_player">[docs]</a>    <span class="k">def</span> <span class="nf">get_player</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the external Video player</span>
+
+<span class="sd">        Returns the external Video player that has been set</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__player__</span>
+</div>
+<div class="viewcode-block" id="BaseAVResource.set_channel"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseAVResource.set_channel">[docs]</a>    <span class="k">def</span> <span class="nf">set_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the channel of the resource</span>
+
+<span class="sd">        Set the channel of the resource for multichannel video files.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__channel__</span> <span class="o">=</span> <span class="n">channel</span>
+</div>
+<div class="viewcode-block" id="BaseAVResource.get_channel"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseAVResource.get_channel">[docs]</a>    <span class="k">def</span> <span class="nf">get_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the channel of the resource</span>
+
+<span class="sd">        Returns the channel of the resource for multichannel video files.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__channel__</span>
+
+</div></div>
+<div class="viewcode-block" id="VideoResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.VideoResource">[docs]</a><span class="k">class</span> <span class="nc">VideoResource</span><span class="p">(</span><span class="n">BaseAVResource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A mumodo Video resource object</span>
+
+<span class="sd">    A VideoResource is a type of resource based on Video files. This module</span>
+<span class="sd">    uses moviepy.editor to handle video files and is thus limited to the</span>
+<span class="sd">    formats supported by that package. This is a rich set of formats, as</span>
+<span class="sd">    moviepy is based on ffmpeg.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="VideoResource.__init__"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.VideoResource.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; VideoResource Constructor</span>
+
+<span class="sd">        In addition to the kwargs defined in the base Resource class</span>
+<span class="sd">        constructor, the following kwargs can also be defined:</span>
+
+<span class="sd">        player -- an external player (e.g. VLC, mplayer) that can play</span>
+<span class="sd">                  the video files. The value must be the FULL path to</span>
+<span class="sd">                  the executable, or the executable has to be in the</span>
+<span class="sd">                  PATH</span>
+
+<span class="sd">        channel -- In case of multi-channel videos, an identifier</span>
+<span class="sd">                   (usually a number) of the channel</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VideoResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;VideoResource&#39;</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">VideoResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="s">&quot;player: {}</span><span class="se">\n</span><span class="s">channel: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__player__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__channel__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">VideoResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">{</span><span class="s">&#39;player&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__player__</span><span class="p">,</span> <span class="s">&#39;channel&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__channel__</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">VideoResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">VideoFileClip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="VideoResource.get_video"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.VideoResource.get_video">[docs]</a>    <span class="k">def</span> <span class="nf">get_video</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the video object of this resource</span>
+
+<span class="sd">        Returns the data object itself (a moviepy VideoClip instance)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No video can be returned.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+</div></div>
+<div class="viewcode-block" id="AudioResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.AudioResource">[docs]</a><span class="k">class</span> <span class="nc">AudioResource</span><span class="p">(</span><span class="n">BaseAVResource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A mumodo Audio resource object</span>
+
+<span class="sd">    An AudioResource is a type of resource based on Audio files. This module</span>
+<span class="sd">    uses moviepy.editor to handle audio files and is thus limited to the</span>
+<span class="sd">    formats supported by that package. This is a rich set of formats, as</span>
+<span class="sd">    moviepy is based on ffmpeg.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AudioResource.__init__"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.AudioResource.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; AudioResource Constructor</span>
+
+<span class="sd">        In addition to the kwargs defined in the base Resource class</span>
+<span class="sd">        constructor, the following kwargs can also be defined:</span>
+
+<span class="sd">        player -- an external player (e.g. VLC, mplayer) that can play</span>
+<span class="sd">                  the audio files. The value must be the FULL path to</span>
+<span class="sd">                  the executable, or the executable has to be in the</span>
+<span class="sd">                  PATH</span>
+
+<span class="sd">        channel -- In case of multi-channel audios, an identifier</span>
+<span class="sd">                   (usually a number) of the channel</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AudioResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;AudioResource&#39;</span>
+
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AudioResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="s">&quot;player: {}</span><span class="se">\n</span><span class="s">channel: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__player__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__channel__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">AudioResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">{</span><span class="s">&#39;player&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__player__</span><span class="p">,</span> <span class="s">&#39;channel&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__channel__</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">AudioResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">AudioFileClip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="AudioResource.get_audio"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.AudioResource.get_audio">[docs]</a>    <span class="k">def</span> <span class="nf">get_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the audio object of this resource</span>
+
+<span class="sd">        Returns the data object itself (a moviepy AudioClip instance)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No audio can be returned.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+</div></div>
+<div class="viewcode-block" id="BaseStreamResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseStreamResource">[docs]</a><span class="k">class</span> <span class="nc">BaseStreamResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An abstract StreamResource class</span>
+
+<span class="sd">    This base StreamResource class serves as the parent for</span>
+<span class="sd">    children with different methods of loading the StreamFrame</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BaseStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;StreamResource&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">t1</span><span class="p">:</span><span class="n">t2</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+
+    <span class="k">def</span> <span class="nf">get_streamframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No StreamFrame  can be returned.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+</div>
+<div class="viewcode-block" id="XIOStreamResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.XIOStreamResource">[docs]</a><span class="k">class</span> <span class="nc">XIOStreamResource</span><span class="p">(</span><span class="n">BaseStreamResource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; StreamFrame from XIO file</span>
+
+<span class="sd">    This class implements a StreamFrame resource that is</span>
+<span class="sd">    loaded from an XIO file.</span>
+
+<span class="sd">    In addition to the base Resource kwargs, the constructor</span>
+<span class="sd">    accepts additional kwargs:</span>
+
+<span class="sd">    sensorname -- the XIO sensorname, which is the only mandatory</span>
+<span class="sd">                  argument in order to open a streamframe from</span>
+<span class="sd">                  an XIO file</span>
+
+<span class="sd">    kwargs  -- a dictonary of kwargs to be passed to the function</span>
+<span class="sd">               that parses the XIO file and returns the StreamFrame.</span>
+<span class="sd">               Notably, an offset can be one of these. See the</span>
+<span class="sd">               documentation of mumodo.mumodoIO for more information</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">XIOStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&#39;sensorname&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__sensorname__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;sensorname&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__sensorname__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;kwargs&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;kwargs&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">XIOStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="s">&quot;sensorname: {}</span><span class="se">\n</span><span class="s">kwargs: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sensorname__</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">XIOStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">{</span><span class="s">&#39;sensorname&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sensorname__</span><span class="p">,</span>
+            <span class="s">&#39;kwargs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">XIOStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sensorname__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No sensorname has been set.&quot;</span>
+            <span class="k">print</span> <span class="s">&quot;No StreamFrame can be created.&quot;</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Parsing XIO file (will be done only once).&quot;</span>
+            <span class="k">print</span> <span class="s">&quot;Please wait ...&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">open_streamframe_from_xiofile</span>\
+                                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">__sensorname__</span><span class="p">,</span>
+                                      <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="CSVStreamResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.CSVStreamResource">[docs]</a><span class="k">class</span> <span class="nc">CSVStreamResource</span><span class="p">(</span><span class="n">BaseStreamResource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; StreamFrame from CSV file</span>
+
+<span class="sd">    This class implements a StreamFrame resource that is</span>
+<span class="sd">    loaded from a CSV file.</span>
+
+<span class="sd">    In addition to the base Resource kwargs, the constructor</span>
+<span class="sd">    accepts additional kwargs:</span>
+
+<span class="sd">    kwargs  -- a dictonary of kwargs to be passed to the pandas</span>
+<span class="sd">               function that parses the CSV file and returns the</span>
+<span class="sd">               StreamFrame. See Pandas documentation for more</span>
+<span class="sd">               information (DataFrame.from_csv())</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CSVStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&#39;kwargs&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;kwargs&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CSVStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="s">&quot;kwargs: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">CSVStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">{</span><span class="s">&#39;kwargs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">CSVStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span>\
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span>
+                                            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="PickledStreamResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.PickledStreamResource">[docs]</a><span class="k">class</span> <span class="nc">PickledStreamResource</span><span class="p">(</span><span class="n">BaseStreamResource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pickled StreamFrame Resource</span>
+
+<span class="sd">    This class implements a previously pickled StreamFrame</span>
+<span class="sd">    resource that is unpickled from a binary file.</span>
+
+<span class="sd">    In addition to the base Resource kwargs, the constructor</span>
+<span class="sd">    accepts no additional kwargs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">PickledStreamResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span>
+                                                      <span class="s">&quot;rb&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="BaseTierResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BaseTierResource">[docs]</a><span class="k">class</span> <span class="nc">BaseTierResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Base Tier Resource</span>
+
+<span class="sd">    The BaseTierResource represents Interval or Point Tier resources,</span>
+<span class="sd">    and serves as a parent for children that load tiers from different</span>
+<span class="sd">    file types. IntervalTiers and PointTiers are Pandas DataFrames with</span>
+<span class="sd">    specific column names and structure. See the documentation of mumodoIO</span>
+<span class="sd">    for more information.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BaseTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;TierResource&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">tiertype</span> <span class="o">=</span> <span class="n">get_tier_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tiertype</span> <span class="o">==</span> <span class="s">&#39;interval&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">slice_intervalframe_by_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">tiertype</span> <span class="o">==</span> <span class="s">&#39;point&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">slice_pointframe_by_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+
+    <span class="k">def</span> <span class="nf">get_tier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+</div>
+<div class="viewcode-block" id="TextGridTierResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.TextGridTierResource">[docs]</a><span class="k">class</span> <span class="nc">TextGridTierResource</span><span class="p">(</span><span class="n">BaseTierResource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Intervalframe or Pointframe from TextGrid</span>
+
+<span class="sd">    The TextGridTierResource imports intervalframes or pointframes</span>
+<span class="sd">    from Praat TextGrids. Additionally to the kwargs defined in the</span>
+<span class="sd">    base Resource class, the following kwargs are additionaly defined:</span>
+
+<span class="sd">    tiername -- the name of the tier for this resource</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TextGridTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&#39;tiername&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__tiername__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tiername&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__tiername__</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TextGridTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="s">&quot;tiername: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__tiername__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">TextGridTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">{</span><span class="s">&#39;tiername&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiername__</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">TextGridTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiername__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No tiername has been set.&quot;</span>
+            <span class="k">print</span> <span class="s">&quot;No TierFrame can be created.&quot;</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">open_intervalframe_from_textgrid</span>\
+                               <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())[</span><span class="bp">self</span><span class="o">.</span><span class="n">__tiername__</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="TextGridTierResource.set_tiername"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.TextGridTierResource.set_tiername">[docs]</a>    <span class="k">def</span> <span class="nf">set_tiername</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tiername</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the tiername for this tier resource</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">        tiername -- the name of the tier to be read from the TextGrid</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tiername__</span> <span class="o">=</span> <span class="n">tiername</span>
+</div>
+<div class="viewcode-block" id="TextGridTierResource.get_tiername"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.TextGridTierResource.get_tiername">[docs]</a>    <span class="k">def</span> <span class="nf">get_tiername</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return  the tiername for this tier resource</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiername__</span>
+</div></div>
+<div class="viewcode-block" id="CSVTierResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.CSVTierResource">[docs]</a><span class="k">class</span> <span class="nc">CSVTierResource</span><span class="p">(</span><span class="n">BaseTierResource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Intervalframe or Pointframe from TextGrid</span>
+
+<span class="sd">    The TextGridTierResource imports intervalframes or pointframes</span>
+<span class="sd">    from CSV files. Additionally to the kwargs defined in the</span>
+<span class="sd">    base Resource class, the following kwargs are additionaly defined:</span>
+
+<span class="sd">    kwargs -- a dict of kwargs to be passed to the Pandas function that</span>
+<span class="sd">              imports dataframes from CSV. Check pandas documentation for</span>
+<span class="sd">              more information.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CSVTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&#39;kwargs&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;kwargs&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CSVTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="s">&quot;kwargs: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">CSVTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">{</span><span class="s">&#39;kwargs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">CSVTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span>\
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span>
+                                            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">__kwargs__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="PickledTierResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.PickledTierResource">[docs]</a><span class="k">class</span> <span class="nc">PickledTierResource</span><span class="p">(</span><span class="n">BaseTierResource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Intervalframe or Pointframe from Pickled data</span>
+
+<span class="sd">    The PickledTierResource imports intervalframes or pointframes</span>
+<span class="sd">    from pickled files. Additionally to the kwargs defined in the</span>
+<span class="sd">    base Resource class, no additional kwargs are  defined:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">PickledTierResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span>
+                                                      <span class="s">&quot;rb&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="ImageResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.ImageResource">[docs]</a><span class="k">class</span> <span class="nc">ImageResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; An image resource coming from an image file</span>
+
+<span class="sd">    The Image resource represents simply an image. Mumodo uses the Python</span>
+<span class="sd">    Image Library to handle image files. Check the documentation of this</span>
+<span class="sd">    module for more details</span>
+
+<span class="sd">    In addition to the base Resource class constructor, this constructor</span>
+<span class="sd">    requires no additional kwargs.</span>
+
+<span class="sd">    The Image resource cannot be sliced by time</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;ImageResource&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">ImageResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="ImageResource.show"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.ImageResource.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Display the image</span>
+
+<span class="sd">        This method simply displays the image using the show() method of the</span>
+<span class="sd">        PIL library</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="ImageResource.get_image"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.ImageResource.get_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the image object</span>
+
+<span class="sd">        This method returns a PIL Image object that represents the image.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+
+</div></div>
+<div class="viewcode-block" id="TextResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.TextResource">[docs]</a><span class="k">class</span> <span class="nc">TextResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A text resource coming from a text file</span>
+
+<span class="sd">    The Text resource represents simply a text.</span>
+
+<span class="sd">    In addition to the base Resource class constructor, this constructor</span>
+<span class="sd">    has  the following optional kwargs:</span>
+
+<span class="sd">    encoding -- the encoding of the text file. If not given the</span>
+<span class="sd">                default is utf-8</span>
+
+<span class="sd">    The Text resource cannot be sliced by time</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TextResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;TextResource&#39;</span>
+
+        <span class="k">if</span> <span class="s">&#39;encoding&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__encoding__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;encoding&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__encoding__</span> <span class="o">=</span> <span class="s">&#39;utf-8&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">TextResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span>
+                                                 <span class="s">&quot;r&quot;</span><span class="p">,</span>
+                                                 <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__encoding__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TextResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="s">&quot;encoding: {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__encoding__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">TextResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">{</span><span class="s">&#39;encoding&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encoding__</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+<div class="viewcode-block" id="TextResource.show"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.TextResource.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Show text</span>
+
+<span class="sd">        Simply print out the entire text</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">line</span>
+</div>
+<div class="viewcode-block" id="TextResource.get_encoding"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.TextResource.get_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">get_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the encoding of this text resource</span>
+
+<span class="sd">        Returns the encoding of the file that this text resource</span>
+<span class="sd">        is stored in</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encoding__</span>
+</div>
+<div class="viewcode-block" id="TextResource.get_text"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.TextResource.get_text">[docs]</a>    <span class="k">def</span> <span class="nf">get_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the entire text</span>
+
+<span class="sd">        Returns the text that is represented by this resource</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">line</span>
+        <span class="k">return</span> <span class="n">text</span>
+</div>
+<div class="viewcode-block" id="TextResource.get_file_object"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.TextResource.get_file_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the file object</span>
+
+<span class="sd">        Returns the file object instead of the entire text. This is</span>
+<span class="sd">        useful for big text files.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+</div></div>
+<div class="viewcode-block" id="BinaryResource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BinaryResource">[docs]</a><span class="k">class</span> <span class="nc">BinaryResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A binary data resource coming from a binary file</span>
+
+<span class="sd">    The Binary resource represents binary data</span>
+
+<span class="sd">    In addition to the base Resource class constructor, this constructor</span>
+<span class="sd">    has no additioanl kwargs:</span>
+
+<span class="sd">    The binary resource cannot be sliced by time, and cannot be shown, but</span>
+<span class="sd">    the file object is returned for further operations</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BinaryResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rtype__</span> <span class="o">=</span> <span class="s">&#39;BinaryResource&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__load__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">BinaryResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span> <span class="s">&quot;rb&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="BinaryResource.get_file_object"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.BinaryResource.get_file_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the file object</span>
+
+<span class="sd">        Returns the file object instead of the entire text. This is</span>
+<span class="sd">        useful for big text files.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load__</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_object__</span>
+</div></div>
+<div class="viewcode-block" id="Mumodo"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Mumodo">[docs]</a><span class="k">class</span> <span class="nc">Mumodo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; The mumodo corpus object &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Mumodo.__init__"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Mumodo.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The constructor of a Mumodo object</span>
+
+<span class="sd">        Possible kwargs</span>
+
+<span class="sd">        name -- The corpus name</span>
+
+<span class="sd">        description --- A brief description</span>
+
+<span class="sd">        url -- A list of remote urls where the corpus can be found.</span>
+
+<span class="sd">        localpath -- A local path where the corpus can be found. This will</span>
+<span class="sd">                     be a path prefix to all the files of this mumodo on disk</span>
+
+<span class="sd">        files  -- A list of the corpus files</span>
+
+<span class="sd">        Other instance variables initialized</span>
+
+<span class="sd">        ID -- an ID that is shorter then the name and can be used as a key more</span>
+<span class="sd">              reliably (e.g. has no spaces or special characters)</span>
+
+<span class="sd">        Other instance variables initialized</span>
+
+<span class="sd">        resources -- A dictionary of available resources in this Mumodo</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;description&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__description__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;description&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__description__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;url&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__url__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;url&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__url__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;localpath&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__localpath__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;localpath&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__localpath__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;files&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__files__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;files&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__files__</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s">&#39;ID&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ID__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;ID&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ID__</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="s">&#39;resources&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;resources&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parent__</span> <span class="o">=</span> <span class="bp">None</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;{}</span><span class="se">\n</span><span class="s">name: {}</span><span class="se">\n</span><span class="s">description: {}</span><span class="se">\n</span><span class="s">url: {}</span><span class="se">\n</span><span class="s">localpath: </span><span class="se">\</span>
+<span class="s">                {}</span><span class="se">\n</span><span class="s">files: {}</span><span class="se">\n</span><span class="s">ID: </span><span class="se">\</span>
+<span class="s">                {}</span><span class="se">\n</span><span class="s">resources: {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">__description__</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">__url__</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">__localpath__</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">__files__</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">__ID__</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__toyaml__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__description__</span><span class="p">,</span>
+                <span class="s">&#39;url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__url__</span><span class="p">,</span> <span class="s">&#39;localpath&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__localpath__</span><span class="p">,</span>
+                <span class="s">&#39;files&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__files__</span><span class="p">,</span> <span class="s">&#39;parent&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parent__</span><span class="p">,</span>
+                <span class="s">&#39;ID&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ID__</span><span class="p">}</span>
+
+<div class="viewcode-block" id="Mumodo.__getitem__"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Mumodo.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Access a resource by its name</span>
+
+<span class="sd">        For convenience, the following expression will store a</span>
+<span class="sd">        reference of the resource named &#39;myresource&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; r = mymodo[&#39;myresource&#39;]</span>
+
+<span class="sd">        Numerical access to resources is not supported, as it is</span>
+<span class="sd">        not really needed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No resources have been defined yet!&quot;</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Mumodo.__iter__"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Mumodo.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; iterate over the resources of this Mumodo</span>
+
+<span class="sd">        Mumodos are also iterable, which is helpful for lookups of</span>
+<span class="sd">        resources with specific names or types</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="Mumodo.add_resource"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Mumodo.add_resource">[docs]</a>    <span class="k">def</span> <span class="nf">add_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a resource to this mumodo</span>
+
+<span class="sd">        The resource has to be an object of type mumodo.corpus.Resource</span>
+<span class="sd">        or a derived type. In addition the new resource cannot have the</span>
+<span class="sd">        same name as an existing resource with the same name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">Resource</span><span class="p">):</span>
+            <span class="n">rname</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">rname</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">rname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Resource must have a unique name!&quot;</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="p">[</span><span class="n">rname</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource</span>
+            <span class="n">resource</span><span class="o">.</span><span class="n">set_path_prefix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__localpath__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">__filename__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__files__</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__files__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">__filename__</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Mumodo.get_resource_names"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Mumodo.get_resource_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_resource_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the names of the resources attached to this Mumodo</span>
+
+<span class="sd">        The function returns the names of the resources in alphabetical</span>
+<span class="sd">        order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="Mumodo.set_localpath"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Mumodo.set_localpath">[docs]</a>    <span class="k">def</span> <span class="nf">set_localpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the local path for this Mumodo</span>
+
+<span class="sd">        This function updates each resource with a local path in which</span>
+<span class="sd">        to look up the file associated with that resource.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__localpath__</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources__</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">set_path_prefix</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Mumodo.get_name"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.Mumodo.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the name of this mumodo</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span>
+</div></div>
+<div class="viewcode-block" id="serialize_mumodo"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.serialize_mumodo">[docs]</a><span class="k">def</span> <span class="nf">serialize_mumodo</span><span class="p">(</span><span class="n">mumodo</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a human-readable and editable yaml dump</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    mumodo  -- a mumodo object, populated with subcorpora and sessions</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ser</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mumodo</span><span class="p">,</span> <span class="n">Mumodo</span><span class="p">):</span>
+        <span class="n">ser</span> <span class="o">+=</span> <span class="s">&quot;!Mumodo</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="n">ser</span> <span class="o">+=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mumodo</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">(),</span>
+                         <span class="n">default_flow_style</span><span class="o">=</span><span class="n">default_flow_style</span><span class="p">)</span>
+        <span class="n">ser</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mumodo</span><span class="o">.</span><span class="n">__resources__</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">ser</span> <span class="o">+=</span> <span class="s">&quot;!{}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mumodo</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+            <span class="n">ser</span> <span class="o">+=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mumodo</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">__toyaml__</span><span class="p">(),</span>
+                             <span class="n">default_flow_style</span><span class="o">=</span><span class="n">default_flow_style</span><span class="p">)</span>
+            <span class="n">ser</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    <span class="k">return</span> <span class="n">ser</span>
+</div>
+<div class="viewcode-block" id="build_mumodo"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.build_mumodo">[docs]</a><span class="k">def</span> <span class="nf">build_mumodo</span><span class="p">(</span><span class="n">stream</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Build and populate Mumodo object(s) from a human-readable yaml dump</span>
+
+<span class="sd">    Returns a list of populated mumodo objects</span>
+
+<span class="sd">    Arguments</span>
+
+<span class="sd">    stream -- a character stream</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">blockbuffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">mumodolist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">object_type</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Mumodo&#39;</span><span class="p">:</span> <span class="n">Mumodo</span><span class="p">,</span>
+            <span class="s">&#39;VideoResource&#39;</span><span class="p">:</span> <span class="n">VideoResource</span><span class="p">,</span>
+            <span class="s">&#39;AudioResource&#39;</span><span class="p">:</span> <span class="n">AudioResource</span><span class="p">,</span>
+            <span class="s">&#39;XIOStreamResource&#39;</span><span class="p">:</span> <span class="n">XIOStreamResource</span><span class="p">,</span>
+            <span class="s">&#39;CSVStreamResource&#39;</span><span class="p">:</span> <span class="n">CSVStreamResource</span><span class="p">,</span>
+            <span class="s">&#39;PickledStreamResource&#39;</span><span class="p">:</span> <span class="n">PickledStreamResource</span><span class="p">,</span>
+            <span class="s">&#39;TextGridTierResource&#39;</span><span class="p">:</span> <span class="n">TextGridTierResource</span><span class="p">,</span>
+            <span class="s">&#39;CSVTierResource&#39;</span><span class="p">:</span> <span class="n">CSVTierResource</span><span class="p">,</span>
+            <span class="s">&#39;PickledTierResource&#39;</span><span class="p">:</span> <span class="n">PickledTierResource</span><span class="p">,</span>
+            <span class="s">&#39;ImageResource&#39;</span><span class="p">:</span> <span class="n">ImageResource</span><span class="p">,</span>
+            <span class="s">&#39;TextResource&#39;</span><span class="p">:</span> <span class="n">TextResource</span><span class="p">,</span>
+            <span class="s">&#39;Resource&#39;</span><span class="p">:</span> <span class="n">Resource</span><span class="p">,</span>
+            <span class="s">&#39;BinaryResource&#39;</span><span class="p">:</span> <span class="n">BinaryResource</span><span class="p">,</span>
+            <span class="s">&#39;CSVResource&#39;</span><span class="p">:</span> <span class="n">CSVResource</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stream</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">):</span>
+        <span class="c">#do we have a new block?</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;!&#39;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">blockbuffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">blockbuffer</span><span class="p">)</span>
+                <span class="n">blockbuffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="c">#Create the object here</span>
+            <span class="k">if</span> <span class="n">object_type</span> <span class="ow">in</span> <span class="n">keys</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="n">object_type</span><span class="p">](</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+                <span class="c">#build the object tree</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Mumodo</span><span class="p">):</span>
+                    <span class="n">mumodolist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Resource</span><span class="p">):</span>
+                    <span class="n">mumodolist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add_resource</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+            <span class="n">object_type</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">continue</span>
+
+        <span class="n">blockbuffer</span> <span class="o">+=</span> <span class="n">line</span>
+        <span class="n">blockbuffer</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="k">return</span> <span class="n">mumodolist</span>
+</div>
+<div class="viewcode-block" id="read_mumodo_from_file"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.read_mumodo_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_mumodo_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read mumodos from a file on disk</span>
+
+<span class="sd">    Reads the file and returns a list of mumodos found</span>
+<span class="sd">    in the file</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    filepath -- a valid filepath</span>
+
+<span class="sd">    Kwargs:</span>
+
+<span class="sd">    encoding -- a valid encoding supported by the Python codecs</span>
+<span class="sd">                package</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;file does not exist!&quot;</span>
+        <span class="k">return</span>
+
+    <span class="n">inser</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">inser</span> <span class="o">+=</span> <span class="n">line</span>
+    <span class="k">return</span> <span class="n">build_mumodo</span><span class="p">(</span><span class="n">inser</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="write_mumodo_to_file"><a class="viewcode-back" href="../../mumodo/Corpus.html#mumodo.corpus.write_mumodo_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_mumodo_to_file</span><span class="p">(</span><span class="n">mumodos</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Write mumodos to a file on disk</span>
+
+<span class="sd">    Write a mumodo or a list of mumodos to the file</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    mumodos -- A list of mumodo objects (may contain a single object)</span>
+
+<span class="sd">    filepath -- a valid filepath</span>
+
+<span class="sd">    kwargs:</span>
+
+<span class="sd">    encoding -- a valid encoding supported by the Python codecs</span>
+<span class="sd">                package</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ser</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">mumodo</span> <span class="ow">in</span> <span class="n">mumodos</span><span class="p">:</span>
+        <span class="n">ser</span> <span class="o">+=</span> <span class="n">serialize_mumodo</span><span class="p">(</span><span class="n">mumodo</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ser</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

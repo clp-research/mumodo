@@ -1,0 +1,243 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 50.5 
+tiers? <exists> 
+size = 3 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "O" 
+        xmin = 0 
+        xmax = 50.5 
+        intervals: size = 23 
+        intervals [1]:
+            xmin = 0 
+            xmax = 2.16 
+            text = "" 
+        intervals [2]:
+            xmin = 2.16 
+            xmax = 2.6 
+            text = "Hello" 
+        intervals [3]:
+            xmin = 2.6 
+            xmax = 3.7 
+            text = "" 
+        intervals [4]:
+            xmin = 3.7 
+            xmax = 4.26 
+            text = "I 'm Oliver" 
+        intervals [5]:
+            xmin = 4.26 
+            xmax = 11.58 
+            text = "" 
+        intervals [6]:
+            xmin = 11.58 
+            xmax = 11.84 
+            text = "<CLAP>" 
+        intervals [7]:
+            xmin = 11.84 
+            xmax = 12.46 
+            text = "" 
+        intervals [8]:
+            xmin = 12.46 
+            xmax = 13.68 
+            text = "a:nd, what does it do?" 
+        intervals [9]:
+            xmin = 13.68 
+            xmax = 21.720000000000002 
+            text = "" 
+        intervals [10]:
+            xmin = 21.720000000000002 
+            xmax = 24.1 
+            text = "ah, Venice can log data from any sensor," 
+        intervals [11]:
+            xmin = 24.1 
+            xmax = 24.200000000000003 
+            text = "" 
+        intervals [12]:
+            xmin = 24.200000000000003 
+            xmax = 27.105255843002986 
+            text = "and right now it's ah logging data from kinect" 
+        intervals [13]:
+            xmin = 27.105255843002986 
+            xmax = 33.76 
+            text = "" 
+        intervals [14]:
+            xmin = 33.76 
+            xmax = 34 
+            text = "<CLAP>" 
+        intervals [15]:
+            xmin = 34 
+            xmax = 34.78 
+            text = "" 
+        intervals [16]:
+            xmin = 34.78 
+            xmax = 36.46 
+            text = "A:nd, what can we do with the data?" 
+        intervals [17]:
+            xmin = 36.46 
+            xmax = 42.82 
+            text = "" 
+        intervals [18]:
+            xmin = 42.82 
+            xmax = 46.561555100097536 
+            text = "A:nd look for the documentation of Venice and Mumodo online" 
+        intervals [19]:
+            xmin = 46.561555100097536 
+            xmax = 47.6 
+            text = "" 
+        intervals [20]:
+            xmin = 47.6 
+            xmax = 47.82 
+            text = "<CLAP>" 
+        intervals [21]:
+            xmin = 47.82 
+            xmax = 48.94 
+            text = "" 
+        intervals [22]:
+            xmin = 48.94 
+            xmax = 49.66 
+            text = "Goodbye" 
+        intervals [23]:
+            xmin = 49.66 
+            xmax = 50.5 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "S" 
+        xmin = 0 
+        xmax = 50.5 
+        intervals: size = 29 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.3000000000000003 
+            text = "" 
+        intervals [2]:
+            xmin = 1.3000000000000003 
+            xmax = 1.8600000000000003 
+            text = "Hello" 
+        intervals [3]:
+            xmin = 1.8600000000000003 
+            xmax = 2.8800000000000003 
+            text = "" 
+        intervals [4]:
+            xmin = 2.8800000000000003 
+            xmax = 3.5 
+            text = "I 'm Spyros" 
+        intervals [5]:
+            xmin = 3.5 
+            xmax = 4.86 
+            text = "" 
+        intervals [6]:
+            xmin = 4.86 
+            xmax = 8.28 
+            text = "Here in the Dialogue Systems Group, in the University of Bielefeld, in Germany, " 
+        intervals [7]:
+            xmin = 8.28 
+            xmax = 8.5 
+            text = "" 
+        intervals [8]:
+            xmin = 8.5 
+            xmax = 10.4 
+            text = "We have developed Mumodo, and Venice" 
+        intervals [9]:
+            xmin = 10.4 
+            xmax = 11.58 
+            text = "" 
+        intervals [10]:
+            xmin = 11.58 
+            xmax = 11.84 
+            text = "<CLAP>" 
+        intervals [11]:
+            xmin = 11.84 
+            xmax = 14.1 
+            text = "" 
+        intervals [12]:
+            xmin = 14.1 
+            xmax = 17.220000000000002 
+            text = "Well, right now we are being recorded by a camera, a microphone" 
+        intervals [13]:
+            xmin = 17.220000000000002 
+            xmax = 17.540000000000003 
+            text = "" 
+        intervals [14]:
+            xmin = 17.540000000000003 
+            xmax = 18.840314236706252 
+            text = "and a Microsoft Kinect sensor" 
+        intervals [15]:
+            xmin = 18.840314236706252 
+            xmax = 19.3 
+            text = "" 
+        intervals [16]:
+            xmin = 19.3 
+            xmax = 21.1 
+            text = "But how will we get the data from Kinect?" 
+        intervals [17]:
+            xmin = 21.1 
+            xmax = 27.700000000000003 
+            text = "" 
+        intervals [18]:
+            xmin = 27.700000000000003 
+            xmax = 31.480000000000004 
+            text = "We are using this timecode to synchronize the data that comes from Venice, " 
+        intervals [19]:
+            xmin = 31.480000000000004 
+            xmax = 31.62 
+            text = "" 
+        intervals [20]:
+            xmin = 31.62 
+            xmax = 32.86 
+            text = "With the audio and video" 
+        intervals [21]:
+            xmin = 32.86 
+            xmax = 33.76 
+            text = "" 
+        intervals [22]:
+            xmin = 33.76 
+            xmax = 34 
+            text = "<CLAP>" 
+        intervals [23]:
+            xmin = 34 
+            xmax = 37.4 
+            text = "" 
+        intervals [24]:
+            xmin = 37.4 
+            xmax = 41.3 
+            text = "We can process the data that comes from Venice, using the Mumodo Python package" 
+        intervals [25]:
+            xmin = 41.3 
+            xmax = 47.6 
+            text = "" 
+        intervals [26]:
+            xmin = 47.6 
+            xmax = 47.82 
+            text = "<CLAP>" 
+        intervals [27]:
+            xmin = 47.82 
+            xmax = 48.94 
+            text = "" 
+        intervals [28]:
+            xmin = 48.94 
+            xmax = 49.66 
+            text = "Goodbye" 
+        intervals [29]:
+            xmin = 49.66 
+            xmax = 50.5 
+            text = "" 
+    item [3]:
+        class = "TextTier" 
+        name = "CLAPS" 
+        xmin = 0 
+        xmax = 50.5 
+        points: size = 3 
+        points [1]:
+            number = 11.654229774916562 
+            mark = "First Clap" 
+        points [2]:
+            number = 33.82448532914639 
+            mark = "Second Clap" 
+        points [3]:
+            number = 47.67268461545157 
+            mark = "Third Clap" 

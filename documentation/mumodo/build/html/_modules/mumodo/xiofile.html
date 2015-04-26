@@ -1,0 +1,738 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>mumodo.xiofile &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for mumodo.xiofile</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;xiofile.py: Classes and functions handling XIO files</span>
+
+<span class="sd">   XIO files are shallow XML representations of typed, timed events.</span>
+<span class="sd">   The format was originally created by the AI Group, University of</span>
+<span class="sd">   Bielefeld. XIO files are typically compressed using the gzip</span>
+<span class="sd">   library.</span>
+
+<span class="sd">   This module contains the XIOFile class, which handles the file I/O</span>
+<span class="sd">   and allows quering the XIO files and seeking fast within them using</span>
+<span class="sd">   a pre-indexing mechanism.</span>
+
+<span class="sd">   Functions that operate on XIOFile objects could also be found here,</span>
+<span class="sd">   e.g. xiofile_quickcopy, a function that can copy a (region of) XIO</span>
+<span class="sd">   file into a new file</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Spyros Kousidis&quot;</span><span class="p">,</span> <span class="s">&quot;Katharina Jettka&quot;</span><span class="p">,</span> <span class="s">&quot;Gerdis Anderson&quot;</span><span class="p">,</span>
+              <span class="s">&quot;Robert Rogalla&quot;</span><span class="p">,</span> <span class="s">&quot;Fabian Wohlgemuth&quot;</span><span class="p">]</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Dialogue Systems Group Bielefeld - www.dsg-bielefeld.de&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Spyros Kousidis&quot;</span><span class="p">,</span> <span class="s">&quot;Katharina Jettka&quot;</span><span class="p">,</span> <span class="s">&quot;Gerdis Anderson&quot;</span><span class="p">,</span>
+               <span class="s">&quot;Robert Rogalla&quot;</span><span class="p">,</span> <span class="s">&quot;Fabian Wohlgemuth&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;GPL&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.1.1&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Spyros Kousidis&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s">&quot;Development&quot;</span> <span class="c"># Development/Production/Prototype</span>
+
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">from</span> <span class="nn">mumodo.InstantIO</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c"># Classes</span>
+    <span class="s">&#39;XIOFile&#39;</span><span class="p">,</span>
+    <span class="c"># Functions</span>
+    <span class="s">&#39;xiofile_quickcopy&#39;</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="XIOFile"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile">[docs]</a><span class="k">class</span> <span class="nc">XIOFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Load, index and query xio.gz files output by FAME logging tool.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="XIOFile.__init__"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">maxlines</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">headerlines</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fileformat</span><span class="o">=</span><span class="s">&quot;venice&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles compressed XIO file I/O.</span>
+
+<span class="sd">        Opens a compressed xio.gz file. This file is produced by legacy</span>
+<span class="sd">        fame logger as well as venice logger.</span>
+<span class="sd">        The file contains line terminated events that consist of a value,</span>
+<span class="sd">        type, timestamp, and value(sensor) name</span>
+
+<span class="sd">        Available modes:</span>
+<span class="sd">        &#39;r&#39;    --  Opens a compressed xio.gz file and creates a line</span>
+<span class="sd">                   index and a time index for fast seeking.</span>
+<span class="sd">        &#39;w&#39;    --  Creates a new xio.gz file and handles write to it.</span>
+
+<span class="sd">        Keyword args:</span>
+<span class="sd">        maxlines    --  The number of lines to index. Can be used to</span>
+<span class="sd">                        index a subset of the lines in case of a very</span>
+<span class="sd">                        long file</span>
+<span class="sd">        indexing    --  Performs indexing of lines and creates lookup</span>
+<span class="sd">                        tables for quick seeking.</span>
+<span class="sd">        headerlines --  The number of lines taken by the file  header.</span>
+<span class="sd">                        These lines are ignored</span>
+<span class="sd">        fileformat  --  The XML format to use when writing. Possible</span>
+<span class="sd">                        values:</span>
+<span class="sd">                        &quot;legacy&quot; - The old TechFak format</span>
+<span class="sd">                        &quot;venice&quot; - (default) the newer, shorter format</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexed</span> <span class="o">=</span> <span class="n">indexing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span> <span class="o">=</span> <span class="n">headerlines</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;r&#39;</span><span class="p">:</span>
+            <span class="c">#dictionary of fieldnames {sensorname: fieldnames}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fieldnames</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c">#open the file</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_gzipped</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\x1f\x8b</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_gzipped</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;opening compressed file ...&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;opening un-compressed file ...&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexed</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;opening file without indexing&#39;</span>
+                <span class="c"># Skip the header lines</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="c">#the next line contains the 1st timestamp</span>
+                <span class="c">#self.min_time = self.xio_parseline(self.f.readline())[&#39;time&#39;]</span>
+                <span class="c">#self.f.seek(0)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">line</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)[</span><span class="s">&#39;time&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;no valid lines found!&#39;</span>
+                <span class="c">#exit the constructor here if not indexing</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xio_index</span><span class="p">(</span><span class="n">maxlines</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&quot;w&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fileformat</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;legacy&#39;</span><span class="p">,</span> <span class="s">&#39;venice&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xioformat</span> <span class="o">=</span> <span class="n">fileformat</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xio_writeheader</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;unsupported file format.&quot;</span>
+                <span class="k">print</span> <span class="s">&quot; Only &#39;legacy&#39; and &#39;venice&#39; allowed&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;unsupported mode. Only &#39;r&#39; and &#39;w&#39; allowed&quot;</span>
+
+
+
+</div>
+<div class="viewcode-block" id="XIOFile.xio_index"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_index">[docs]</a>    <span class="k">def</span> <span class="nf">xio_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxlines</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform indexing of an input XIO file &quot;&quot;&quot;</span>
+        <span class="c">#Set up structures for indexing</span>
+        <span class="c">#List of file offsets every 1000 lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_offset</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#list of flie offsets every 1 sec (1000ms)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_offset</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#file indexing: populate line_offset every 1000 lines</span>
+        <span class="c">#time_offset every (approximately) one second</span>
+        <span class="c">#and fill fieldnames dictionary</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span> <span class="c">#cumulative byte offset</span>
+        <span class="n">toffset</span> <span class="o">=</span> <span class="mi">0</span> <span class="c">#last timestamp that was indexed</span>
+        <span class="n">tcurrent</span> <span class="o">=</span> <span class="mi">0</span> <span class="c">#current timestamp</span>
+        <span class="k">print</span> <span class="s">&#39;indexing ...&#39;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">):</span>
+            <span class="c">#do not look at the header lines. indexing starts</span>
+            <span class="c">#from the first line after the headerlines</span>
+            <span class="c">#Break if specified number of lines is reached</span>
+            <span class="k">if</span> <span class="n">maxlines</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">maxlines</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="c">#Create an index every 1000 lines</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">line_offset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+            <span class="c">#Create an index every (approximately 1000ms</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">parsedline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">tcurrent</span> <span class="o">=</span> <span class="n">parsedline</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">tcurrent</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;unable to parse line &#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">,</span> <span class="n">line</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;min_time&#39;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span> <span class="o">=</span> <span class="n">tcurrent</span>
+                <span class="k">if</span> <span class="n">tcurrent</span> <span class="o">-</span> <span class="n">toffset</span> <span class="o">&gt;=</span> <span class="mi">1000</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">time_offset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+                    <span class="n">toffset</span> <span class="o">=</span> <span class="n">tcurrent</span>
+                <span class="c">#populate fieldnames dictionary</span>
+                <span class="n">sname</span> <span class="o">=</span> <span class="n">parsedline</span><span class="p">[</span><span class="s">&#39;sensorname&#39;</span><span class="p">]</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">parsedline</span><span class="p">[</span><span class="s">&#39;fieldname&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">sname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fieldnames</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fieldnames</span><span class="p">[</span><span class="n">sname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="n">fname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fieldnames</span><span class="p">[</span><span class="n">sname</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fieldnames</span><span class="p">[</span><span class="n">sname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="c">#add to byte offset</span>
+            <span class="n">offset</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="c">#show progress</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">linecount</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000000</span>
+                <span class="k">if</span> <span class="n">linecount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="n">linecount</span><span class="p">,</span> <span class="s">&#39;million lines&#39;</span>
+            <span class="c">#first two and last line do not contain data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_lines</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="c">#self.min_time = self.xio_parseline_lineno(0)[&#39;time&#39;]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline_lineno</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lines</span><span class="p">)[</span><span class="s">&#39;time&#39;</span><span class="p">]</span>
+        <span class="k">print</span> <span class="s">&#39;done! (indexed &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_lines</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; lines)&#39;</span>
+
+</div>
+<div class="viewcode-block" id="XIOFile.xio_quicklinegen"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_quicklinegen">[docs]</a>    <span class="k">def</span> <span class="nf">xio_quicklinegen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">parsed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                         <span class="n">relative</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">on_errors</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Quickly generate a timestamp range for un-indexed files.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        start_time, end_time    --  The desired time range.</span>
+<span class="sd">        start_time = 0 means start reading from the first line of the file.</span>
+<span class="sd">        end_time = 0 means read until the end of the file.</span>
+
+<span class="sd">        Keyword argumetns:</span>
+<span class="sd">        parsed      --  Flag to yield parsed or non-parsed output.</span>
+<span class="sd">        relative    --  Flag to toggle between absolute and relative</span>
+<span class="sd">                        timestamps. Relative timestamps have the zero</span>
+<span class="sd">                        at min_time (the first timestamp in the file)</span>
+<span class="sd">        on_errors   --  Flag to toggle between different ways of</span>
+<span class="sd">                        handling unparseable lines. If on_errors is</span>
+<span class="sd">                        &#39;ignore&#39; (default), unparseable lines will</span>
+<span class="sd">                        be skipped without warning. If on_errors is</span>
+<span class="sd">                        &#39;report&#39;, a warning will be printed. If</span>
+<span class="sd">                        on_errors is &#39;stop&#39;, the generator will stop</span>
+<span class="sd">                        at the first unparseable line; an additional</span>
+<span class="sd">                        warning will be printed.</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ignore&#39;</span><span class="p">,</span> <span class="s">&#39;report&#39;</span><span class="p">,</span> <span class="s">&#39;stop&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">relative</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span>
+            <span class="k">if</span> <span class="n">end_time</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">end_time</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span>
+        <span class="c">#self.f.seek(0)</span>
+        <span class="c">#length = len([li for n, li in enumerate(self.f)]) - 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">):</span>
+            <span class="c">#Ignore 8the header lines</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">parsedline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">tcurrent</span> <span class="o">=</span> <span class="n">parsedline</span><span class="p">[</span><span class="s">&quot;time&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">tcurrent</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">errors</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">on_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&quot;line &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; not parseable&quot;</span>
+                <span class="k">if</span> <span class="n">errors</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">on_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">continue</span>  <span class="c">#for clarity</span>
+
+            <span class="k">if</span> <span class="n">tcurrent</span> <span class="o">&lt;</span> <span class="n">start_time</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">end_time</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">tcurrent</span> <span class="o">&gt;</span> <span class="n">end_time</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="k">yield</span> <span class="n">parsedline</span> <span class="k">if</span> <span class="n">parsed</span> <span class="k">else</span> <span class="n">line</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_quicksearch"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_quicksearch">[docs]</a>    <span class="k">def</span> <span class="nf">xio_quicksearch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">restart</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Quick searching of a timestamp for un-indexed files.</span>
+
+<span class="sd">        Search if a timestamp exists in the file. Useful function for</span>
+<span class="sd">        finding offsets between XIO files and other formats, such as</span>
+<span class="sd">        videos. Returns True,timestamp if timestap is found or</span>
+<span class="sd">        False, timestamp (the next one) if not</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        timestamp    --  The timestamp sought after.</span>
+<span class="sd">                     Use absolute times only (for now).</span>
+
+
+<span class="sd">        Keyword argumetns:</span>
+<span class="sd">        restart --  Flag to begin searching from the beginning of</span>
+<span class="sd">                    the file (for consecutive searches)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">restart</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">):</span>
+            <span class="c">#Ignore the header lines</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headerlines</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">parsedline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">tcurrent</span> <span class="o">=</span> <span class="n">parsedline</span><span class="p">[</span><span class="s">&quot;time&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">tcurrent</span> <span class="o">==</span> <span class="n">timestamp</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">tcurrent</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">tcurrent</span> <span class="o">&gt;</span> <span class="n">timestamp</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">tcurrent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">tcurrent</span><span class="p">,</span> <span class="s">&quot;end of file&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_seek"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_seek">[docs]</a>    <span class="k">def</span> <span class="nf">xio_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineno</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Seek up to a line by looking up the line_offset list.</span>
+
+<span class="sd">        Keyword arguments:</span>
+<span class="sd">        lineno    --  The line number to seek to.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexed</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="c">#find the nearest line_offset index and offset from there</span>
+        <span class="n">offset_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">lineno</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line_offset</span><span class="p">[</span><span class="n">offset_index</span><span class="p">])</span>
+        <span class="c">#readin x-1 lines where x is the offset from the last 1000_line_offset</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">lineno</span><span class="o">%</span><span class="mi">1000</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_timeseek"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_timeseek">[docs]</a>    <span class="k">def</span> <span class="nf">xio_timeseek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Seek to the first line with a specified timestamp</span>
+<span class="sd">        by looking up the time_offset list.</span>
+
+<span class="sd">        parameter:</span>
+<span class="sd">        timestamp    --  The time to seek to (in ms)</span>
+<span class="sd">        relative    --  Flag to toggle between absolute and relative</span>
+<span class="sd">                        timestamps. Relative timestamps have the zero</span>
+<span class="sd">                        at min_time (the first timestamp in the file)</span>
+
+<span class="sd">        returns:</span>
+<span class="sd">        False if timeseeking fails</span>
+<span class="sd">        The first line found with the requested timestamp</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexed</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="n">relative</span><span class="p">:</span>
+            <span class="n">timestamp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span>
+        <span class="k">if</span> <span class="n">timestamp</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span> <span class="ow">or</span> <span class="n">timestamp</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_time</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="c">#find the nearest time_offset index and offset from there</span>
+        <span class="n">offset_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">timestamp</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_offset</span><span class="p">[</span><span class="n">offset_index</span><span class="p">])</span>
+        <span class="c">#seek back if erroneoulsy sought too far</span>
+        <span class="k">while</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">timestamp</span><span class="p">)</span> <span class="ow">and</span> \
+              <span class="p">(</span><span class="n">offset_index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">offset_index</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_offset</span><span class="p">[</span><span class="n">offset_index</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">offset_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c">#readin lines until timestamp is found</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">timestamp</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">line</span>
+
+</div>
+<div class="viewcode-block" id="XIOFile.xio_getline"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_getline">[docs]</a>    <span class="k">def</span> <span class="nf">xio_getline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineno</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve a line from a previously opened and indexed XIO file.</span>
+
+<span class="sd">        Returns the line identified by lineno</span>
+
+<span class="sd">        Keyword arguments:</span>
+<span class="sd">        lineno    --  A line number.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lineno</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">lineno</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lines</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;line number out of range&quot;</span>
+        <span class="c">#seek to the line no</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xio_seek</span><span class="p">(</span><span class="n">lineno</span><span class="p">)</span>
+        <span class="c">#read the line</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_getline_attime"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_getline_attime">[docs]</a>    <span class="k">def</span> <span class="nf">xio_getline_attime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve a line from a previously opened and indexed XIO file.</span>
+
+<span class="sd">        Returns the first line found at timestamp</span>
+
+<span class="sd">        Keyword arguments:</span>
+<span class="sd">        timestamp    --  A timestamp.</span>
+<span class="sd">        relative     --  Toggle between relative and absolute timestamps</span>
+<span class="sd">                         Relative timestamps have their zero at min_time</span>
+<span class="sd">                         (the first timestamp in the file)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#seek to the first line with this timestamp</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_timeseek</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">relative</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+            <span class="c">#read the line</span>
+            <span class="k">return</span> <span class="n">line</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;time out of range&quot;</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_parsename"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_parsename">[docs]</a>    <span class="k">def</span> <span class="nf">xio_parsename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="s">&#39;//&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse a &#39;/&#39; delimited sensorname.</span>
+
+<span class="sd">        Parse the long sensor name into sensor name and</span>
+<span class="sd">        field name. the field name is only the last token</span>
+
+<span class="sd">        Keyword arguments:</span>
+<span class="sd">        line    --  A &#39;/&#39; delimited string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">field</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_parseline"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_parseline">[docs]</a>    <span class="k">def</span> <span class="nf">xio_parseline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="s">&#39; &#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse a raw xioline</span>
+
+<span class="sd">        Parse a line from a previously opened XIO file.</span>
+<span class="sd">        Return a dictionary describing the data.</span>
+
+<span class="sd">        Returns error codes in the &#39;time&#39; key of the dictionary:</span>
+<span class="sd">        -2 means line was parsed but the data type could not parse</span>
+<span class="sd">        -1 measn the line was not parsed (the line is passed as the</span>
+<span class="sd">        value)</span>
+
+<span class="sd">        Keyword arguments:</span>
+
+<span class="sd">        line    --  A line.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c">#support legacy format from fame logger that had</span>
+            <span class="c"># an &quot;:&quot; character in the type</span>
+            <span class="k">if</span> <span class="s">&#39;:&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s">&#39;&lt;:&#39;</span> <span class="o">+</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c">#get the sensor_name, value type, value and timestamp of event</span>
+            <span class="n">value_type</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">sensor_name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;sensorName=&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;value=&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;timestamp=&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c">#extract the field (slot) name from the sensor name</span>
+            <span class="n">sensor_name</span><span class="p">,</span> <span class="n">field_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parsename</span><span class="p">(</span><span class="n">sensor_name</span><span class="p">)</span>
+
+            <span class="c">#pack everything into a dict</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;valuetype&#39;</span><span class="p">:</span> <span class="n">value_type</span><span class="p">,</span>
+                      <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parsetypes</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">value_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()),</span>
+                      <span class="s">&#39;sensorname&#39;</span><span class="p">:</span> <span class="n">sensor_name</span><span class="p">,</span> <span class="s">&#39;fieldname&#39;</span><span class="p">:</span> <span class="n">field_name</span><span class="p">,</span>
+                      <span class="s">&#39;time&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)}</span>
+
+            <span class="c">#if the type is not supported return an error code of -2</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;KeyError&#39;</span><span class="p">):</span>
+                <span class="n">values</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;valuetype&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">line</span><span class="p">,</span> <span class="s">&#39;sensorname&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;fieldname&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;time&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">values</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_parsetypes"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_parsetypes">[docs]</a>    <span class="k">def</span> <span class="nf">xio_parsetypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">otype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert string value_types into suitable object types.</span>
+
+<span class="sd">           The type names are coded as strings. This function</span>
+<span class="sd">           assigns an appropriate parsing function to the value,</span>
+<span class="sd">           according to a lookup table.</span>
+
+<span class="sd">           Arguments</span>
+
+<span class="sd">           value -- The value</span>
+<span class="sd">           otype -- The string that describes the type (must be all lowercase)</span>
+
+<span class="sd">           If type is not found in the lookup table, the returned value is</span>
+<span class="sd">           a string starting with &#39;KeyError&#39;, followed by the type</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Dict of functions for parsing sensor values</span>
+        <span class="c"># appropriate to each input type.</span>
+        <span class="n">parsing_fn</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;sffloat&#39;</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                      <span class="s">&#39;sfvec3f&#39;</span> <span class="p">:</span> <span class="n">SFVec3f</span><span class="p">,</span>
+                      <span class="s">&#39;sfvec2f&#39;</span> <span class="p">:</span> <span class="n">SFVec2f</span><span class="p">,</span>
+                      <span class="s">&#39;mfvec2f&#39;</span> <span class="p">:</span> <span class="n">MFVec2f</span><span class="p">,</span>
+                      <span class="s">&#39;mfvec3f&#39;</span> <span class="p">:</span> <span class="n">MFVec3f</span><span class="p">,</span>
+                      <span class="s">&#39;sfrotation&#39;</span> <span class="p">:</span> <span class="n">SFRotation</span><span class="p">,</span>
+                      <span class="s">&#39;mfrotation&#39;</span> <span class="p">:</span> <span class="n">MFRotation</span><span class="p">,</span>
+                      <span class="s">&#39;sfbool&#39;</span> <span class="p">:</span> <span class="n">sfbool</span><span class="p">,</span>
+                      <span class="s">&#39;boolean&#39;</span><span class="p">:</span> <span class="n">sfbool</span><span class="p">,</span>
+                      <span class="s">&#39;sfint32&#39;</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                      <span class="s">&#39;sfstring&#39;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                      <span class="s">&#39;mfstring&#39;</span><span class="p">:</span> <span class="n">MFString</span><span class="p">,</span>
+                      <span class="s">&#39;mffloat&#39;</span><span class="p">:</span> <span class="n">MFFloat</span><span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">converted</span> <span class="o">=</span> <span class="n">parsing_fn</span><span class="p">[</span><span class="n">otype</span><span class="p">](</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">converted</span> <span class="o">=</span> <span class="s">&#39;KeyError:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">otype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">converted</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_parseline_lineno"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_parseline_lineno">[docs]</a>    <span class="k">def</span> <span class="nf">xio_parseline_lineno</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineno</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse a numbered line from a previously opened and</span>
+<span class="sd">           indexed XIO file.</span>
+
+<span class="sd">        Keyword arguments:</span>
+<span class="sd">        lineno    --  A line number.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xio_getline</span><span class="p">(</span><span class="n">lineno</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_parseline_attime"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_parseline_attime">[docs]</a>    <span class="k">def</span> <span class="nf">xio_parseline_attime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse a line at a specific timestamp from a previously</span>
+<span class="sd">           opened and indexed XIO file.</span>
+
+<span class="sd">        Keyword arguments:</span>
+<span class="sd">        timestamp    --  the reuested time. If several lines have the</span>
+<span class="sd">                         same timestamp, only the fisrt is parsed</span>
+<span class="sd">        relative     --  Toggle between relative and absolute timestamps</span>
+<span class="sd">                         Relative timestamps have their zero at min_time</span>
+<span class="sd">                         (the first timestamp in the file)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xio_getline_attime</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">relative</span><span class="p">))</span>
+
+
+</div>
+<div class="viewcode-block" id="XIOFile.xio_linegen"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_linegen">[docs]</a>    <span class="k">def</span> <span class="nf">xio_linegen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">parsed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">on_errors</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Generate a (raw or parsed) line range from a previously</span>
+<span class="sd">           opened and indexed XIO file.</span>
+
+<span class="sd">        Keyword arguments:</span>
+<span class="sd">        start,end    -- The line range.</span>
+<span class="sd">        parsed       -- Toggle between raw or parsed output lines</span>
+<span class="sd">        on_errors    -- Flag to toggle between different ways of</span>
+<span class="sd">                        handling unparseable lines. If on_errors is</span>
+<span class="sd">                        &#39;ignore&#39; (default), unparseable lines will</span>
+<span class="sd">                        be skipped without warning. If on_errors is</span>
+<span class="sd">                        &#39;report&#39;, a warning will be printed. If</span>
+<span class="sd">                        on_errors is &#39;stop&#39;, the generator will stop</span>
+<span class="sd">                        at the first unparseable line; an additional</span>
+<span class="sd">                        warning will be printed.</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">end</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_getline</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">==</span> \
+                          <span class="s">&quot;line number out of range&quot;</span> \
+                       <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_getline</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="o">==</span> <span class="s">&quot;line number out of range&quot;</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s">&quot;bad limits or limits out of range&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xio_seek</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">start</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ignore&#39;</span><span class="p">,</span> <span class="s">&#39;report&#39;</span><span class="p">,</span> <span class="s">&#39;stop&#39;</span><span class="p">]</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">parsed</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">line</span>
+                    <span class="k">continue</span>
+                <span class="c">#else:</span>
+                <span class="n">parsedline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">tcurrent</span> <span class="o">=</span> <span class="n">parsedline</span><span class="p">[</span><span class="s">&quot;time&quot;</span><span class="p">]</span>
+                <span class="c">#errors = [&#39;ignore&#39;, &#39;report&#39;, &#39;stop&#39;]</span>
+                <span class="k">if</span> <span class="n">tcurrent</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">errors</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">on_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s">&quot;line &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; not parseable&quot;</span>
+                    <span class="k">if</span> <span class="n">errors</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">on_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">parsedline</span>
+
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+
+
+</div>
+<div class="viewcode-block" id="XIOFile.xio_linegen_timerange"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_linegen_timerange">[docs]</a>    <span class="k">def</span> <span class="nf">xio_linegen_timerange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                              <span class="n">parsed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">on_errors</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a (parsed or raw) line range from a previously</span>
+<span class="sd">           opened and indexed XIO file.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        start_time, end_time -- timestamp range.</span>
+
+<span class="sd">        Keyword arguments:</span>
+<span class="sd">        relative     --  Toggle between relative and absolute timestamps</span>
+<span class="sd">                         Relative timestamps have their zero at min_time</span>
+<span class="sd">                         (the first timestamp in the file)</span>
+<span class="sd">        parsed -- Toggle between raw or parsed output lines</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ignore&#39;</span><span class="p">,</span> <span class="s">&#39;report&#39;</span><span class="p">,</span> <span class="s">&#39;stop&#39;</span><span class="p">]</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_timeseek</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">relative</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">start_time</span> <span class="o">&gt;</span> <span class="n">end_time</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s">&quot;bad limits&quot;</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s">&quot;time out of range&quot;</span> <span class="c">#exit if seeking was unsuccessful</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">relative</span><span class="p">:</span>
+                <span class="n">end_time</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span>
+                <span class="n">start_time</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_time</span>
+            <span class="n">tcurrent</span> <span class="o">=</span> <span class="n">start_time</span>
+            <span class="n">parsedline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">tcurrent</span> <span class="o">&lt;=</span> <span class="n">end_time</span> <span class="ow">and</span> <span class="n">line</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tcurrent</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">parsedline</span> <span class="k">if</span> <span class="n">parsed</span> <span class="k">else</span> <span class="n">line</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">errors</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">on_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s">&quot;unparseable line: &quot;</span> <span class="o">+</span> <span class="n">line</span>
+                    <span class="k">if</span> <span class="n">errors</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">on_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+                <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="n">parsedline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xio_parseline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">tcurrent</span> <span class="o">=</span> <span class="n">parsedline</span><span class="p">[</span><span class="s">&quot;time&quot;</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_formatline"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_formatline">[docs]</a>    <span class="k">def</span> <span class="nf">xio_formatline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">sensorname</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span>
+                       <span class="n">timestamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Format a raw XIO line for output from the given input</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        value_type  -- A string describing the object type</span>
+<span class="sd">        value       -- The value of the object</span>
+<span class="sd">        sensorname  -- possibly &#39;/&#39; delimited string describing the</span>
+<span class="sd">                       sensor, or namespace of this field</span>
+<span class="sd">        fieldname   -- The name of the field</span>
+<span class="sd">        timestamp   -- The timestamp of this line</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">string</span><span class="p">[</span><span class="s">&#39;legacy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;irio:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value_type</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; value=&quot;&#39;</span> <span class="o">+</span> \
+                           <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&quot; sensorName=&quot;xioFileClass/&#39;</span> <span class="o">+</span> \
+                           <span class="nb">str</span><span class="p">(</span><span class="n">sensorname</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span> <span class="o">+</span> \
+                           <span class="s">&#39;&quot; timestamp=&quot;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&quot;&gt;&lt;/irio:&#39;</span> <span class="o">+</span> \
+                           <span class="nb">str</span><span class="p">(</span><span class="n">value_type</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&gt;&#39;</span> <span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">string</span><span class="p">[</span><span class="s">&#39;venice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value_type</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; value=&quot;&#39;</span> <span class="o">+</span> \
+                           <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&quot; timestamp=&quot;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span> <span class="o">+</span> \
+                           <span class="s">&#39;&quot; sensorName=&quot;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sensorname</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> \
+                           <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&quot;/&gt;&#39;</span>  <span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="k">return</span> <span class="n">string</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">xioformat</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_writeheader"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_writeheader">[docs]</a>    <span class="k">def</span> <span class="nf">xio_writeheader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the header to the output XIO file&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xio_writeline</span><span class="p">(</span><span class="s">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#39;</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">string</span><span class="p">[</span><span class="s">&#39;legacy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;&lt;instantioprotocol xmlns=&quot;http://www.techfak.uni&#39;</span>
+                            <span class="s">&#39;-bielefeld.de/ags/wbski/instantloggerprotocol&quot;&#39;</span>
+                            <span class="s">&#39; xmlns:irio=&quot;http://www.techfak.uni-bielefeld.de&#39;</span>
+                            <span class="s">&#39;/ags/wbski/instantloggerprotocol/interaction&quot;&#39;</span>
+                            <span class="s">&#39; version=&quot;1&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="n">string</span><span class="p">[</span><span class="s">&#39;venice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;&lt;veniceprotocol info=&quot;venice file format &#39;</span>
+                            <span class="s">&#39;generated by mumodo&quot; version=&quot;1.0&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xio_writeline</span><span class="p">(</span><span class="n">string</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">xioformat</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xio_writeline"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xio_writeline">[docs]</a>    <span class="k">def</span> <span class="nf">xio_writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write a line to an XIO file previously opened for writing &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="XIOFile.xiofile_close"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.XIOFile.xiofile_close">[docs]</a>    <span class="k">def</span> <span class="nf">xiofile_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close a previously opened xio File.&quot;&quot;&quot;</span>
+
+        <span class="n">string</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">string</span><span class="p">[</span><span class="s">&#39;legacy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;/instantioprotocol&gt;&#39;</span>
+        <span class="n">string</span><span class="p">[</span><span class="s">&#39;venice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;/veniceprotocol&gt;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;w&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xio_writeline</span><span class="p">(</span><span class="n">string</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">xioformat</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+</div></div>
+<div class="viewcode-block" id="xiofile_quickcopy"><a class="viewcode-back" href="../../mumodo/XIOFile.html#mumodo.xiofile.xiofile_quickcopy">[docs]</a><span class="k">def</span> <span class="nf">xiofile_quickcopy</span><span class="p">(</span><span class="n">origin_file</span><span class="p">,</span> <span class="n">new_file</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                      <span class="n">relative</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Copy a part of a XIOFile to a new file.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    origin_file        --  Filename and path of the file to copy.</span>
+<span class="sd">    new_file           --  Filename and path of the new file.</span>
+
+<span class="sd">    Keyword arguments:</span>
+<span class="sd">    start_time,end_time  --  Time range which should be copied. Default</span>
+<span class="sd">                             values copy the entire file.</span>
+<span class="sd">    relative     --  Toggle between relative and absolute timestamps</span>
+<span class="sd">                     Relative timestamps have their zero at min_time</span>
+<span class="sd">                     (the first timestamp in the file)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">infile</span> <span class="o">=</span> <span class="n">XIOFile</span><span class="p">(</span><span class="n">origin_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">oufile</span> <span class="o">=</span> <span class="n">XIOFile</span><span class="p">(</span><span class="n">new_file</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">infile</span><span class="o">.</span><span class="n">xio_quicklinegen</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">parsed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                        <span class="n">relative</span><span class="o">=</span><span class="n">relative</span><span class="p">):</span>
+        <span class="n">oufile</span><span class="o">.</span><span class="n">xio_writeline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">infile</span><span class="o">.</span><span class="n">xiofile_close</span><span class="p">()</span>
+    <span class="n">oufile</span><span class="o">.</span><span class="n">xiofile_close</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

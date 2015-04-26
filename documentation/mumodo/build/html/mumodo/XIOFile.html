@@ -1,0 +1,422 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xiofile.py &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../index.html" />
+    <link rel="next" title="increco.py" href="IncReco.html" />
+    <link rel="prev" title="analysis.py" href="Analysis.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="IncReco.html" title="increco.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Analysis.html" title="analysis.py"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="xiofile-py">
+<h1>xiofile.py<a class="headerlink" href="#xiofile-py" title="Permalink to this headline">¶</a></h1>
+<p>Parse, copy and create XIO files</p>
+<span class="target" id="module-mumodo.xiofile"></span><p>xiofile.py: Classes and functions handling XIO files</p>
+<p>XIO files are shallow XML representations of typed, timed events.
+The format was originally created by the AI Group, University of
+Bielefeld. XIO files are typically compressed using the gzip
+library.</p>
+<p>This module contains the XIOFile class, which handles the file I/O
+and allows quering the XIO files and seeking fast within them using
+a pre-indexing mechanism.</p>
+<p>Functions that operate on XIOFile objects could also be found here,
+e.g. xiofile_quickcopy, a function that can copy a (region of) XIO
+file into a new file</p>
+<dl class="class">
+<dt id="mumodo.xiofile.XIOFile">
+<em class="property">class </em><tt class="descclassname">mumodo.xiofile.</tt><tt class="descname">XIOFile</tt><big>(</big><em>path</em>, <em>mode='r'</em>, <em>maxlines=0</em>, <em>indexing=False</em>, <em>headerlines=2</em>, <em>fileformat='venice'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load, index and query xio.gz files output by FAME logging tool.</p>
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>path</em>, <em>mode='r'</em>, <em>maxlines=0</em>, <em>indexing=False</em>, <em>headerlines=2</em>, <em>fileformat='venice'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles compressed XIO file I/O.</p>
+<p>Opens a compressed xio.gz file. This file is produced by legacy
+fame logger as well as venice logger.
+The file contains line terminated events that consist of a value,
+type, timestamp, and value(sensor) name</p>
+<p>Available modes:
+&#8216;r&#8217;    &#8211;  Opens a compressed xio.gz file and creates a line</p>
+<blockquote>
+<div>index and a time index for fast seeking.</div></blockquote>
+<p>&#8216;w&#8217;    &#8211;  Creates a new xio.gz file and handles write to it.</p>
+<p>Keyword args:
+maxlines    &#8211;  The number of lines to index. Can be used to</p>
+<blockquote>
+<div>index a subset of the lines in case of a very
+long file</div></blockquote>
+<dl class="docutils">
+<dt>indexing    &#8211;  Performs indexing of lines and creates lookup</dt>
+<dd>tables for quick seeking.</dd>
+<dt>headerlines &#8211;  The number of lines taken by the file  header.</dt>
+<dd>These lines are ignored</dd>
+<dt>fileformat  &#8211;  The XML format to use when writing. Possible</dt>
+<dd>values:
+&#8220;legacy&#8221; - The old TechFak format
+&#8220;venice&#8221; - (default) the newer, shorter format</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mumodo.xiofile.XIOFile.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#mumodo.xiofile.XIOFile.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_formatline">
+<tt class="descname">xio_formatline</tt><big>(</big><em>value_type</em>, <em>value</em>, <em>sensorname</em>, <em>fieldname</em>, <em>timestamp</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_formatline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_formatline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a raw XIO line for output from the given input</p>
+<p>Arguments:
+value_type  &#8211; A string describing the object type
+value       &#8211; The value of the object
+sensorname  &#8211; possibly &#8216;/&#8217; delimited string describing the</p>
+<blockquote>
+<div>sensor, or namespace of this field</div></blockquote>
+<p>fieldname   &#8211; The name of the field
+timestamp   &#8211; The timestamp of this line</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_getline">
+<tt class="descname">xio_getline</tt><big>(</big><em>lineno=0</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_getline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_getline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a line from a previously opened and indexed XIO file.</p>
+<p>Returns the line identified by lineno</p>
+<p>Keyword arguments:
+lineno    &#8211;  A line number.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_getline_attime">
+<tt class="descname">xio_getline_attime</tt><big>(</big><em>timestamp=0</em>, <em>relative=True</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_getline_attime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_getline_attime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a line from a previously opened and indexed XIO file.</p>
+<p>Returns the first line found at timestamp</p>
+<p>Keyword arguments:
+timestamp    &#8211;  A timestamp.
+relative     &#8211;  Toggle between relative and absolute timestamps</p>
+<blockquote>
+<div>Relative timestamps have their zero at min_time
+(the first timestamp in the file)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_index">
+<tt class="descname">xio_index</tt><big>(</big><em>maxlines</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform indexing of an input XIO file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_linegen">
+<tt class="descname">xio_linegen</tt><big>(</big><em>start=0</em>, <em>end=1</em>, <em>parsed=True</em>, <em>on_errors='ignore'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_linegen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_linegen" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Generate a (raw or parsed) line range from a previously</dt>
+<dd>opened and indexed XIO file.</dd>
+</dl>
+<p>Keyword arguments:
+start,end    &#8211; The line range.
+parsed       &#8211; Toggle between raw or parsed output lines
+on_errors    &#8211; Flag to toggle between different ways of</p>
+<blockquote>
+<div>handling unparseable lines. If on_errors is
+&#8216;ignore&#8217; (default), unparseable lines will
+be skipped without warning. If on_errors is
+&#8216;report&#8217;, a warning will be printed. If
+on_errors is &#8216;stop&#8217;, the generator will stop
+at the first unparseable line; an additional
+warning will be printed.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_linegen_timerange">
+<tt class="descname">xio_linegen_timerange</tt><big>(</big><em>start_time</em>, <em>end_time</em>, <em>relative=True</em>, <em>parsed=True</em>, <em>on_errors='ignore'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_linegen_timerange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_linegen_timerange" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Generate a (parsed or raw) line range from a previously</dt>
+<dd>opened and indexed XIO file.</dd>
+</dl>
+<p>Arguments:
+start_time, end_time &#8211; timestamp range.</p>
+<p>Keyword arguments:
+relative     &#8211;  Toggle between relative and absolute timestamps</p>
+<blockquote>
+<div>Relative timestamps have their zero at min_time
+(the first timestamp in the file)</div></blockquote>
+<p>parsed &#8211; Toggle between raw or parsed output lines</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_parseline">
+<tt class="descname">xio_parseline</tt><big>(</big><em>line=' '</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_parseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_parseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a raw xioline</p>
+<p>Parse a line from a previously opened XIO file.
+Return a dictionary describing the data.</p>
+<p>Returns error codes in the &#8216;time&#8217; key of the dictionary:
+-2 means line was parsed but the data type could not parse
+-1 measn the line was not parsed (the line is passed as the
+value)</p>
+<p>Keyword arguments:</p>
+<p>line    &#8211;  A line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_parseline_attime">
+<tt class="descname">xio_parseline_attime</tt><big>(</big><em>timestamp=0</em>, <em>relative=True</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_parseline_attime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_parseline_attime" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Parse a line at a specific timestamp from a previously</dt>
+<dd>opened and indexed XIO file.</dd>
+</dl>
+<p>Keyword arguments:
+timestamp    &#8211;  the reuested time. If several lines have the</p>
+<blockquote>
+<div>same timestamp, only the fisrt is parsed</div></blockquote>
+<dl class="docutils">
+<dt>relative     &#8211;  Toggle between relative and absolute timestamps</dt>
+<dd>Relative timestamps have their zero at min_time
+(the first timestamp in the file)</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_parseline_lineno">
+<tt class="descname">xio_parseline_lineno</tt><big>(</big><em>lineno=0</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_parseline_lineno"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_parseline_lineno" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Parse a numbered line from a previously opened and</dt>
+<dd>indexed XIO file.</dd>
+</dl>
+<p>Keyword arguments:
+lineno    &#8211;  A line number.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_parsename">
+<tt class="descname">xio_parsename</tt><big>(</big><em>line='//'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_parsename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_parsename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a &#8216;/&#8217; delimited sensorname.</p>
+<p>Parse the long sensor name into sensor name and
+field name. the field name is only the last token</p>
+<p>Keyword arguments:
+line    &#8211;  A &#8216;/&#8217; delimited string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_parsetypes">
+<tt class="descname">xio_parsetypes</tt><big>(</big><em>value</em>, <em>otype</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_parsetypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_parsetypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert string value_types into suitable object types.</p>
+<p>The type names are coded as strings. This function
+assigns an appropriate parsing function to the value,
+according to a lookup table.</p>
+<p>Arguments</p>
+<p>value &#8211; The value
+otype &#8211; The string that describes the type (must be all lowercase)</p>
+<p>If type is not found in the lookup table, the returned value is
+a string starting with &#8216;KeyError&#8217;, followed by the type</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_quicklinegen">
+<tt class="descname">xio_quicklinegen</tt><big>(</big><em>start_time</em>, <em>end_time</em>, <em>parsed=True</em>, <em>relative=True</em>, <em>on_errors='ignore'</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_quicklinegen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_quicklinegen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quickly generate a timestamp range for un-indexed files.</p>
+<p>Arguments:
+start_time, end_time    &#8211;  The desired time range.
+start_time = 0 means start reading from the first line of the file.
+end_time = 0 means read until the end of the file.</p>
+<p>Keyword argumetns:
+parsed      &#8211;  Flag to yield parsed or non-parsed output.
+relative    &#8211;  Flag to toggle between absolute and relative</p>
+<blockquote>
+<div>timestamps. Relative timestamps have the zero
+at min_time (the first timestamp in the file)</div></blockquote>
+<dl class="docutils">
+<dt>on_errors   &#8211;  Flag to toggle between different ways of</dt>
+<dd>handling unparseable lines. If on_errors is
+&#8216;ignore&#8217; (default), unparseable lines will
+be skipped without warning. If on_errors is
+&#8216;report&#8217;, a warning will be printed. If
+on_errors is &#8216;stop&#8217;, the generator will stop
+at the first unparseable line; an additional
+warning will be printed.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_quicksearch">
+<tt class="descname">xio_quicksearch</tt><big>(</big><em>timestamp</em>, <em>restart=True</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_quicksearch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_quicksearch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quick searching of a timestamp for un-indexed files.</p>
+<p>Search if a timestamp exists in the file. Useful function for
+finding offsets between XIO files and other formats, such as
+videos. Returns True,timestamp if timestap is found or
+False, timestamp (the next one) if not</p>
+<p>Arguments:
+timestamp    &#8211;  The timestamp sought after.</p>
+<blockquote>
+<div>Use absolute times only (for now).</div></blockquote>
+<p>Keyword argumetns:
+restart &#8211;  Flag to begin searching from the beginning of</p>
+<blockquote>
+<div>the file (for consecutive searches)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_seek">
+<tt class="descname">xio_seek</tt><big>(</big><em>lineno=0</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_seek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_seek" title="Permalink to this definition">¶</a></dt>
+<dd><p>Seek up to a line by looking up the line_offset list.</p>
+<p>Keyword arguments:
+lineno    &#8211;  The line number to seek to.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_timeseek">
+<tt class="descname">xio_timeseek</tt><big>(</big><em>timestamp=0</em>, <em>relative=True</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_timeseek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_timeseek" title="Permalink to this definition">¶</a></dt>
+<dd><p>Seek to the first line with a specified timestamp
+by looking up the time_offset list.</p>
+<p>parameter:
+timestamp    &#8211;  The time to seek to (in ms)
+relative    &#8211;  Flag to toggle between absolute and relative</p>
+<blockquote>
+<div>timestamps. Relative timestamps have the zero
+at min_time (the first timestamp in the file)</div></blockquote>
+<p>returns:
+False if timeseeking fails
+The first line found with the requested timestamp</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_writeheader">
+<tt class="descname">xio_writeheader</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_writeheader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_writeheader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the header to the output XIO file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xio_writeline">
+<tt class="descname">xio_writeline</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xio_writeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xio_writeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a line to an XIO file previously opened for writing</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mumodo.xiofile.XIOFile.xiofile_close">
+<tt class="descname">xiofile_close</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#XIOFile.xiofile_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.XIOFile.xiofile_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close a previously opened xio File.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.xiofile.xiofile_quickcopy">
+<tt class="descclassname">mumodo.xiofile.</tt><tt class="descname">xiofile_quickcopy</tt><big>(</big><em>origin_file</em>, <em>new_file</em>, <em>start_time=0</em>, <em>end_time=0</em>, <em>relative=True</em><big>)</big><a class="reference internal" href="../_modules/mumodo/xiofile.html#xiofile_quickcopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.xiofile.xiofile_quickcopy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy a part of a XIOFile to a new file.</p>
+<p>Arguments:
+origin_file        &#8211;  Filename and path of the file to copy.
+new_file           &#8211;  Filename and path of the new file.</p>
+<p>Keyword arguments:
+start_time,end_time  &#8211;  Time range which should be copied. Default</p>
+<blockquote>
+<div>values copy the entire file.</div></blockquote>
+<dl class="docutils">
+<dt>relative     &#8211;  Toggle between relative and absolute timestamps</dt>
+<dd>Relative timestamps have their zero at min_time
+(the first timestamp in the file)</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Analysis.html"
+                        title="previous chapter">analysis.py</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="IncReco.html"
+                        title="next chapter">increco.py</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/mumodo/XIOFile.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="IncReco.html" title="increco.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Analysis.html" title="analysis.py"
+             >previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

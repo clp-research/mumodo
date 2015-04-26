@@ -1,0 +1,146 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0.0
+xmax = 80.0
+tiers? <exists>
+size = 1
+item []:
+	item [1]:
+		class = "IntervalTier"
+		name = "labels"
+		xmin = 0.0
+		xmax = 80.0
+		intervals: size = 33
+		intervals [1]:
+			xmin = 0.0
+			xmax = 1.0
+			text = "a"
+		intervals [2]:
+			xmin = 1.0
+			xmax = 2.0
+			text = ""
+		intervals [3]:
+			xmin = 2.0
+			xmax = 3.0
+			text = "b"
+		intervals [4]:
+			xmin = 3.0
+			xmax = 5.0
+			text = ""
+		intervals [5]:
+			xmin = 5.0
+			xmax = 6.0
+			text = "b"
+		intervals [6]:
+			xmin = 6.0
+			xmax = 8.0
+			text = ""
+		intervals [7]:
+			xmin = 8.0
+			xmax = 9.0
+			text = "b"
+		intervals [8]:
+			xmin = 9.0
+			xmax = 10.0
+			text = "c"
+		intervals [9]:
+			xmin = 10.0
+			xmax = 15.0
+			text = ""
+		intervals [10]:
+			xmin = 15.0
+			xmax = 16.0
+			text = "c"
+		intervals [11]:
+			xmin = 16.0
+			xmax = 17.0
+			text = "c"
+		intervals [12]:
+			xmin = 17.0
+			xmax = 18.0
+			text = "c"
+		intervals [13]:
+			xmin = 18.0
+			xmax = 21.0
+			text = ""
+		intervals [14]:
+			xmin = 21.0
+			xmax = 22.0
+			text = "d"
+		intervals [15]:
+			xmin = 22.0
+			xmax = 25.0
+			text = ""
+		intervals [16]:
+			xmin = 25.0
+			xmax = 26.0
+			text = "e"
+		intervals [17]:
+			xmin = 26.0
+			xmax = 27.0
+			text = ""
+		intervals [18]:
+			xmin = 27.0
+			xmax = 28.0
+			text = "e"
+		intervals [19]:
+			xmin = 28.0
+			xmax = 31.0
+			text = ""
+		intervals [20]:
+			xmin = 31.0
+			xmax = 32.0
+			text = "a"
+		intervals [21]:
+			xmin = 32.0
+			xmax = 33.0
+			text = "a"
+		intervals [22]:
+			xmin = 33.0
+			xmax = 43.0
+			text = ""
+		intervals [23]:
+			xmin = 43.0
+			xmax = 44.0
+			text = "a"
+		intervals [24]:
+			xmin = 44.0
+			xmax = 45.0
+			text = "a"
+		intervals [25]:
+			xmin = 45.0
+			xmax = 55.0
+			text = ""
+		intervals [26]:
+			xmin = 55.0
+			xmax = 56.0
+			text = "c"
+		intervals [27]:
+			xmin = 56.0
+			xmax = 57.0
+			text = "c"
+		intervals [28]:
+			xmin = 57.0
+			xmax = 58.0
+			text = ""
+		intervals [29]:
+			xmin = 58.0
+			xmax = 59.0
+			text = "c"
+		intervals [30]:
+			xmin = 59.0
+			xmax = 68.0
+			text = ""
+		intervals [31]:
+			xmin = 68.0
+			xmax = 69.0
+			text = "b"
+		intervals [32]:
+			xmin = 69.0
+			xmax = 79.0
+			text = ""
+		intervals [33]:
+			xmin = 79.0
+			xmax = 80.0
+			text = "b"

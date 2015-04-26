@@ -1,0 +1,1098 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 1631.88 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "HeadZM" 
+        xmin = 0 
+        xmax = 1631.88 
+        intervals: size = 271 
+        intervals [1]:
+            xmin = 0 
+            xmax = 546.603 
+            text = "" 
+        intervals [2]:
+            xmin = 546.603 
+            xmax = 547.09 
+            text = "turn-1-tw" 
+        intervals [3]:
+            xmin = 547.09 
+            xmax = 549.493 
+            text = "" 
+        intervals [4]:
+            xmin = 549.493 
+            xmax = 550.043 
+            text = "turn-1-aw" 
+        intervals [5]:
+            xmin = 550.043 
+            xmax = 555.793 
+            text = "" 
+        intervals [6]:
+            xmin = 555.793 
+            xmax = 556.553 
+            text = "nod-1+turn-1-tw" 
+        intervals [7]:
+            xmin = 556.553 
+            xmax = 556.78 
+            text = "" 
+        intervals [8]:
+            xmin = 556.78 
+            xmax = 557.54 
+            text = "nod-1+pro-1+nod-1" 
+        intervals [9]:
+            xmin = 557.54 
+            xmax = 561.48 
+            text = "" 
+        intervals [10]:
+            xmin = 561.48 
+            xmax = 563.388 
+            text = "nod-3" 
+        intervals [11]:
+            xmin = 563.388 
+            xmax = 567.246 
+            text = "" 
+        intervals [12]:
+            xmin = 567.246 
+            xmax = 567.984 
+            text = "slide-1-left" 
+        intervals [13]:
+            xmin = 567.984 
+            xmax = 578.118 
+            text = "" 
+        intervals [14]:
+            xmin = 578.118 
+            xmax = 579.564 
+            text = " nod-5+turn-1-tw" 
+        intervals [15]:
+            xmin = 579.564 
+            xmax = 585.96 
+            text = "" 
+        intervals [16]:
+            xmin = 585.96 
+            xmax = 587.07 
+            text = "nod-2+slide-1-left+nod-2" 
+        intervals [17]:
+            xmin = 587.07 
+            xmax = 604.65 
+            text = "" 
+        intervals [18]:
+            xmin = 604.65 
+            xmax = 607.434 
+            text = "nod-4+shake-2+turn-1-tw" 
+        intervals [19]:
+            xmin = 607.434 
+            xmax = 609.078 
+            text = "" 
+        intervals [20]:
+            xmin = 609.078 
+            xmax = 610.026 
+            text = "nod-2" 
+        intervals [21]:
+            xmin = 610.026 
+            xmax = 617.304 
+            text = "" 
+        intervals [22]:
+            xmin = 617.304 
+            xmax = 618.852 
+            text = "turn-1-tw+nod-5" 
+        intervals [23]:
+            xmin = 618.852 
+            xmax = 625.494 
+            text = "" 
+        intervals [24]:
+            xmin = 625.494 
+            xmax = 626.298 
+            text = "nod-3" 
+        intervals [25]:
+            xmin = 626.298 
+            xmax = 640.926 
+            text = "" 
+        intervals [26]:
+            xmin = 640.926 
+            xmax = 642.204 
+            text = "nod-4" 
+        intervals [27]:
+            xmin = 642.204 
+            xmax = 643.884 
+            text = "" 
+        intervals [28]:
+            xmin = 643.884 
+            xmax = 644.556 
+            text = "nod-2" 
+        intervals [29]:
+            xmin = 644.556 
+            xmax = 654.78 
+            text = "" 
+        intervals [30]:
+            xmin = 654.78 
+            xmax = 655.494 
+            text = "shake-3"
+        intervals [31]:
+            xmin = 655.494 
+            xmax = 660.822 
+            text = "" 
+        intervals [32]:
+            xmin = 660.822 
+            xmax = 661.344 
+            text = "turn-1-aw" 
+        intervals [33]:
+            xmin = 661.344 
+            xmax = 668.304 
+            text = "" 
+        intervals [34]:
+            xmin = 668.304 
+            xmax = 668.868 
+            text = "turn-1-tw+nod-2" 
+        intervals [35]:
+            xmin = 668.868 
+            xmax = 671.622 
+            text = "" 
+        intervals [36]:
+            xmin = 671.622 
+            xmax = 672.222 
+            text = "turn-1-aw" 
+        intervals [37]:
+            xmin = 672.222 
+            xmax = 672.774 
+            text = "" 
+        intervals [38]:
+            xmin = 672.774 
+            xmax = 673.386 
+            text = "turn-1-tw" 
+        intervals [39]:
+            xmin = 673.386 
+            xmax = 677.742 
+            text = "" 
+        intervals [40]:
+            xmin = 677.742 
+            xmax = 678.492 
+            text = "tilt-1-left" 
+        intervals [41]:
+            xmin = 678.492 
+            xmax = 679.398 
+            text = "" 
+        intervals [42]:
+            xmin = 679.398 
+            xmax = 680.538 
+            text = "tilt-1-right+turn-1-aw" 
+        intervals [43]:
+            xmin = 680.538 
+            xmax = 681.102 
+            text = "" 
+        intervals [44]:
+            xmin = 681.102 
+            xmax = 681.504 
+            text = "turn-1-tw" 
+        intervals [45]:
+            xmin = 681.504 
+            xmax = 683.67 
+            text = "" 
+        intervals [46]:
+            xmin = 683.67 
+            xmax = 684.354 
+            text = "nod-2" 
+        intervals [47]:
+            xmin = 684.354 
+            xmax = 697.98 
+            text = "" 
+        intervals [48]:
+            xmin = 697.98 
+            xmax = 698.526 
+            text = "turn-1-aw" 
+        intervals [49]:
+            xmin = 698.526 
+            xmax = 701.94 
+            text = "" 
+        intervals [50]:
+            xmin = 701.94 
+            xmax = 703.998 
+            text = "turn-1-tw+nod-1+retr-1+nod-2" 
+        intervals [51]:
+            xmin = 703.998 
+            xmax = 709.95 
+            text = "" 
+        intervals [52]:
+            xmin = 709.95 
+            xmax = 710.502 
+            text = "turn-1-tw" 
+        intervals [53]:
+            xmin = 710.502 
+            xmax = 722.724 
+            text = "" 
+        intervals [54]:
+            xmin = 722.724 
+            xmax = 724.53 
+            text = "jerk-1+nod-1+tilt-1-right+nod-2" 
+        intervals [55]:
+            xmin = 724.53 
+            xmax = 726.87 
+            text = "" 
+        intervals [56]:
+            xmin = 726.87 
+            xmax = 727.728 
+            text = "turn-1-tw+nod-2" 
+        intervals [57]:
+            xmin = 727.728 
+            xmax = 730.776 
+            text = "" 
+        intervals [58]:
+            xmin = 730.776 
+            xmax = 732.318 
+            text = "nod-1+turn-1-aw+pro-1+turn-1-tw+nod-2" 
+        intervals [59]:
+            xmin = 732.318 
+            xmax = 733.416 
+            text = "" 
+        intervals [60]:
+            xmin = 733.416 
+            xmax = 735.906 
+            text = "nod-2+tilt-1-right+nod-4" 
+        intervals [61]:
+            xmin = 735.906 
+            xmax = 737.058 
+            text = "" 
+        intervals [62]:
+            xmin = 737.058 
+            xmax = 738.45 
+            text = "nod-4" 
+        intervals [63]:
+            xmin = 738.45 
+            xmax = 739.35 
+            text = "" 
+        intervals [64]:
+            xmin = 739.35 
+            xmax = 739.806 
+            text = "turn-1-aw" 
+        intervals [65]:
+            xmin = 739.806 
+            xmax = 740.964 
+            text = "" 
+        intervals [66]:
+            xmin = 740.964 
+            xmax = 741.312 
+            text = "turn-1-tw" 
+        intervals [67]:
+            xmin = 741.312 
+            xmax = 747.42 
+            text = "" 
+        intervals [68]:
+            xmin = 747.42 
+            xmax = 748.008 
+            text = "turn-1-tw" 
+        intervals [69]:
+            xmin = 748.008 
+            xmax = 748.968 
+            text = "" 
+        intervals [70]:
+            xmin = 748.968 
+            xmax = 750.186 
+            text = "nod-3+slide-1-left" 
+        intervals [71]:
+            xmin = 750.186 
+            xmax = 765.69 
+            text = "" 
+        intervals [72]:
+            xmin = 765.69 
+            xmax = 767.568 
+            text = "nod-1+itlt-1-right+nod-4" 
+        intervals [73]:
+            xmin = 767.568 
+            xmax = 771.192 
+            text = "" 
+        intervals [74]:
+            xmin = 771.192 
+            xmax = 771.57 
+            text = "turn-1-tw" 
+        intervals [75]:
+            xmin = 771.57 
+            xmax = 782.754 
+            text = "" 
+        intervals [76]:
+            xmin = 782.754 
+            xmax = 783.144 
+            text = "turn-1-aw" 
+        intervals [77]:
+            xmin = 783.144 
+            xmax = 786.174 
+            text = "" 
+        intervals [78]:
+            xmin = 786.174 
+            xmax = 786.558 
+            text = "nod-1" 
+        intervals [79]:
+            xmin = 786.558 
+            xmax = 790.44 
+            text = "" 
+        intervals [80]:
+            xmin = 790.44 
+            xmax = 791.76 
+            text = "turn-1-aw+turn-1-tw" 
+        intervals [81]:
+            xmin = 791.76 
+            xmax = 796.35 
+            text = "" 
+        intervals [82]:
+            xmin = 796.35 
+            xmax = 796.92 
+            text = "turn-1-tw" 
+        intervals [83]:
+            xmin = 796.92 
+            xmax = 799.332 
+            text = "" 
+        intervals [84]:
+            xmin = 799.332 
+            xmax = 799.89 
+            text = "nod-1" 
+        intervals [85]:
+            xmin = 799.89 
+            xmax = 805.416 
+            text = "" 
+        intervals [86]:
+            xmin = 805.416 
+            xmax = 806.07 
+            text = "jerk-1+nod-1" 
+        intervals [87]:
+            xmin = 806.07 
+            xmax = 806.316 
+            text = "" 
+        intervals [88]:
+            xmin = 806.316 
+            xmax = 807.714 
+            text = "bobble-1-right" 
+        intervals [89]:
+            xmin = 807.714 
+            xmax = 819.54 
+            text = "" 
+        intervals [90]:
+            xmin = 819.54 
+            xmax = 821.058 
+            text = "nod-2+turn-1-aw" 
+        intervals [91]:
+            xmin = 821.058 
+            xmax = 824.136 
+            text = "" 
+        intervals [92]:
+            xmin = 824.136 
+            xmax = 824.7 
+            text = "turn-1-tw" 
+        intervals [93]:
+            xmin = 824.7 
+            xmax = 825.27 
+            text = "" 
+        intervals [94]:
+            xmin = 825.27 
+            xmax = 825.852 
+            text = "turn-1-tw" 
+        intervals [95]:
+            xmin = 825.852 
+            xmax = 832.53 
+            text = "" 
+        intervals [96]:
+            xmin = 832.53 
+            xmax = 833.196 
+            text = "turn-1-aw" 
+        intervals [97]:
+            xmin = 833.196 
+            xmax = 834.84 
+            text = "" 
+        intervals [98]:
+            xmin = 834.84 
+            xmax = 835.428 
+            text = "turn-1-tw" 
+        intervals [99]:
+            xmin = 835.428 
+            xmax = 836.94 
+            text = "" 
+        intervals [100]:
+            xmin = 836.94 
+            xmax = 837.372 
+            text = "nod-1" 
+        intervals [101]:
+            xmin = 837.372 
+            xmax = 839.148 
+            text = "" 
+        intervals [102]:
+            xmin = 839.148 
+            xmax = 840.522 
+            text = "pro-2" 
+        intervals [103]:
+            xmin = 840.522 
+            xmax = 843.3 
+            text = "" 
+        intervals [104]:
+            xmin = 843.3 
+            xmax = 844.296 
+            text = "turn-1-aw" 
+        intervals [105]:
+            xmin = 844.296 
+            xmax = 846.57 
+            text = "" 
+        intervals [106]:
+            xmin = 846.57 
+            xmax = 847.326 
+            text = "turn-1-tw" 
+        intervals [107]:
+            xmin = 847.326 
+            xmax = 848.268 
+            text = "" 
+        intervals [108]:
+            xmin = 848.268 
+            xmax = 848.7 
+            text = "turn-1-aw" 
+        intervals [109]:
+            xmin = 848.7 
+            xmax = 848.892 
+            text = "" 
+        intervals [110]:
+            xmin = 848.892 
+            xmax = 849.366 
+            text = "turn-1-aw" 
+        intervals [111]:
+            xmin = 849.366 
+            xmax = 849.696 
+            text = "" 
+        intervals [112]:
+            xmin = 849.696 
+            xmax = 850.218 
+            text = "turn-1-tw" 
+        intervals [113]:
+            xmin = 850.218 
+            xmax = 857.862 
+            text = "" 
+        intervals [114]:
+            xmin = 857.862 
+            xmax = 858.738 
+            text = "nod-1" 
+        intervals [115]:
+            xmin = 858.738 
+            xmax = 860.268 
+            text = "" 
+        intervals [116]:
+            xmin = 860.268 
+            xmax = 861.762 
+            text = "jerk-1+nod-1" 
+        intervals [117]:
+            xmin = 861.762 
+            xmax = 873.192 
+            text = "" 
+        intervals [118]:
+            xmin = 873.192 
+            xmax = 876.15 
+            text = "tilt-1-left" 
+        intervals [119]:
+            xmin = 876.15 
+            xmax = 877.86 
+            text = "" 
+        intervals [120]:
+            xmin = 877.86 
+            xmax = 878.526 
+            text = "jerk-1" 
+        intervals [121]:
+            xmin = 878.526 
+            xmax = 878.97 
+            text = "" 
+        intervals [122]:
+            xmin = 878.97 
+            xmax = 879.954 
+            text = "shake-3" 
+        intervals [123]:
+            xmin = 879.954 
+            xmax = 881.352 
+            text = "" 
+        intervals [124]:
+            xmin = 881.352 
+            xmax = 881.784 
+            text = "retr-1" 
+        intervals [125]:
+            xmin = 881.784 
+            xmax = 925.722 
+            text = "" 
+        intervals [126]:
+            xmin = 925.722 
+            xmax = 926.82 
+            text = "jerk-1+nod-1" 
+        intervals [127]:
+            xmin = 926.82 
+            xmax = 927.24 
+            text = "" 
+        intervals [128]:
+            xmin = 927.24 
+            xmax = 927.798 
+            text = "tilt-1-right+slide-1-left" 
+        intervals [129]:
+            xmin = 927.798 
+            xmax = 930.348 
+            text = "" 
+        intervals [130]:
+            xmin = 930.348 
+            xmax = 930.852 
+            text = "turn-1-tw" 
+        intervals [131]:
+            xmin = 930.852 
+            xmax = 931.746 
+            text = "" 
+        intervals [132]:
+            xmin = 931.746 
+            xmax = 932.19 
+            text = "tilt-1-right" 
+        intervals [133]:
+            xmin = 932.19 
+            xmax = 933.828 
+            text = "" 
+        intervals [134]:
+            xmin = 933.828 
+            xmax = 934.584 
+            text = "nod-2" 
+        intervals [135]:
+            xmin = 934.584 
+            xmax = 943.044 
+            text = "" 
+        intervals [136]:
+            xmin = 943.044 
+            xmax = 943.62 
+            text = "nod-1" 
+        intervals [137]:
+            xmin = 943.62 
+            xmax = 948.456 
+            text = "" 
+        intervals [138]:
+            xmin = 948.456 
+            xmax = 949.662 
+            text = "pro-1+nod-2" 
+        intervals [139]:
+            xmin = 949.662 
+            xmax = 951.348 
+            text = "" 
+        intervals [140]:
+            xmin = 951.348 
+            xmax = 952.302 
+            text = "nod-2" 
+        intervals [141]:
+            xmin = 952.302 
+            xmax = 959.46 
+            text = "" 
+        intervals [142]:
+            xmin = 959.46 
+            xmax = 961.26 
+            text = "turn-1-tw+nod-1+retr-1+nod-3" 
+        intervals [143]:
+            xmin = 961.26 
+            xmax = 963.594 
+            text = "" 
+        intervals [144]:
+            xmin = 963.594 
+            xmax = 964.086 
+            text = "tilt-1-left" 
+        intervals [145]:
+            xmin = 964.086 
+            xmax = 967.842 
+            text = "" 
+        intervals [146]:
+            xmin = 967.842 
+            xmax = 969.03 
+            text = "nod-1+slide-1-right+nod-2" 
+        intervals [147]:
+            xmin = 969.03 
+            xmax = 969.744 
+            text = "" 
+        intervals [148]:
+            xmin = 969.744 
+            xmax = 970.23 
+            text = "shake-1" 
+        intervals [149]:
+            xmin = 970.23 
+            xmax = 975.966 
+            text = "" 
+        intervals [150]:
+            xmin = 975.966 
+            xmax = 976.746 
+            text = "nod-1" 
+        intervals [151]:
+            xmin = 976.746 
+            xmax = 980.196 
+            text = "" 
+        intervals [152]:
+            xmin = 980.196 
+            xmax = 980.706 
+            text = "turn-1-tw" 
+        intervals [153]:
+            xmin = 980.706 
+            xmax = 982.392 
+            text = "" 
+        intervals [154]:
+            xmin = 982.392 
+            xmax = 982.932 
+            text = "nod-1" 
+        intervals [155]:
+            xmin = 982.932 
+            xmax = 985.62 
+            text = "" 
+        intervals [156]:
+            xmin = 985.62 
+            xmax = 986.82 
+            text = "turn-1-aw+turn-1-tw" 
+        intervals [157]:
+            xmin = 986.82 
+            xmax = 989.718 
+            text = "" 
+        intervals [158]:
+            xmin = 989.718 
+            xmax = 991.458 
+            text = "turn-1-aw+turn-1-tw" 
+        intervals [159]:
+            xmin = 991.458 
+            xmax = 993.714 
+            text = "" 
+        intervals [160]:
+            xmin = 993.714 
+            xmax = 994.266 
+            text = "shake-2" 
+        intervals [161]:
+            xmin = 994.266 
+            xmax = 994.83 
+            text = "" 
+        intervals [162]:
+            xmin = 994.83 
+            xmax = 995.418 
+            text = "nod-1" 
+        intervals [163]:
+            xmin = 995.418 
+            xmax = 1002.33 
+            text = "" 
+        intervals [164]:
+            xmin = 1002.33 
+            xmax = 1003.17 
+            text = "turn-1-aw" 
+        intervals [165]:
+            xmin = 1003.17 
+            xmax = 1005.084 
+            text = "" 
+        intervals [166]:
+            xmin = 1005.084 
+            xmax = 1005.672 
+            text = "turn-1-tw" 
+        intervals [167]:
+            xmin = 1005.672 
+            xmax = 1014.564 
+            text = "" 
+        intervals [168]:
+            xmin = 1014.564 
+            xmax = 1016.786 
+            text = "turn-1-tw+shake-2+nod-4" 
+        intervals [169]:
+            xmin = 1016.786 
+            xmax = 1018.178 
+            text = "" 
+        intervals [170]:
+            xmin = 1018.178 
+            xmax = 1019.024 
+            text = "tilt-1-right" 
+        intervals [171]:
+            xmin = 1019.024 
+            xmax = 1027.788 
+            text = "" 
+        intervals [172]:
+            xmin = 1027.788 
+            xmax = 1029.21 
+            text = "turn-1-aw+tilt-1-left" 
+        intervals [173]:
+            xmin = 1029.21 
+            xmax = 1029.252 
+            text = "" 
+        intervals [174]:
+            xmin = 1029.252 
+            xmax = 1030.542 
+            text = "tilt-1-right+nod-3" 
+        intervals [175]:
+            xmin = 1030.542 
+            xmax = 1036.032 
+            text = "" 
+        intervals [176]:
+            xmin = 1036.032 
+            xmax = 1036.572 
+            text = "shake-1" 
+        intervals [177]:
+            xmin = 1036.572 
+            xmax = 1037.346 
+            text = "" 
+        intervals [178]:
+            xmin = 1037.346 
+            xmax = 1039.344 
+            text = "nod-2+pro-1+nod-2+turn-1-aw+tilt-1-left" 
+        intervals [179]:
+            xmin = 1039.344 
+            xmax = 1041.726 
+            text = "" 
+        intervals [180]:
+            xmin = 1041.726 
+            xmax = 1042.674 
+            text = "turn-1-tw" 
+        intervals [181]:
+            xmin = 1042.674 
+            xmax = 1045.104 
+            text = "" 
+        intervals [182]:
+            xmin = 1045.104 
+            xmax = 1045.968 
+            text = "nod-1" 
+        intervals [183]:
+            xmin = 1045.968 
+            xmax = 1050.672 
+            text = "" 
+        intervals [184]:
+            xmin = 1050.672 
+            xmax = 1051.638 
+            text = "shake-3" 
+        intervals [185]:
+            xmin = 1051.638 
+            xmax = 1060.392 
+            text = "" 
+        intervals [186]:
+            xmin = 1060.392 
+            xmax = 1063.008 
+            text = "nod-6" 
+        intervals [187]:
+            xmin = 1063.008 
+            xmax = 1066.434 
+            text = "" 
+        intervals [188]:
+            xmin = 1066.434 
+            xmax = 1067.034 
+            text = "turn-1-tw" 
+        intervals [189]:
+            xmin = 1067.034 
+            xmax = 1067.892 
+            text = "" 
+        intervals [190]:
+            xmin = 1067.892 
+            xmax = 1069.05 
+            text = "shake-1+slide-1-right" 
+        intervals [191]:
+            xmin = 1069.05 
+            xmax = 1076.964 
+            text = "" 
+        intervals [192]:
+            xmin = 1076.964 
+            xmax = 1077.774 
+            text = "nod-1" 
+        intervals [193]:
+            xmin = 1077.774 
+            xmax = 1081.476 
+            text = "" 
+        intervals [194]:
+            xmin = 1081.476 
+            xmax = 1081.95 
+            text = "nod-2" 
+        intervals [195]:
+            xmin = 1081.95 
+            xmax = 1082.238 
+            text = "" 
+        intervals [196]:
+            xmin = 1082.238 
+            xmax = 1084.158 
+            text = "nod-8" 
+        intervals [197]:
+            xmin = 1084.158 
+            xmax = 1085.622 
+            text = "" 
+        intervals [198]:
+            xmin = 1085.622 
+            xmax = 1086.768 
+            text = "nod-4" 
+        intervals [199]:
+            xmin = 1086.768 
+            xmax = 1087.806 
+            text = "" 
+        intervals [200]:
+            xmin = 1087.806 
+            xmax = 1088.394 
+            text = "turn-1-aw" 
+        intervals [201]:
+            xmin = 1088.394 
+            xmax = 1094.286 
+            text = "" 
+        intervals [202]:
+            xmin = 1094.286 
+            xmax = 1095.864 
+            text = "bobble-1-right+slide-1-right" 
+        intervals [203]:
+            xmin = 1095.864 
+            xmax = 1096.968 
+            text = "" 
+        intervals [204]:
+            xmin = 1096.968 
+            xmax = 1098.732 
+            text = "tilt-1-right+shake-2+turn-1-aw" 
+        intervals [205]:
+            xmin = 1098.732 
+            xmax = 1100.046 
+            text = "" 
+        intervals [206]:
+            xmin = 1100.046 
+            xmax = 1100.712 
+            text = "turn-1-tw" 
+        intervals [207]:
+            xmin = 1100.712 
+            xmax = 1101.252 
+            text = "" 
+        intervals [208]:
+            xmin = 1101.252 
+            xmax = 1102.104 
+            text = "turn-1-aw" 
+        intervals [209]:
+            xmin = 1102.104 
+            xmax = 1102.614 
+            text = "" 
+        intervals [210]:
+            xmin = 1102.614 
+            xmax = 1103.466 
+            text = "turn-1-tw" 
+        intervals [211]:
+            xmin = 1103.466 
+            xmax = 1108.632 
+            text = "" 
+        intervals [212]:
+            xmin = 1108.632 
+            xmax = 1109.298 
+            text = "nod-2" 
+        intervals [213]:
+            xmin = 1109.298 
+            xmax = 1117.254 
+            text = "" 
+        intervals [214]:
+            xmin = 1117.254 
+            xmax = 1118.778 
+            text = "jerk-1+nod-2" 
+        intervals [215]:
+            xmin = 1118.778 
+            xmax = 1119.87 
+            text = "" 
+        intervals [216]:
+            xmin = 1119.87 
+            xmax = 1120.836 
+            text = "tilt-1-right" 
+        intervals [217]:
+            xmin = 1120.836 
+            xmax = 1127.832 
+            text = "" 
+        intervals [218]:
+            xmin = 1127.832 
+            xmax = 1128.462 
+            text = "nod-1" 
+        intervals [219]:
+            xmin = 1128.462 
+            xmax = 1128.738 
+            text = "" 
+        intervals [220]:
+            xmin = 1128.738 
+            xmax = 1129.44 
+            text = "nod-2" 
+        intervals [221]:
+            xmin = 1129.44 
+            xmax = 1132.188 
+            text = "" 
+        intervals [222]:
+            xmin = 1132.188 
+            xmax = 1133.358 
+            text = "turn-1-tw+nod-2+turn-1-aw" 
+        intervals [223]:
+            xmin = 1133.358 
+            xmax = 1137.246 
+            text = "" 
+        intervals [224]:
+            xmin = 1137.246 
+            xmax = 1138.302 
+            text = "jerk-1+nod-1" 
+        intervals [225]:
+            xmin = 1138.302 
+            xmax = 1141.962 
+            text = "" 
+        intervals [226]:
+            xmin = 1141.962 
+            xmax = 1143.3 
+            text = "nod-2" 
+        intervals [227]:
+            xmin = 1143.3 
+            xmax = 1152.042 
+            text = "" 
+        intervals [228]:
+            xmin = 1152.042 
+            xmax = 1153.53 
+            text = "nod-4+turn-1-aw" 
+        intervals [229]:
+            xmin = 1153.53 
+            xmax = 1158.306 
+            text = "" 
+        intervals [230]:
+            xmin = 1158.306 
+            xmax = 1159.134 
+            text = "nod-1+pro-1" 
+        intervals [231]:
+            xmin = 1159.134 
+            xmax = 1165.038 
+            text = "" 
+        intervals [232]:
+            xmin = 1165.038 
+            xmax = 1165.806 
+            text = "turn-1-tw" 
+        intervals [233]:
+            xmin = 1165.806 
+            xmax = 1167.858 
+            text = "" 
+        intervals [234]:
+            xmin = 1167.858 
+            xmax = 1168.632 
+            text = "turn-1-tw+tilt-1-right" 
+        intervals [235]:
+            xmin = 1168.632 
+            xmax = 1178.64 
+            text = "" 
+        intervals [236]:
+            xmin = 1178.64 
+            xmax = 1180.5 
+            text = "jerk-1+nod-4" 
+        intervals [237]:
+            xmin = 1180.5 
+            xmax = 1181.178 
+            text = "" 
+        intervals [238]:
+            xmin = 1181.178 
+            xmax = 1182.702 
+            text = "nod-4+turn-1-aw" 
+        intervals [239]:
+            xmin = 1182.702 
+            xmax = 1184.04 
+            text = "" 
+        intervals [240]:
+            xmin = 1184.04 
+            xmax = 1184.784 
+            text = "turn-1-tw+tilt-1-right" 
+        intervals [241]:
+            xmin = 1184.784 
+            xmax = 1192.5 
+            text = "" 
+        intervals [242]:
+            xmin = 1192.5 
+            xmax = 1193.304 
+            text = "turn-1-aw" 
+        intervals [243]:
+            xmin = 1193.304 
+            xmax = 1195.566 
+            text = "" 
+        intervals [244]:
+            xmin = 1195.566 
+            xmax = 1196.67 
+            text = "turn-1-tw" 
+        intervals [245]:
+            xmin = 1196.67 
+            xmax = 1198.494 
+            text = "" 
+        intervals [246]:
+            xmin = 1198.494 
+            xmax = 1199.166 
+            text = "turn-1-tw+pro-1" 
+        intervals [247]:
+            xmin = 1199.166 
+            xmax = 1219.818 
+            text = "" 
+        intervals [248]:
+            xmin = 1219.818 
+            xmax = 1220.82 
+            text = "tilt-1-left" 
+        intervals [249]:
+            xmin = 1220.82 
+            xmax = 1223.364 
+            text = "" 
+        intervals [250]:
+            xmin = 1223.364 
+            xmax = 1224.696 
+            text = "nod-1" 
+        intervals [251]:
+            xmin = 1224.696 
+            xmax = 1256.772 
+            text = "" 
+        intervals [252]:
+            xmin = 1256.772 
+            xmax = 1257.726 
+            text = "shake-2" 
+        intervals [253]:
+            xmin = 1257.726 
+            xmax = 1272.228 
+            text = "" 
+        intervals [254]:
+            xmin = 1272.228 
+            xmax = 1272.57 
+            text = "pro-1" 
+        intervals [255]:
+            xmin = 1272.57 
+            xmax = 1274.208 
+            text = "" 
+        intervals [256]:
+            xmin = 1274.208 
+            xmax = 1275.612 
+            text = "turn-1-aw+shake-3+nod-1+turn-1-tw" 
+        intervals [257]:
+            xmin = 1275.612 
+            xmax = 1277.436 
+            text = "" 
+        intervals [258]:
+            xmin = 1277.436 
+            xmax = 1278.054 
+            text = "turn-1-aw" 
+        intervals [259]:
+            xmin = 1278.054 
+            xmax = 1279.008 
+            text = "" 
+        intervals [260]:
+            xmin = 1279.008 
+            xmax = 1280.664 
+            text = "turn-1-aw+nod-2+turn-1-tw" 
+        intervals [261]:
+            xmin = 1280.664 
+            xmax = 1282.896 
+            text = "" 
+        intervals [262]:
+            xmin = 1282.896 
+            xmax = 1283.55 
+            text = "turn-1-aw" 
+        intervals [263]:
+            xmin = 1283.55 
+            xmax = 1284.462 
+            text = "" 
+        intervals [264]:
+            xmin = 1284.462 
+            xmax = 1285.224 
+            text = "turn-1-tw" 
+        intervals [265]:
+            xmin = 1285.224 
+            xmax = 1289.814 
+            text = "" 
+        intervals [266]:
+            xmin = 1289.814 
+            xmax = 1292.862 
+            text = "jerk-1+nod-1+tilt-1-right+turn-1-aw+turn-1-tw " 
+        intervals [267]:
+            xmin = 1292.862 
+            xmax = 1300.794 
+            text = "" 
+        intervals [268]:
+            xmin = 1300.794 
+            xmax = 1301.832 
+            text = "jerk-1+nod-2" 
+        intervals [269]:
+            xmin = 1301.832 
+            xmax = 1308.006 
+            text = "" 
+        intervals [270]:
+            xmin = 1308.006 
+            xmax = 1308.882 
+            text = "turn-1-aw+nod-1" 
+        intervals [271]:
+            xmin = 1308.882 
+            xmax = 1631.88 
+            text = "" 

@@ -1,0 +1,558 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>mumodo.plotting &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for mumodo.plotting</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;plotting.py -- plotting functions</span>
+
+<span class="sd">Detailed description goes here</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Spyros Kousidis&quot;</span><span class="p">,</span> <span class="s">&quot;Katharina Jettka&quot;</span><span class="p">,</span> <span class="s">&quot;Gerdis Anderson&quot;</span><span class="p">,</span>
+              <span class="s">&quot;Robert Rogalla&quot;</span><span class="p">,</span> <span class="s">&quot;Fabian Wohlgemuth&quot;</span><span class="p">,</span> <span class="s">&quot;Casey Kennington&quot;</span><span class="p">]</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Dialogue Systems Group Bielefeld - www.dsg-bielefeld.de&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Spyros Kousidis&quot;</span><span class="p">,</span> <span class="s">&quot;Katharina Jettka&quot;</span><span class="p">,</span> <span class="s">&quot;Gerdis Anderson&quot;</span><span class="p">,</span>
+               <span class="s">&quot;Robert Rogalla&quot;</span><span class="p">,</span> <span class="s">&quot;Fabian Wohlgemuth&quot;</span><span class="p">,</span> <span class="s">&quot;Casey Kennington&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;GPL&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.1.1&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Spyros Kousidis&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s">&quot;Development&quot;</span> <span class="c"># Development/Production/Prototype</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
+<span class="kn">from</span> <span class="nn">mumodo.analysis</span> <span class="kn">import</span> <span class="n">get_tier_boundaries</span><span class="p">,</span> <span class="n">get_tier_type</span><span class="p">,</span> \
+                            <span class="n">slice_intervalframe_by_time</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;plot_annotations&#39;</span><span class="p">,</span> <span class="s">&#39;plot_scalar&#39;</span><span class="p">,</span> <span class="s">&#39;plot_vector&#39;</span><span class="p">,</span> <span class="s">&#39;plot_reco&#39;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">__point_tier_to_intervals__</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a point tier into intervals for drawing</span>
+
+<span class="sd">    The function takes a point_tier as input and returns an</span>
+<span class="sd">    interval tier, with the intervals centered around the points.</span>
+<span class="sd">    The width parameter controls the width of the intervals.</span>
+
+<span class="sd">    This funciton is used strictly for drawing</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">newtier</span> <span class="o">=</span> <span class="n">tier</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">newtier</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newtier</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">newtier</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newtier</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">newtier</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newtier</span><span class="p">[</span><span class="s">&#39;mark&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">newtier</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">]]</span>
+
+<span class="k">def</span> <span class="nf">__truncate_text__</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="n">st</span><span class="p">,</span> <span class="n">en</span><span class="p">,</span> <span class="n">textkwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Truncate the text to fit nicely in the plot</span>
+
+<span class="sd">    Recursively cuts 10 % of the text until the text fits</span>
+<span class="sd">    (horizontally) in an area defined in plotted units</span>
+
+<span class="sd">    ax -- the matplotlib Axes object of a subplot</span>
+<span class="sd">    text -- the text to fit in the area</span>
+<span class="sd">    renderer -- the figure.canvas.renderer object</span>
+<span class="sd">    st, en -- the left-to-right limits of the area (in</span>
+<span class="sd">              plotted units)</span>
+
+<span class="sd">    textkwargs -- the fontdict of the text</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mytext</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">textkwargs</span><span class="p">)</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">mytext</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span><span class="o">.</span><span class="n">width</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">transData</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">st</span><span class="p">,</span> <span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">transData</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">en</span><span class="p">,</span> <span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">while</span> <span class="n">width</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">):</span>
+        <span class="n">mytext</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">textkwargs</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">mytext</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span><span class="o">.</span><span class="n">width</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">transData</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">st</span><span class="p">,</span> <span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">transData</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">en</span><span class="p">,</span> <span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="n">text</span>
+
+<span class="k">def</span> <span class="nf">__draw_tier__</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="n">tier</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Subplot of an interval or point tier</span>
+
+<span class="sd">    Not to be called by itself but as part a plot function</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    ax -- A Matplotlib.pylab subplot object</span>
+
+<span class="sd">    renderer -- A Figure.canvas renderer object</span>
+
+<span class="sd">    tier -- the tier to be drawn</span>
+
+<span class="sd">    The following kwargs HAVE to be passed:</span>
+
+<span class="sd">    xmin, xmax -- limits of the x axis</span>
+
+<span class="sd">    ymin, ymax -- define the base and top (in units between 0 and 1)</span>
+<span class="sd">                  of the boxes depicting the intervals</span>
+
+<span class="sd">    xticks: the x axis tick marks</span>
+
+<span class="sd">    xlabels: the x axis tick labels</span>
+
+<span class="sd">    tierkey: this key will be shown to identify this tier</span>
+
+<span class="sd">    tiercolor -- set the color of the subplot items (boxes or lines)</span>
+<span class="sd">                 if this is a color code, then all intervals/lines of the</span>
+<span class="sd">                 tier are drawn in that colour (by default blue)</span>
+
+<span class="sd">                 if it is a dictionary of labels and colors, then those</span>
+<span class="sd">                 colors are used for those labels, with black for labels</span>
+<span class="sd">                 not found in the dict.</span>
+
+<span class="sd">    edgecolor --set the color of the edges of boxes</span>
+
+<span class="sd">    textkwargs -- if not None, uses these kwargs to print the labels</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tierkey&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="s">&#39;90&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xticks&#39;</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xlabels&#39;</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xmin&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xmax&#39;</span><span class="p">])</span>
+    <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;ymin&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;ymax&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;edgecolor&#39;</span><span class="p">],</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="n">ecolor</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;edgecolor&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ecolor</span> <span class="o">=</span> <span class="s">&#39;w&#39;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tier</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tiercolor&#39;</span><span class="p">],</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="n">fcolor</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tiercolor&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tiercolor&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">tier</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tiercolor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">fcolor</span> <span class="o">=</span> <span class="s">&#39;black&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fcolor</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tiercolor&#39;</span><span class="p">][</span><span class="n">tier</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fcolor</span> <span class="o">=</span> <span class="s">&#39;b&#39;</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span>
+                   <span class="p">(</span><span class="n">tier</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xmin&#39;</span><span class="p">])</span> <span class="o">/</span> \
+                   <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xmax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xmin&#39;</span><span class="p">]),</span>
+                   <span class="p">(</span><span class="n">tier</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>  <span class="o">-</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xmin&#39;</span><span class="p">])</span> <span class="o">/</span> \
+                   <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xmax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;xmin&#39;</span><span class="p">]),</span>
+                   <span class="n">facecolor</span><span class="o">=</span><span class="n">fcolor</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ecolor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;textkwargs&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">txt</span> <span class="o">=</span> <span class="n">__truncate_text__</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">tier</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">renderer</span><span class="p">,</span>
+                                    <span class="n">tier</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span>
+                                    <span class="n">tier</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span>
+                                    <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;textkwargs&#39;</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">tier</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">txt</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;textkwargs&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="plot_reco"><a class="viewcode-back" href="../../mumodo/Plotting.html#mumodo.plotting.plot_reco">[docs]</a><span class="k">def</span> <span class="nf">plot_reco</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot an inc_reco file</span>
+
+<span class="sd">    The function accepts only kwargs, so as to be used with IPython</span>
+<span class="sd">    widgets. These kwargs have to be passed</span>
+
+<span class="sd">    iframe -- an intervalframe dict that represents the imported reco,</span>
+<span class="sd">              with each update on a separate tier</span>
+
+<span class="sd">    latest_tiers -- the number of updates to display as separate tier</span>
+<span class="sd">                    subplots. If there are yet more updates than subplots</span>
+<span class="sd">                    available, they appear as grey diamonds on the tier subplot</span>
+<span class="sd">                    representing the earliest visible update (yellow diamond)</span>
+
+<span class="sd">    current_time -- the current time. Only updates up to this time will be</span>
+<span class="sd">                    plotted on any tier</span>
+
+<span class="sd">    optional kwargs:</span>
+
+<span class="sd">    max_history -- set the earliest time in the past (relative to current time)</span>
+<span class="sd">                   that will be shown on any tier</span>
+
+<span class="sd">    printing -- if True, the latest update is also printed as text</span>
+
+<span class="sd">    filepath -- a valid file path and name for saving the plot as</span>
+<span class="sd">                a figure on disk (no figure will be saved if filename is</span>
+<span class="sd">                None)</span>
+
+<span class="sd">    hscale, vscale -- enlarge the resulting plot horizontally or vertically,</span>
+<span class="sd">                      (must be positive integers)</span>
+
+<span class="sd">    textfontsize -- fontsize for the interval (IU) labels</span>
+
+<span class="sd">    tickfontsize -- fontsize for the ticks</span>
+
+<span class="sd">    labelfontsize -- fontsize for the Y (updates) labels</span>
+
+<span class="sd">    tickspacing -- spacing for the x axis ticks (positive int)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">intervalframe</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;iframe&#39;</span><span class="p">]</span>
+    <span class="n">latest_tiers</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;latest_tiers&#39;</span><span class="p">]</span>
+    <span class="n">current_time</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;current_time&#39;</span><span class="p">]</span>
+
+    <span class="c">#dict of optional kwargs and default values:</span>
+
+    <span class="n">optional</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;printing&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                <span class="s">&#39;filepath&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                <span class="s">&#39;max_history&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s">&#39;hscale&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&#39;vscale&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&#39;textfontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+                <span class="s">&#39;tickfontsize&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+                <span class="s">&#39;labelfontsize&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+                <span class="s">&#39;tickspacing&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">optional</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">opt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">opt</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">opt</span><span class="p">]</span> <span class="o">=</span> <span class="n">optional</span><span class="p">[</span><span class="n">opt</span><span class="p">]</span>
+
+
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;max_history&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">min_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">current_time</span> <span class="o">-</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;max_history&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;max_history&#39;</span><span class="p">],</span> <span class="n">current_time</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">min_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">intervalframe</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+
+    <span class="n">min_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_time</span><span class="p">)</span>
+    <span class="n">max_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_time</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">updates</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">intervalframe</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">current_time</span><span class="p">:</span>
+            <span class="n">updates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;hscale&#39;</span><span class="p">],</span>
+                              <span class="mi">2</span> <span class="o">*</span> <span class="n">latest_tiers</span> <span class="o">*</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;vscale&#39;</span><span class="p">]))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">latest_tiers</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">splots</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">latest_tiers</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">updates</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">updates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">updates</span><span class="p">)):</span>
+            <span class="n">tier</span> <span class="o">=</span> <span class="n">slice_intervalframe_by_time</span><span class="p">(</span><span class="n">intervalframe</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">u</span><span class="p">)],</span>
+                                               <span class="n">min_time</span><span class="p">,</span> <span class="n">max_time</span><span class="p">)</span>
+            <span class="n">last_time</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">u</span><span class="p">)][</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">updates</span><span class="p">)</span> <span class="o">-</span> <span class="n">latest_tiers</span><span class="p">:</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">latest_tiers</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">splots</span><span class="p">)</span>
+                <span class="n">__draw_tier__</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">get_renderer</span><span class="p">(),</span>
+                              <span class="n">tier</span><span class="p">,</span>
+                              <span class="n">xmin</span><span class="o">=</span><span class="n">min_time</span><span class="p">,</span>
+                              <span class="n">xmax</span><span class="o">=</span><span class="n">max_time</span><span class="p">,</span>
+                              <span class="n">xticks</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">min_time</span><span class="p">,</span> <span class="n">max_time</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                           <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tickspacing&#39;</span><span class="p">]),</span>
+                              <span class="n">xlabels</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">min_time</span><span class="p">,</span>
+                                            <span class="n">max_time</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                            <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;tickspacing&#39;</span><span class="p">]),</span>
+                              <span class="n">tierkey</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                              <span class="n">tiercolor</span><span class="o">=</span><span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+                              <span class="n">textkwargs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;color&#39;</span><span class="p">:</span> <span class="s">&#39;k&#39;</span><span class="p">,</span>
+                                          <span class="s">&#39;fontsize&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;textfontsize&#39;</span><span class="p">]})</span>
+                <span class="n">splots</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">last_time</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">],</span> <span class="s">&#39;yD&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">updates</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">last_time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">u</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">current_time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">latest_tiers</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">latest_tiers</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">last_time</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">],</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;grey&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;printing&#39;</span><span class="p">]:</span>
+            <span class="k">print</span> <span class="s">&quot;update at:&quot;</span><span class="p">,</span> <span class="n">u</span>
+            <span class="k">print</span> <span class="n">intervalframe</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">u</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_time</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;filepath&#39;</span><span class="p">]:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="plot_scalar"><a class="viewcode-back" href="../../mumodo/Plotting.html#mumodo.plotting.plot_scalar">[docs]</a><span class="k">def</span> <span class="nf">plot_scalar</span><span class="p">(</span><span class="n">streamframe</span><span class="p">,</span> <span class="n">scalars</span><span class="p">,</span> <span class="n">first_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">last_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot scalar(s) vs time</span>
+
+<span class="sd">    Plot one or more column(s) with a scalar type against time (index of the</span>
+<span class="sd">    streamframe)</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    streamframe -- a streamframe with time as index, naturally</span>
+<span class="sd">    scalars -- a list of column names (strings)</span>
+
+<span class="sd">    Keyword arguments:</span>
+<span class="sd">    first_index, last_index -- define a time region (index is time).</span>
+<span class="sd">                               A value of zero is interpreted as the</span>
+<span class="sd">                               beginning and end of the streamframe,</span>
+<span class="sd">                               respectively</span>
+<span class="sd">    filepath    -- Filepath to save the plot.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">first_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">first_index</span> <span class="o">=</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">last_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">last_index</span> <span class="o">=</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">scalars</span><span class="p">:</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">streamframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">first_index</span><span class="p">:</span><span class="n">last_index</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                 <span class="n">streamframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">first_index</span><span class="p">:</span><span class="n">last_index</span><span class="p">][</span><span class="n">scalar</span><span class="p">],</span>
+                 <span class="n">label</span><span class="o">=</span><span class="n">scalar</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">streamframe</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n">filepath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="plot_annotations"><a class="viewcode-back" href="../../mumodo/Plotting.html#mumodo.plotting.plot_annotations">[docs]</a><span class="k">def</span> <span class="nf">plot_annotations</span><span class="p">(</span><span class="n">tierdict</span><span class="p">,</span> <span class="n">time_begin</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">time_end</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">tierorder</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                     <span class="n">colorindex</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">hscale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">vscale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">linespan</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                     <span class="n">pointwidth</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">tickspacing</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                     <span class="n">text_kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Plot ELAN annotations, imported from textgrids</span>
+
+<span class="sd">    arguments:</span>
+<span class="sd">    tierdict    a dictionary of intervalframes</span>
+
+<span class="sd">    keyword arguments:</span>
+
+<span class="sd">    time_begin     -- minimum time (in seconds) of plot. If set to None, the</span>
+<span class="sd">                       minimum time is found from the data</span>
+<span class="sd">    time_end       -- maximum time (in seconds) of plot. If set to None, the</span>
+<span class="sd">                       maximum time is found from the data</span>
+<span class="sd">    tierorder      -- list of tierKey names to set the order of plotting.</span>
+<span class="sd">                      Specifying less names than in the tierdict itself</span>
+<span class="sd">                      results in only those tiers being drawn</span>
+
+<span class="sd">    colorindex     -- list of colors to cycle through for each tier, or</span>
+
+<span class="sd">                dictionary with labels as keys and colorcodes as values,</span>
+<span class="sd">                for plotting annotation tiers with finite label sets</span>
+
+<span class="sd">    hscale, vscale -- horizontal/vertical scaling of the plot</span>
+
+<span class="sd">    linespan       -- time displayed per line of the plot (default 20 seconds)</span>
+
+<span class="sd">    pointwidth     -- width of lines for point tiers (in seconds)</span>
+
+<span class="sd">    tickspacing    -- number of seconds between ticks on x axis (default 1)</span>
+
+<span class="sd">    text_kwargs    -- a fontdict for plt.text() in order to print the</span>
+<span class="sd">                      text labels. Set to None to avoid printing any text</span>
+
+<span class="sd">    filepath       -- path to filename to save the figure, e.g:</span>
+<span class="sd">                      &#39;~/Desktop/myfile.pdf&#39;</span>
+
+<span class="sd">                      The file must have one of the matplolib-supported</span>
+<span class="sd">                      extensions, e.g. &#39;pdf&#39;, &#39;png&#39;, &#39;jpg&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">colorindex</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">colorindex</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="s">&#39;k&#39;</span><span class="p">]</span>
+    <span class="c">#determine tiers to draw and the order</span>
+    <span class="n">thekeys</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">tierorder</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">thekeys</span> <span class="o">=</span> <span class="n">tierdict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">thekeys</span> <span class="o">=</span> <span class="n">tierorder</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">thekeys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&quot;No tiers to plot!&quot;</span>
+
+    <span class="c">#find boundaries</span>
+    <span class="n">tiermin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">get_tier_boundaries</span><span class="p">(</span><span class="n">tierdict</span><span class="p">[</span><span class="n">tierkey</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">tierkey</span> \
+                   <span class="ow">in</span> <span class="n">thekeys</span><span class="p">])</span>
+    <span class="n">tiermax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">get_tier_boundaries</span><span class="p">(</span><span class="n">tierdict</span><span class="p">[</span><span class="n">tierkey</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tierkey</span> \
+                   <span class="ow">in</span> <span class="n">thekeys</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">time_begin</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">time_begin</span> <span class="o">=</span> <span class="n">tiermin</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">time_begin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">time_begin</span><span class="p">,</span> <span class="n">tiermin</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">time_end</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">time_end</span> <span class="o">=</span> <span class="n">tiermax</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">time_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">time_end</span><span class="p">,</span> <span class="n">tiermax</span><span class="p">)</span>
+
+    <span class="c">#Check time limits</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">time_end</span> <span class="o">-</span> <span class="n">time_begin</span>
+    <span class="k">if</span> <span class="n">duration</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&quot;Wrong time limits!&quot;</span>
+    <span class="k">elif</span> <span class="n">duration</span> <span class="o">&lt;</span> <span class="n">linespan</span><span class="p">:</span>
+        <span class="n">linespan</span> <span class="o">=</span> <span class="n">duration</span>
+        <span class="n">number_of_lines</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">number_of_lines</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span> <span class="o">/</span> <span class="n">linespan</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">hscale</span> <span class="o">*</span> <span class="n">linespan</span><span class="p">,</span>
+                              <span class="n">vscale</span> <span class="o">*</span> <span class="n">number_of_lines</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">thekeys</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_lines</span><span class="p">):</span>
+        <span class="c">#Drawing loop of tiers</span>
+        <span class="k">for</span> <span class="n">tiernumber</span><span class="p">,</span> <span class="n">tierkey</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">thekeys</span><span class="p">):</span>
+            <span class="c">#Trim tier at time limits</span>
+            <span class="n">t1</span> <span class="o">=</span> <span class="n">time_begin</span> <span class="o">+</span> <span class="n">line</span> <span class="o">*</span> <span class="n">linespan</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">t1</span> <span class="o">+</span> <span class="n">linespan</span><span class="p">,</span> <span class="n">time_end</span><span class="p">)</span>
+
+
+            <span class="k">if</span> <span class="n">get_tier_type</span><span class="p">(</span><span class="n">tierdict</span><span class="p">[</span><span class="n">tierkey</span><span class="p">])</span> <span class="o">==</span> <span class="s">&#39;point&#39;</span><span class="p">:</span>
+                <span class="n">tier</span> <span class="o">=</span> <span class="n">slice_intervalframe_by_time</span><span class="p">(</span>\
+                       <span class="n">__point_tier_to_intervals__</span><span class="p">(</span><span class="n">tierdict</span><span class="p">[</span><span class="n">tierkey</span><span class="p">],</span>
+                                                   <span class="n">pointwidth</span><span class="p">),</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">get_tier_type</span><span class="p">(</span><span class="n">tierdict</span><span class="p">[</span><span class="n">tierkey</span><span class="p">])</span> <span class="o">==</span> <span class="s">&#39;interval&#39;</span><span class="p">:</span>
+                <span class="n">tier</span> <span class="o">=</span> <span class="n">slice_intervalframe_by_time</span><span class="p">(</span><span class="n">tierdict</span><span class="p">[</span><span class="n">tierkey</span><span class="p">],</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c">#Add subplots</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">number_of_lines</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">thekeys</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span>
+                                 <span class="n">line</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">thekeys</span><span class="p">)</span> <span class="o">+</span> <span class="n">tiernumber</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">xticks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">t1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">t2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tickspacing</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tiernumber</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">thekeys</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">xlabels</span> <span class="o">=</span> <span class="n">xticks</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xlabels</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c">#Set the color</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colorindex</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">tiercolor</span> <span class="o">=</span> <span class="n">colorindex</span><span class="p">[</span><span class="n">tiernumber</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colorindex</span><span class="p">)]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colorindex</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">tiercolor</span> <span class="o">=</span> <span class="n">colorindex</span>
+
+            <span class="n">__draw_tier__</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">get_renderer</span><span class="p">(),</span> <span class="n">tier</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="n">t1</span><span class="p">,</span>
+                          <span class="n">xmax</span><span class="o">=</span><span class="p">(</span><span class="n">t1</span> <span class="o">+</span> <span class="n">linespan</span><span class="p">),</span> <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                          <span class="n">xticks</span><span class="o">=</span><span class="n">xticks</span><span class="p">,</span> <span class="n">xlabels</span><span class="o">=</span><span class="n">xlabels</span><span class="p">,</span> <span class="n">tierkey</span><span class="o">=</span><span class="n">tierkey</span><span class="p">,</span>
+                          <span class="n">tiercolor</span><span class="o">=</span><span class="n">tiercolor</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;w&#39;</span><span class="p">,</span>
+                          <span class="n">textkwargs</span><span class="o">=</span><span class="n">text_kwargs</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n">filepath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="plot_vector"><a class="viewcode-back" href="../../mumodo/Plotting.html#mumodo.plotting.plot_vector">[docs]</a><span class="k">def</span> <span class="nf">plot_vector</span><span class="p">(</span><span class="n">streamframe</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">first_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">last_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">pointsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">jet</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot vector vs time</span>
+
+<span class="sd">    Plot one column with a 3D-vector type against time (index of the</span>
+<span class="sd">    streamframe). Creates a 3D scatter plot with points color-coded for</span>
+<span class="sd">    time (the streamframe index)</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    streamframe -- a streamframe with time as index, naturally</span>
+<span class="sd">    vector -- column name (string)</span>
+
+<span class="sd">    Keyword arguments:</span>
+<span class="sd">    first_index, last_index -- define a time region (index is time).</span>
+<span class="sd">                               A value of zero is interpreted as the</span>
+<span class="sd">                               beginning and end of the streamframe,</span>
+<span class="sd">                               respectively</span>
+<span class="sd">    pointsize -- radius of 3D points</span>
+<span class="sd">    colormap -- a matplotlib cmap collection</span>
+<span class="sd">    filepath    -- Filepath to save the plot.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">first_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">first_index</span> <span class="o">=</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">last_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">last_index</span> <span class="o">=</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s">&#39;3d&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">&#39;X&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">&#39;Y&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s">&#39;Z&#39;</span><span class="p">)</span>
+    <span class="n">xst</span><span class="p">,</span> <span class="n">yst</span><span class="p">,</span> <span class="n">zst</span><span class="p">,</span> <span class="n">cst</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">frame_time</span> <span class="ow">in</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">first_index</span><span class="p">:</span><span class="n">last_index</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">streamframe</span><span class="p">[</span><span class="n">vector</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">frame_time</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">yst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">streamframe</span><span class="p">[</span><span class="n">vector</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">frame_time</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">zst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">streamframe</span><span class="p">[</span><span class="n">vector</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">frame_time</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+            <span class="n">cst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame_time</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">cax</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xst</span><span class="p">,</span> <span class="n">yst</span><span class="p">,</span> <span class="n">zst</span><span class="p">,</span> <span class="n">zdir</span><span class="o">=</span><span class="s">&#39;z&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">pointsize</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">cst</span><span class="p">,</span>
+                      <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n">filepath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

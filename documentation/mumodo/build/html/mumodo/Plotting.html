@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>plotting.py &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../index.html" />
+    <link rel="prev" title="InstantIO.py" href="InstantIO.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="InstantIO.html" title="InstantIO.py"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="plotting-py">
+<h1>plotting.py<a class="headerlink" href="#plotting-py" title="Permalink to this headline">¶</a></h1>
+<p>Basic toolkit for analysing data with mumodo</p>
+<span class="target" id="module-mumodo.plotting"></span><p>plotting.py &#8211; plotting functions</p>
+<p>Detailed description goes here</p>
+<dl class="function">
+<dt id="mumodo.plotting.plot_annotations">
+<tt class="descclassname">mumodo.plotting.</tt><tt class="descname">plot_annotations</tt><big>(</big><em>tierdict</em>, <em>time_begin=None</em>, <em>time_end=None</em>, <em>tierorder=None</em>, <em>colorindex=None</em>, <em>hscale=1</em>, <em>vscale=1</em>, <em>linespan=20</em>, <em>pointwidth=0.05</em>, <em>tickspacing=1</em>, <em>text_kwargs=None</em>, <em>filepath=None</em><big>)</big><a class="reference internal" href="../_modules/mumodo/plotting.html#plot_annotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.plotting.plot_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot ELAN annotations, imported from textgrids</p>
+<p>arguments:
+tierdict    a dictionary of intervalframes</p>
+<p>keyword arguments:</p>
+<dl class="docutils">
+<dt>time_begin     &#8211; minimum time (in seconds) of plot. If set to None, the</dt>
+<dd>minimum time is found from the data</dd>
+<dt>time_end       &#8211; maximum time (in seconds) of plot. If set to None, the</dt>
+<dd>maximum time is found from the data</dd>
+<dt>tierorder      &#8211; list of tierKey names to set the order of plotting.</dt>
+<dd>Specifying less names than in the tierdict itself
+results in only those tiers being drawn</dd>
+</dl>
+<p>colorindex     &#8211; list of colors to cycle through for each tier, or</p>
+<blockquote>
+<div>dictionary with labels as keys and colorcodes as values,
+for plotting annotation tiers with finite label sets</div></blockquote>
+<p>hscale, vscale &#8211; horizontal/vertical scaling of the plot</p>
+<p>linespan       &#8211; time displayed per line of the plot (default 20 seconds)</p>
+<p>pointwidth     &#8211; width of lines for point tiers (in seconds)</p>
+<p>tickspacing    &#8211; number of seconds between ticks on x axis (default 1)</p>
+<dl class="docutils">
+<dt>text_kwargs    &#8211; a fontdict for plt.text() in order to print the</dt>
+<dd>text labels. Set to None to avoid printing any text</dd>
+<dt>filepath       &#8211; path to filename to save the figure, e.g:</dt>
+<dd><p class="first">&#8216;~/Desktop/myfile.pdf&#8217;</p>
+<p class="last">The file must have one of the matplolib-supported
+extensions, e.g. &#8216;pdf&#8217;, &#8216;png&#8217;, &#8216;jpg&#8217;</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.plotting.plot_scalar">
+<tt class="descclassname">mumodo.plotting.</tt><tt class="descname">plot_scalar</tt><big>(</big><em>streamframe</em>, <em>scalars</em>, <em>first_index=0</em>, <em>last_index=0</em>, <em>filepath=''</em><big>)</big><a class="reference internal" href="../_modules/mumodo/plotting.html#plot_scalar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.plotting.plot_scalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot scalar(s) vs time</p>
+<p>Plot one or more column(s) with a scalar type against time (index of the
+streamframe)</p>
+<p>Arguments:
+streamframe &#8211; a streamframe with time as index, naturally
+scalars &#8211; a list of column names (strings)</p>
+<p>Keyword arguments:
+first_index, last_index &#8211; define a time region (index is time).</p>
+<blockquote>
+<div>A value of zero is interpreted as the
+beginning and end of the streamframe,
+respectively</div></blockquote>
+<p>filepath    &#8211; Filepath to save the plot.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.plotting.plot_vector">
+<tt class="descclassname">mumodo.plotting.</tt><tt class="descname">plot_vector</tt><big>(</big><em>streamframe</em>, <em>vector</em>, <em>first_index=0</em>, <em>last_index=0</em>, <em>pointsize=40</em>, <em>colormap=&lt;matplotlib.colors.LinearSegmentedColormap object at 0x10d869050&gt;</em>, <em>filepath=''</em><big>)</big><a class="reference internal" href="../_modules/mumodo/plotting.html#plot_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.plotting.plot_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot vector vs time</p>
+<p>Plot one column with a 3D-vector type against time (index of the
+streamframe). Creates a 3D scatter plot with points color-coded for
+time (the streamframe index)</p>
+<p>Arguments:
+streamframe &#8211; a streamframe with time as index, naturally
+vector &#8211; column name (string)</p>
+<p>Keyword arguments:
+first_index, last_index &#8211; define a time region (index is time).</p>
+<blockquote>
+<div>A value of zero is interpreted as the
+beginning and end of the streamframe,
+respectively</div></blockquote>
+<p>pointsize &#8211; radius of 3D points
+colormap &#8211; a matplotlib cmap collection
+filepath    &#8211; Filepath to save the plot.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mumodo.plotting.plot_reco">
+<tt class="descclassname">mumodo.plotting.</tt><tt class="descname">plot_reco</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/mumodo/plotting.html#plot_reco"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mumodo.plotting.plot_reco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot an inc_reco file</p>
+<p>The function accepts only kwargs, so as to be used with IPython
+widgets. These kwargs have to be passed</p>
+<dl class="docutils">
+<dt>iframe &#8211; an intervalframe dict that represents the imported reco,</dt>
+<dd>with each update on a separate tier</dd>
+<dt>latest_tiers &#8211; the number of updates to display as separate tier</dt>
+<dd>subplots. If there are yet more updates than subplots
+available, they appear as grey diamonds on the tier subplot
+representing the earliest visible update (yellow diamond)</dd>
+<dt>current_time &#8211; the current time. Only updates up to this time will be</dt>
+<dd>plotted on any tier</dd>
+</dl>
+<p>optional kwargs:</p>
+<dl class="docutils">
+<dt>max_history &#8211; set the earliest time in the past (relative to current time)</dt>
+<dd>that will be shown on any tier</dd>
+</dl>
+<p>printing &#8211; if True, the latest update is also printed as text</p>
+<dl class="docutils">
+<dt>filepath &#8211; a valid file path and name for saving the plot as</dt>
+<dd>a figure on disk (no figure will be saved if filename is
+None)</dd>
+<dt>hscale, vscale &#8211; enlarge the resulting plot horizontally or vertically,</dt>
+<dd>(must be positive integers)</dd>
+</dl>
+<p>textfontsize &#8211; fontsize for the interval (IU) labels</p>
+<p>tickfontsize &#8211; fontsize for the ticks</p>
+<p>labelfontsize &#8211; fontsize for the Y (updates) labels</p>
+<p>tickspacing &#8211; spacing for the x axis ticks (positive int)</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="InstantIO.html"
+                        title="previous chapter">InstantIO.py</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/mumodo/Plotting.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="InstantIO.html" title="InstantIO.py"
+             >previous</a> |</li>
+        <li><a href="../index.html">mumodo 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

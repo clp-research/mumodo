@@ -1,0 +1,509 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>mumodo.mumodoIO &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for mumodo.mumodoIO</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;mumodoIO.py: Functions to for stream- and interval- frame I/O</span>
+
+<span class="sd">  Streamframes and Intervalframes are the two types of objects that</span>
+<span class="sd">  mumodo uses for analysis. Both are Pandas DataFrames. Instead of</span>
+<span class="sd">  subclassing Pandas DataFrames, we simply format our dataframes in</span>
+<span class="sd">  a specific way.</span>
+
+<span class="sd">  Streamframes are like time series. They contain a series of timed,</span>
+<span class="sd">  typed events. The events can be of different types in the same series.</span>
+<span class="sd">  The index of the DataFrame is the timestamp of the event. Thus, slices</span>
+<span class="sd">  of the DataFrame correspond to time intervals directly. Streamframes</span>
+<span class="sd">  are created primarily from our own XIO files, but can also be saved in</span>
+<span class="sd">  other formats (e.g. CSV, Praat point tiers).</span>
+
+<span class="sd">  Intervalframes are tiers of annotation intervals, such as those found</span>
+<span class="sd">  in Praat and ELAN. They have three columns (start_time, end_time, text)</span>
+<span class="sd">  This module makes use of the tgt [textgrid tools]</span>
+<span class="sd">  package in order to import Praat textgrids. Because each tier of a</span>
+<span class="sd">  textgrid is an intervalframe itself, the respective function returns</span>
+<span class="sd">  a dictionary of Intervalframes, with the names of the tiers as keys.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Spyros Kousidis&quot;</span><span class="p">,</span> <span class="s">&quot;Katharina Jettka&quot;</span><span class="p">,</span> <span class="s">&quot;Gerdis Anderson&quot;</span><span class="p">,</span>
+              <span class="s">&quot;Robert Rogalla&quot;</span><span class="p">,</span> <span class="s">&quot;Fabian Wohlgemuth&quot;</span><span class="p">]</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Dialogue Systems Group Bielefeld - www.dsg-bielefeld.de&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Spyros Kousidis&quot;</span><span class="p">,</span> <span class="s">&quot;Katharina Jettka&quot;</span><span class="p">,</span> <span class="s">&quot;Gerdis Anderson&quot;</span><span class="p">,</span>
+               <span class="s">&quot;Robert Rogalla&quot;</span><span class="p">,</span> <span class="s">&quot;Fabian Wohlgemuth&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;GPL&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.1.1&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Spyros Kousidis&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s">&quot;Development&quot;</span> <span class="c"># Development/Production/Prototype</span>
+
+<span class="kn">from</span> <span class="nn">mumodo.xiofile</span> <span class="kn">import</span> <span class="n">XIOFile</span>
+<span class="kn">from</span> <span class="nn">mumodo.increco</span> <span class="kn">import</span> <span class="n">IncReco</span>
+<span class="kn">import</span> <span class="nn">tgt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;open_streamframe_from_xiofile&#39;</span><span class="p">,</span>
+           <span class="s">&#39;save_streamframe_to_xiofile&#39;</span><span class="p">,</span> <span class="s">&#39;open_intervalframe_from_textgrid&#39;</span><span class="p">,</span>
+           <span class="s">&#39;save_intervalframe_to_textgrid&#39;</span><span class="p">,</span>
+           <span class="s">&#39;quantize&#39;</span><span class="p">,</span> <span class="s">&#39;open_intervalframe_from_increco&#39;</span><span class="p">,</span>
+           <span class="s">&#39;convert_pointtier_to_streamframe&#39;</span><span class="p">,</span>
+           <span class="s">&#39;convert_streamframe_to_pointtier&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="open_streamframe_from_xiofile"><a class="viewcode-back" href="../../mumodo/IO.html#mumodo.mumodoIO.open_streamframe_from_xiofile">[docs]</a><span class="k">def</span> <span class="nf">open_streamframe_from_xiofile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">sensorname</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                  <span class="n">with_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">without_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                  <span class="n">discard_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                  <span class="n">end_time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                  <span class="n">timestamp_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Import data for one sensor out of a XIOFile and return a</span>
+<span class="sd">       StreamFrame indexed with timestamps. By default, the timestamps</span>
+<span class="sd">       are made relative. Optionally, and offset can be added to</span>
+<span class="sd">       relative timestamps or the raw timestamps can be kept.</span>
+
+<span class="sd">       Arguments:</span>
+<span class="sd">       filepath             --  Path + filename of the XIOFile to be imported.</span>
+<span class="sd">       sensorname           --  Name of the sensor to be imported.</span>
+<span class="sd">       window_size,</span>
+<span class="sd">       with_fields,</span>
+<span class="sd">       without_fields,</span>
+<span class="sd">       discard_duplicates   --  Parameters for quantizing (see Quantize</span>
+<span class="sd">                                function)</span>
+<span class="sd">       start_time,</span>
+<span class="sd">       end_time,</span>
+<span class="sd">       relative             -- Parameters for xio_quicklinegen.</span>
+<span class="sd">       timestamp_offset     -- is zero by default and makes timestamps relative</span>
+<span class="sd">                               Set to any non_integer value, timestamp_offset</span>
+<span class="sd">                               will leave the timestamps raw. Any non-zero</span>
+<span class="sd">                               integer value will be added as offset to the</span>
+<span class="sd">                               relative timestamps</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">infile</span> <span class="o">=</span> <span class="n">XIOFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">stream</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">quantize</span><span class="p">(</span><span class="n">infile</span><span class="o">.</span><span class="n">xio_quicklinegen</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span>
+                                                           <span class="bp">True</span><span class="p">,</span> <span class="n">relative</span><span class="p">),</span>
+                                   <span class="n">sensorname</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">with_fields</span><span class="p">,</span>
+                                   <span class="n">without_fields</span><span class="p">,</span> <span class="n">discard_duplicates</span><span class="p">,</span>
+                                   <span class="n">enumerate_fields</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">stream</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">timestamp_offset</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">index</span> <span class="o">-=</span> <span class="n">infile</span><span class="o">.</span><span class="n">min_time</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">index</span> <span class="o">+=</span> <span class="n">timestamp_offset</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;non-int offset in input: raw timestamps from the file will be&quot;</span> <span class="o">+</span>\
+               <span class="s">&quot; used&quot;</span>
+    <span class="n">infile</span><span class="o">.</span><span class="n">xiofile_close</span><span class="p">()</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">stream</span>
+</div>
+<div class="viewcode-block" id="save_streamframe_to_xiofile"><a class="viewcode-back" href="../../mumodo/IO.html#mumodo.mumodoIO.save_streamframe_to_xiofile">[docs]</a><span class="k">def</span> <span class="nf">save_streamframe_to_xiofile</span><span class="p">(</span><span class="n">framedict</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save many streamframes to a single XIOFile.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    framedict   --  a dict of streamframes, keys are the</span>
+<span class="sd">                    sensornames</span>
+<span class="sd">    filepath    --  Path + filename of the file to be written.</span>
+<span class="sd">    sensorname  --  Name of the sensor.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c">#create a joined streamframe</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">framedict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">framedict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">sensorframe</span> <span class="o">=</span> <span class="n">framedict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">sensorframe</span><span class="p">[</span><span class="s">&#39;sensorname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">sensorframe</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sensorframe</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;invalid data!&quot;</span>
+        <span class="k">return</span>
+
+    <span class="n">frame</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">outfile</span> <span class="o">=</span> <span class="n">XIOFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;float&#39;</span><span class="p">:</span> <span class="s">&#39;sffloat&#39;</span><span class="p">,</span> <span class="s">&#39;SFVec3f&#39;</span><span class="p">:</span> <span class="s">&#39;sfvec3f&#39;</span><span class="p">,</span> <span class="s">&#39;SFVec2f&#39;</span><span class="p">:</span> <span class="s">&#39;sfvec2f&#39;</span><span class="p">,</span>
+             <span class="s">&#39;SFRotation&#39;</span><span class="p">:</span> <span class="s">&#39;sfrotation&#39;</span><span class="p">,</span> <span class="s">&#39;MFVec3f&#39;</span><span class="p">:</span> <span class="s">&#39;mfvec3f&#39;</span><span class="p">,</span>
+             <span class="s">&#39;MFVec2f&#39;</span><span class="p">:</span> <span class="s">&#39;mfvec2f&#39;</span><span class="p">,</span> <span class="s">&#39;MFRotation&#39;</span><span class="p">:</span> <span class="s">&#39;mfrotation&#39;</span><span class="p">,</span>
+             <span class="s">&#39;MFString&#39;</span><span class="p">:</span> <span class="s">&#39;mfstring&#39;</span><span class="p">,</span> <span class="s">&#39;MFFloat&#39;</span><span class="p">:</span> <span class="s">&#39;mffloat&#39;</span><span class="p">,</span>
+             <span class="s">&#39;bool&#39;</span><span class="p">:</span><span class="s">&#39;sfbool&#39;</span><span class="p">,</span> <span class="s">&#39;int&#39;</span><span class="p">:</span><span class="s">&#39;sfint32&#39;</span><span class="p">,</span> <span class="s">&#39;str&#39;</span><span class="p">:</span><span class="s">&#39;sfstring&#39;</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span> <span class="c">#each row of the dataframe</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sensorname</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;sensorname&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>  <span class="c">#fieldname becomes name of each column</span>
+            <span class="k">if</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">,</span> <span class="s">&#39;sensorname&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">fieldname</span><span class="p">])):</span>
+                    <span class="n">otype</span> <span class="o">=</span> <span class="n">types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">fieldname</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;nan&#39;</span><span class="p">:</span>
+                        <span class="n">outfile</span><span class="o">.</span><span class="n">xio_writeline</span><span class="p">(</span><span class="n">outfile</span><span class="o">.</span><span class="n">xio_formatline</span><span class="p">(</span><span class="n">otype</span><span class="p">,</span>
+                                                                     <span class="n">value</span><span class="p">,</span>
+                                                                     <span class="n">sensorname</span><span class="p">,</span>
+                                                                     <span class="n">fieldname</span><span class="p">,</span>
+                                                                     <span class="n">timestamp</span><span class="p">))</span>
+    <span class="n">outfile</span><span class="o">.</span><span class="n">xiofile_close</span><span class="p">()</span>
+    <span class="k">return</span>
+</div>
+<div class="viewcode-block" id="open_intervalframe_from_textgrid"><a class="viewcode-back" href="../../mumodo/IO.html#mumodo.mumodoIO.open_intervalframe_from_textgrid">[docs]</a><span class="k">def</span> <span class="nf">open_intervalframe_from_textgrid</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span>
+                                     <span class="n">asobjects</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                     <span class="n">include_empty_intervals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Import a textgrid and return a dict of IntervalFrames.</span>
+
+<span class="sd">    Each tier in the textgrid becomes an IntervalFrame (Pandas DataFrame)</span>
+<span class="sd">    The Intervals by default are tokenized into start_time, end_time and</span>
+<span class="sd">    text columns.</span>
+<span class="sd">    The points (for point tiers) are tokenized into time and mark columns.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    filepath  -- Path + filename of the TextGrid file to be imported.</span>
+
+<span class="sd">    Keyword Arguments:</span>
+<span class="sd">    asobjects -- If True, then values are intervalobjects (as defined in</span>
+<span class="sd">                 package tgt, instead of tokenizing into start_time etc.</span>
+<span class="sd">                 IntervalFrame has only one column with these objects.</span>
+<span class="sd">    include_empty_intervals -- If enabled, empty intervals between</span>
+<span class="sd">                               annotations are also returned</span>
+<span class="sd">    encoding -- character encoding to read the textgrid file</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">textgrid</span> <span class="o">=</span> <span class="n">tgt</span><span class="o">.</span><span class="n">read_textgrid</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">include_empty_intervals</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">tier</span> <span class="ow">in</span> <span class="n">textgrid</span><span class="o">.</span><span class="n">tiers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tier</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="n">tgt</span><span class="o">.</span><span class="n">IntervalTier</span><span class="p">):</span>
+                <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tier</span><span class="o">.</span><span class="n">intervals</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;intervals&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">asobjects</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;intervals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>\
+                                                             <span class="n">x</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;intervals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>\
+                                                               <span class="n">x</span><span class="o">.</span><span class="n">end_time</span><span class="p">)</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;intervals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;intervals&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="n">tgt</span><span class="o">.</span><span class="n">PointTier</span><span class="p">):</span>
+                <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tier</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;points&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">asobjects</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;points&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="s">&#39;mark&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;points&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;points&#39;</span><span class="p">]</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">tier</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span>
+    <span class="k">return</span> <span class="n">result</span>
+</div>
+<div class="viewcode-block" id="save_intervalframe_to_textgrid"><a class="viewcode-back" href="../../mumodo/IO.html#mumodo.mumodoIO.save_intervalframe_to_textgrid">[docs]</a><span class="k">def</span> <span class="nf">save_intervalframe_to_textgrid</span><span class="p">(</span><span class="n">framedict</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write a dict of IntervalFrames in a textgrid-File.</span>
+
+<span class="sd">       Arguments:</span>
+<span class="sd">       framedict    --  Dictionary of dataframes. The keys become tier</span>
+<span class="sd">                        names in the textgrid file</span>
+<span class="sd">       filepath     --  Path + filename of the file to be written.</span>
+
+<span class="sd">       Keyword arguments:</span>
+<span class="sd">       encoding: character encoding to save textgrid file</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">framedict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;invalid data!&quot;</span>
+        <span class="k">return</span>
+    <span class="n">mytextgrid</span> <span class="o">=</span> <span class="n">tgt</span><span class="o">.</span><span class="n">TextGrid</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">tier_name</span> <span class="ow">in</span> <span class="n">framedict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">newtier</span> <span class="o">=</span> <span class="n">framedict</span><span class="p">[</span><span class="n">tier_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">newtier</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">mytier</span> <span class="o">=</span> <span class="n">tgt</span><span class="o">.</span><span class="n">IntervalTier</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">tier_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">newtier</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="n">myinterval</span> <span class="o">=</span> <span class="n">tgt</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="n">newtier</span><span class="p">[</span><span class="n">newtier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">row</span><span class="p">],</span>
+                                          <span class="n">newtier</span><span class="p">[</span><span class="n">newtier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">row</span><span class="p">],</span>
+                                          <span class="n">newtier</span><span class="p">[</span><span class="n">newtier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="n">row</span><span class="p">])</span>
+                <span class="n">mytier</span><span class="o">.</span><span class="n">add_interval</span><span class="p">(</span><span class="n">myinterval</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">newtier</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">mytier</span> <span class="o">=</span> <span class="n">tgt</span><span class="o">.</span><span class="n">PointTier</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">tier_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">newtier</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="n">mypoint</span> <span class="o">=</span> <span class="n">tgt</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">newtier</span><span class="p">[</span><span class="n">newtier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">row</span><span class="p">],</span>
+                                    <span class="n">newtier</span><span class="p">[</span><span class="n">newtier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">row</span><span class="p">])</span>
+                <span class="n">mytier</span><span class="o">.</span><span class="n">add_point</span><span class="p">(</span><span class="n">mypoint</span><span class="p">)</span>
+        <span class="n">mytextgrid</span><span class="o">.</span><span class="n">add_tier</span><span class="p">(</span><span class="n">mytier</span><span class="p">)</span>
+    <span class="n">tgt</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">mytextgrid</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;long&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="open_intervalframe_from_increco"><a class="viewcode-back" href="../../mumodo/IO.html#mumodo.mumodoIO.open_intervalframe_from_increco">[docs]</a><span class="k">def</span> <span class="nf">open_intervalframe_from_increco</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">lastonly</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create an interval frame from an inc_reco file</span>
+
+<span class="sd">    Creates a dictionary with an intervalframe per chunk. The dictionary</span>
+<span class="sd">    keys are the times of the chunks</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    filepath - the path to the inc_reco file</span>
+
+<span class="sd">    Kwargs:</span>
+
+<span class="sd">    encoding -- the encoding of the file</span>
+
+<span class="sd">    lastonly -- Read only the last chunk in the inc_reco file</span>
+<span class="sd">                rather than all chunks</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">reco</span> <span class="o">=</span> <span class="n">IncReco</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">start_chunk</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">lastonly</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="n">frame_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">reco</span><span class="p">[</span><span class="n">start_chunk</span><span class="p">:]:</span>
+        <span class="n">cur_frame</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">chunk</span><span class="p">[</span><span class="s">&#39;Chunk&#39;</span><span class="p">]:</span>
+            <span class="n">reco_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span><span class="s">&quot;start_time&quot;</span><span class="p">:</span> \
+                                        <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)),</span>
+                                        <span class="s">&quot;end_time&quot;</span><span class="p">:</span> \
+                                        <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)),</span>
+                                        <span class="s">&quot;text&quot;</span><span class="p">:</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)}])</span>
+            <span class="k">if</span> <span class="n">cur_frame</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">cur_frame</span> <span class="o">=</span> <span class="n">reco_frame</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cur_frame</span> <span class="o">=</span> <span class="n">cur_frame</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reco_frame</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="c">#check for minor errors in the times</span>
+        <span class="c">#Sometimes the end of the previous word is 1 ms later than</span>
+        <span class="c">#the start of the next word</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cur_frame</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">cur_frame</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cur_frame</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                                <span class="n">cur_frame</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">frame_dict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">chunk</span><span class="p">[</span><span class="s">&#39;Time&#39;</span><span class="p">])]</span> <span class="o">=</span> <span class="n">cur_frame</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span>
+                                                          <span class="s">&#39;end_time&#39;</span><span class="p">,</span>
+                                                          <span class="s">&#39;text&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">frame_dict</span>
+</div>
+<div class="viewcode-block" id="quantize"><a class="viewcode-back" href="../../mumodo/IO.html#mumodo.mumodoIO.quantize">[docs]</a><span class="k">def</span> <span class="nf">quantize</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">sensorname</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">with_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">without_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">discard_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+             <span class="n">enumerate_fields</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Quantize frames within a fixed time window</span>
+
+<span class="sd">    Series of typed, timed events can often be grouped by sensorname</span>
+<span class="sd">    (or namespace) to create complete frames of data. For example,</span>
+<span class="sd">    skeleton/lefthand and skeleton/righthand may have been logged as</span>
+<span class="sd">    different events (lines), but should belong together, as frames of</span>
+<span class="sd">    the sensor &#39;skeleton&#39;. This function performs this operation. This</span>
+<span class="sd">    results in the quantization of the timestamps of the individual</span>
+<span class="sd">    events into less timestamps for frames.</span>
+
+<span class="sd">    The function is a Python generator that yields dictionaries.</span>
+<span class="sd">    Each dictionary is a frame, with keys corresponding to individual</span>
+<span class="sd">    fields in the frame and their values. The function can be directly</span>
+<span class="sd">    input to a Pandas Dataframe constructor (as the data argument)</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    rows  -- iterable with dictionaries as items. They represent parsed</span>
+<span class="sd">             I/O events. These dictionaries&#39; keys should be:</span>
+<span class="sd">            [&#39;sensorname&#39;, &#39;fieldname&#39;, &#39;time&#39;, &#39;type&#39;,&#39;value&#39;]</span>
+
+<span class="sd">    sensorname --  the name of the sensor by which to group</span>
+
+<span class="sd">    Keyword arguments:</span>
+<span class="sd">    window_size --  maximum time in ms to consider as one frame. Start a</span>
+<span class="sd">                 new frame after this time has passed</span>
+<span class="sd">    with_fields -- a list of fieldnames. Output frames contain only these</span>
+<span class="sd">                 fields</span>
+<span class="sd">    without_fields --  a list of fieldnames. Ouput frames will not contain</span>
+<span class="sd">                       any of these fields. This overrides with_fields</span>
+<span class="sd">                       for the same field if found in both lists</span>
+<span class="sd">    discard_duplicates -- if True, additional values for the same field found</span>
+<span class="sd">                          in the same window will be discarded.</span>
+<span class="sd">                          If False, additional values for the same field found</span>
+<span class="sd">                          in the same window will overwrite previous values</span>
+<span class="sd">    enumerate_fields -- if True, enumerate all fields found in any frame. This</span>
+<span class="sd">                        is required in order to prevent type coercion of columns</span>
+<span class="sd">                        by Pandas, but is false by default. It will cause the</span>
+<span class="sd">                        function to yield one final dict with value TRUE for all</span>
+<span class="sd">                        keys that were enumerated. Thus, Pandas will not create</span>
+<span class="sd">                        a FLOAT dtype for a column of INTs that has one NaN</span>
+<span class="sd">                        value in it</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">with_fields</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">with_fields</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">without_fields</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">without_fields</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">doenumerate</span> <span class="o">=</span> <span class="n">enumerate_fields</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">with_fields</span>
+    <span class="k">if</span> <span class="n">doenumerate</span><span class="p">:</span>
+        <span class="n">enumerated_fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="n">window_end</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">cur_row</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;sensorname&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">sensorname</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;fieldname&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">with_fields</span> <span class="ow">and</span> <span class="n">with_fields</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;fieldname&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">without_fields</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">doenumerate</span><span class="p">:</span>
+            <span class="n">enumerated_fields</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;fieldname&#39;</span><span class="p">])</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span>
+        <span class="n">fieldname</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;fieldname&#39;</span><span class="p">]</span>
+        <span class="c"># If time falls in the current window, update row.</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="o">&lt;=</span> <span class="n">window_end</span><span class="p">:</span>
+            <span class="c"># Do nothing if the same field already exists and</span>
+            <span class="c"># discard duplicates is true.</span>
+            <span class="k">if</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">cur_row</span> <span class="ow">and</span> <span class="n">discard_duplicates</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cur_row</span><span class="p">[</span><span class="n">fieldname</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="c"># Otherwise, create a new window.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#yield the currentframe</span>
+            <span class="k">if</span> <span class="n">cur_row</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">cur_row</span>
+            <span class="c">#initialize the new frame</span>
+            <span class="n">cur_row</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;time&#39;</span> <span class="p">:</span> <span class="n">time</span><span class="p">,</span> <span class="n">fieldname</span> <span class="p">:</span> <span class="n">value</span><span class="p">}</span>
+            <span class="n">window_end</span> <span class="o">=</span> <span class="n">time</span> <span class="o">+</span> <span class="n">window_size</span>
+    <span class="c">#After the loop, ensure the last frame is yielded</span>
+    <span class="k">yield</span> <span class="n">cur_row</span>
+
+    <span class="c">#then add row with True for all keys, so that column-types aren&#39;t</span>
+    <span class="c">#converted automatically to float, due to a NaN value</span>
+    <span class="k">if</span> <span class="n">enumerate_fields</span><span class="p">:</span>
+        <span class="c">#if with_fields are given, these are the enumerated_fields</span>
+        <span class="k">if</span> <span class="n">with_fields</span><span class="p">:</span>
+            <span class="n">enumerated_fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">with_fields</span><span class="p">)</span>
+        <span class="n">cur_row</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">field</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">enumerated_fields</span><span class="p">])</span>
+        <span class="n">cur_row</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">yield</span> <span class="n">cur_row</span>
+</div>
+<div class="viewcode-block" id="convert_pointtier_to_streamframe"><a class="viewcode-back" href="../../mumodo/IO.html#mumodo.mumodoIO.convert_pointtier_to_streamframe">[docs]</a><span class="k">def</span> <span class="nf">convert_pointtier_to_streamframe</span><span class="p">(</span><span class="n">pointtier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a Pointier into a StreamFrame</span>
+
+<span class="sd">    Converts a PointTier imported from a textgrid into a Streamframe</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    pointtier -- The PoinTier to convert</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">streamframe</span> <span class="o">=</span> <span class="n">pointtier</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">streamframe</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">streamframe</span><span class="p">[</span><span class="n">streamframe</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">del</span> <span class="n">streamframe</span><span class="p">[</span><span class="n">streamframe</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">streamframe</span>
+</div>
+<div class="viewcode-block" id="convert_streamframe_to_pointtier"><a class="viewcode-back" href="../../mumodo/IO.html#mumodo.mumodoIO.convert_streamframe_to_pointtier">[docs]</a><span class="k">def</span> <span class="nf">convert_streamframe_to_pointtier</span><span class="p">(</span><span class="n">streamframe</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a StreamFrame into a dictionary of PointTiers</span>
+
+<span class="sd">    Converts a Streamframe into a dictionary of PointTiers.</span>
+<span class="sd">    The column names of the stream frame becomes the dictionary keys</span>
+<span class="sd">    The resulting dictionary can then be saved into a  Praat TextGrid</span>
+<span class="sd">    with those Point Tiers.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    streamframe -- the input streamframe</span>
+
+<span class="sd">    Keyword Arguments:</span>
+<span class="sd">    columns -- list of columns to convert. Each column must exist</span>
+<span class="sd">               in the streamframe</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pointdict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">columns</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="n">pointdict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">col</span><span class="p">:</span> <span class="n">streamframe</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
+                                       <span class="s">&#39;time&#39;</span><span class="p">:</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">},</span>
+                                      <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span>
+        <span class="n">pointdict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pointdict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pointdict</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

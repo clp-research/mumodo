@@ -1,0 +1,745 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>mumodo.analysis &mdash; mumodo 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mumodo 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for mumodo.analysis</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;analyis.py -- analysis and plotting functions</span>
+
+<span class="sd">Functions for analyis of streamframes, intervalframes and pointframes</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Spyros Kousidis&quot;</span><span class="p">,</span> <span class="s">&quot;Katharina Jettka&quot;</span><span class="p">,</span> <span class="s">&quot;Gerdis Anderson&quot;</span><span class="p">,</span>
+              <span class="s">&quot;Robert Rogalla&quot;</span><span class="p">,</span> <span class="s">&quot;Fabian Wohlgemuth&quot;</span><span class="p">,</span> <span class="s">&quot;Casey Kennington&quot;</span><span class="p">]</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Dialogue Systems Group Bielefeld - www.dsg-bielefeld.de&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Spyros Kousidis&quot;</span><span class="p">,</span> <span class="s">&quot;Katharina Jettka&quot;</span><span class="p">,</span> <span class="s">&quot;Gerdis Anderson&quot;</span><span class="p">,</span>
+               <span class="s">&quot;Robert Rogalla&quot;</span><span class="p">,</span> <span class="s">&quot;Fabian Wohlgemuth&quot;</span><span class="p">,</span> <span class="s">&quot;Casey Kennington&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;GPL&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.1.1&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Spyros Kousidis&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s">&quot;Development&quot;</span> <span class="c"># Development/Production/Prototype</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;intervalframe_overlaps&#39;</span><span class="p">,</span> <span class="s">&#39;intervalframe_union&#39;</span><span class="p">,</span>
+           <span class="s">&#39;invert_intervalframe&#39;</span><span class="p">,</span> <span class="s">&#39;create_intervalframe_from_streamframe&#39;</span><span class="p">,</span>
+           <span class="s">&#39;create_streamframe_from_intervalframe&#39;</span><span class="p">,</span>
+           <span class="s">&#39;slice_streamframe_on_intervals&#39;</span><span class="p">,</span> <span class="s">&#39;slice_intervalframe_by_time&#39;</span><span class="p">,</span>
+           <span class="s">&#39;slice_pointframe_by_time&#39;</span><span class="p">,</span>
+           <span class="s">&#39;convert_times_of_tier&#39;</span><span class="p">,</span> <span class="s">&#39;convert_times_of_tiers&#39;</span><span class="p">,</span>
+           <span class="s">&#39;shift_tier&#39;</span><span class="p">,</span> <span class="s">&#39;shift_tiers&#39;</span><span class="p">,</span> <span class="s">&#39;get_tier_type&#39;</span><span class="p">,</span> <span class="s">&#39;get_tier_boundaries&#39;</span><span class="p">,</span>
+           <span class="s">&#39;join_intervals_by_label&#39;</span><span class="p">,</span> <span class="s">&#39;join_intervals_by_time&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="intervalframe_overlaps"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.intervalframe_overlaps">[docs]</a><span class="k">def</span> <span class="nf">intervalframe_overlaps</span><span class="p">(</span><span class="n">frame1</span><span class="p">,</span> <span class="n">frame2</span><span class="p">,</span> <span class="n">concatdelimiter</span><span class="o">=</span><span class="s">&#39;/&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Intersection of two interval frames</span>
+
+<span class="sd">    Return an IntervalFrame with the intersection  of two intervalframes</span>
+<span class="sd">    An intersection is defined as an AND function on the intervals of both</span>
+<span class="sd">    sources (regardless of text). HINT: Input Intervalframes should</span>
+<span class="sd">    be imported without empty intervals</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    frame1,frame2   -- IntervalFrames.</span>
+
+<span class="sd">    Keyword arguments:</span>
+
+<span class="sd">    concatdelimiter  --  Concatenate the labels of the overlapping intervals</span>
+<span class="sd">                         to create labels of the new dataframe intervals.</span>
+<span class="sd">                         If empty string is given, the intervals are simply</span>
+<span class="sd">                         labeled with &#39;overlap&#39; instead.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">overlaps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame1</span><span class="p">):</span>
+        <span class="n">frame1</span><span class="p">,</span> <span class="n">frame2</span> <span class="o">=</span> <span class="n">frame2</span><span class="p">,</span> <span class="n">frame1</span>
+    <span class="k">for</span> <span class="n">intrv1</span> <span class="ow">in</span> <span class="n">frame1</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="n">st1</span> <span class="o">=</span> <span class="n">frame1</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">intrv1</span><span class="p">]</span>
+        <span class="n">en1</span> <span class="o">=</span> <span class="n">frame1</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">intrv1</span><span class="p">]</span>
+        <span class="n">fr2</span> <span class="o">=</span> <span class="n">frame2</span><span class="p">[</span><span class="n">frame2</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">st1</span><span class="p">]</span>
+        <span class="n">fr2</span> <span class="o">=</span> <span class="n">fr2</span><span class="p">[</span><span class="n">fr2</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">en1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">intrv2</span> <span class="ow">in</span> <span class="n">fr2</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">overlap</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">concatdelimiter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">concatdelimiter</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">overlap</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fr2</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">intrv2</span><span class="p">][</span><span class="s">&#39;text&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">concatdelimiter</span> <span class="o">+</span> \
+                                  <span class="n">frame1</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">intrv1</span><span class="p">][</span><span class="s">&#39;text&#39;</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">overlap</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;overlap&#39;</span>
+            <span class="n">st2</span> <span class="o">=</span> <span class="n">fr2</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">intrv2</span><span class="p">]</span>
+            <span class="n">en2</span> <span class="o">=</span> <span class="n">fr2</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">intrv2</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">st2</span> <span class="o">&gt;</span> <span class="n">st1</span><span class="p">:</span>
+                <span class="n">overlap</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">st2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">overlap</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">st1</span>
+            <span class="k">if</span> <span class="n">en2</span> <span class="o">&gt;</span> <span class="n">en1</span><span class="p">:</span>
+                <span class="n">overlap</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">en1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">overlap</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">en2</span>
+            <span class="n">overlaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">]]</span>
+</div>
+<div class="viewcode-block" id="intervalframe_union"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.intervalframe_union">[docs]</a><span class="k">def</span> <span class="nf">intervalframe_union</span><span class="p">(</span><span class="n">frame1</span><span class="p">,</span> <span class="n">frame2</span><span class="p">,</span> <span class="n">concatdelimiter</span><span class="o">=</span><span class="s">&#39;/&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Union of two interval frames</span>
+
+<span class="sd">    Return an IntervalFrame with the union of two intervalframes</span>
+<span class="sd">    A union is defined as an OR function on the intervals of both</span>
+<span class="sd">    sources (regardless of text). Optionally, the labels of overlapping</span>
+<span class="sd">    intervals can be concatenated to create the labels of the new</span>
+<span class="sd">    dataframe intervals. HINT: Input Intervalframes should</span>
+<span class="sd">    be imported without empty intervals</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    frame1,frame2   -- IntervalFrames.</span>
+
+<span class="sd">    concatdelimiter  --  Concatenate the labels of the overlapping intervals</span>
+<span class="sd">                         to create labels of the new dataframe intervals.</span>
+<span class="sd">                         If empty string is given, the intervals are simply</span>
+<span class="sd">                         labeled with &#39;overlap&#39; instead.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unifications</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c">#join the two frames into one</span>
+    <span class="n">newframe</span> <span class="o">=</span> <span class="n">frame1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">newframe</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="n">newframe</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">newframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c">#Read first interval</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">newframe</span><span class="o">.</span><span class="n">irow</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">newframe</span><span class="o">.</span><span class="n">irow</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">newframe</span><span class="o">.</span><span class="n">irow</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="s">&#39;text&#39;</span><span class="p">]</span>
+    <span class="c">#main loop</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">newframe</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="c">#Read the new interval</span>
+        <span class="n">start2</span> <span class="o">=</span> <span class="n">newframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span>
+        <span class="n">end2</span> <span class="o">=</span> <span class="n">newframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span>
+        <span class="n">text2</span> <span class="o">=</span> <span class="n">newframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;text&#39;</span><span class="p">]</span>
+        <span class="c">#Is the new interval disjoint from the running one?</span>
+        <span class="k">if</span> <span class="n">start2</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">concatdelimiter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">concatdelimiter</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="s">&#39;union&#39;</span>
+            <span class="n">unifications</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">start</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">end</span><span class="p">,</span>
+                                 <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">})</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">start2</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">end2</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">end2</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">end2</span>
+            <span class="c">#Set the running label</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">concatdelimiter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="n">concatdelimiter</span> <span class="o">+</span> <span class="n">text2</span>
+    <span class="c">#add the last working interval</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">concatdelimiter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">concatdelimiter</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s">&#39;union&#39;</span>
+    <span class="n">unifications</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">start</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">end</span><span class="p">,</span>
+                         <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">unifications</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span>
+                                               <span class="s">&#39;end_time&#39;</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="invert_intervalframe"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.invert_intervalframe">[docs]</a><span class="k">def</span> <span class="nf">invert_intervalframe</span><span class="p">(</span><span class="n">inversion</span><span class="p">,</span> <span class="n">st</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">en</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                         <span class="n">concat_delimiter</span><span class="o">=</span><span class="s">&#39;/&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Return the negative of an interval frame</span>
+
+<span class="sd">    Return the inversion of an interval frame.</span>
+<span class="sd">    An inversion is defined as a NOT function of the original</span>
+<span class="sd">    interval frame. The labels of inverted intervals are by default</span>
+<span class="sd">    a concatenation of the labels of surrounding intervals. Any other</span>
+<span class="sd">    preferred label can be passed to the function.</span>
+<span class="sd">    HINT: Input Intervalframes should be imported without empty intervals</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    frame            -- IntervalFrame.</span>
+
+<span class="sd">    label            -- The labels of the intervals of the inverted frame</span>
+<span class="sd">                        are concatenations of the labels of the surrounding</span>
+<span class="sd">                        intervals in the original frame when the default</span>
+<span class="sd">                        value None is not changed. Any string that is</span>
+<span class="sd">                        given instead will become the label of the</span>
+<span class="sd">                        inverted frame&#39;s intervals.</span>
+
+<span class="sd">    st               -- The time at which the inverted frame shall start.</span>
+<span class="sd">                        If st is None, the inverted frame will start at the</span>
+<span class="sd">                        end_time of the first interval of the original frame.</span>
+
+<span class="sd">    en               -- The time at which the inverted frame shall end. If en is</span>
+<span class="sd">                        None, the inverted frame will end at the start_time of</span>
+<span class="sd">                        the last interval of the original frame.</span>
+
+<span class="sd">    concat_delimiter -- the character by which the labels of the surrounding</span>
+<span class="sd">                        intervals of the original frame are to be concatenated.</span>
+
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="s">&#39;min_boundary_threshold&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">min_boundary_threshold</span> <span class="o">=</span> <span class="mf">0.000001</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">min_boundary_threshold</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;min_boundary_threshold&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inversion</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">inversion</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">,</span>
+                                                     <span class="s">&#39;text&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">print</span> <span class="s">&quot;empty intervalframe or wrong shape&quot;</span>
+        <span class="k">return</span>
+
+    <span class="n">tf</span> <span class="o">=</span> <span class="n">inversion</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">st</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">en</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">en</span> <span class="o">=</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">tf</span><span class="p">[</span><span class="s">&#39;temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span>
+    <span class="n">tf</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span>
+    <span class="n">tf</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;temp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span><span class="s">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="s">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">en</span><span class="p">,</span>
+                                  <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]}]))</span>
+    <span class="n">tf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span><span class="s">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">st</span><span class="p">,</span>
+                                  <span class="s">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;temp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                  <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]}]))</span>
+
+    <span class="n">tf</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">tf</span><span class="p">[</span><span class="s">&#39;dur&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span>
+    <span class="n">tf</span> <span class="o">=</span> <span class="n">tf</span><span class="p">[</span><span class="n">tf</span><span class="p">[</span><span class="s">&#39;dur&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">min_boundary_threshold</span><span class="p">]</span>
+    <span class="n">tf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">concat_delimiter</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tf</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">]]</span>
+</div>
+<div class="viewcode-block" id="create_intervalframe_from_streamframe"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.create_intervalframe_from_streamframe">[docs]</a><span class="k">def</span> <span class="nf">create_intervalframe_from_streamframe</span><span class="p">(</span><span class="n">streamframe</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span>
+                                          <span class="n">intervalwidth</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">&#39;True&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates an Intervalframe from a streamframe based on a condition.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    streamFrame   -- The Streamframe that contains the data.</span>
+<span class="sd">    column        -- The column to evaluate (function evaluates each</span>
+<span class="sd">                     item of this column).</span>
+<span class="sd">    function      -- A lambda function that evaluates to true or false</span>
+<span class="sd">                     depending on a condition</span>
+<span class="sd">                     e.g. lambda x: True if x&gt;0 else False.</span>
+<span class="sd">    intervalWidth -- Minimum distance between intervals (setting higher</span>
+<span class="sd">                     results in less, bigger intervals).</span>
+
+<span class="sd">    Keyword arguments:</span>
+<span class="sd">    text          -- Text for the Intervalframe labels (default True).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">streamframe</span><span class="p">[</span><span class="n">streamframe</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">function</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">interval_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c">#Little helper function</span>
+    <span class="k">def</span> <span class="nf">append_to_list</span><span class="p">(</span><span class="n">tt1</span><span class="p">,</span> <span class="n">tt2</span><span class="p">,</span> <span class="n">ttx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;add a dictionary to the list&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tt2</span> <span class="o">!=</span> <span class="n">tt1</span><span class="p">:</span>
+            <span class="n">interval</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">interval</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tt1</span>
+            <span class="n">interval</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tt2</span>
+            <span class="n">interval</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ttx</span>
+            <span class="n">interval_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">-</span> <span class="n">last</span> <span class="o">&lt;=</span> <span class="n">intervalwidth</span><span class="p">:</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">append_to_list</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">last</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="c">#Append the last interval if required</span>
+    <span class="n">append_to_list</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">last</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">interval_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">interval_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span>
+                                                         <span class="s">&#39;end_time&#39;</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="create_streamframe_from_intervalframe"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.create_streamframe_from_intervalframe">[docs]</a><span class="k">def</span> <span class="nf">create_streamframe_from_intervalframe</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                          <span class="n">start_label_appendix</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                                          <span class="n">end_label_appendix</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                                          <span class="n">fillstep</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Creates a streamframe from an intervalframe</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    frame                 -- The IntervalFrame that contains the data</span>
+<span class="sd">    relative              -- If set to True, relative will make the</span>
+<span class="sd">                             timestampfs that serve as index values relative</span>
+<span class="sd">                             to the frist timestamp</span>
+<span class="sd">    start_label_appendix  -- Appends a suffix to the first event of the</span>
+<span class="sd">                             respective type.</span>
+<span class="sd">    end_label_appendix    -- Appends a suffix to the last event of the</span>
+<span class="sd">                             respective type</span>
+<span class="sd">    fillstep              -- If greater than the default value 0, then in the</span>
+<span class="sd">                             streamframe</span>
+<span class="sd">                             there will be inserted events of the respective</span>
+<span class="sd">                             type of each</span>
+<span class="sd">                             interval at regular steps between the start and</span>
+<span class="sd">                             the end of</span>
+<span class="sd">                             that interval. The stepwidth is the value of</span>
+<span class="sd">                             fillstep.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">,</span>
+                                             <span class="s">&#39;text&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">print</span> <span class="s">&quot;empty intervalframe or wrong shape&quot;</span>
+        <span class="k">return</span>
+
+    <span class="n">sframe</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">sframe</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span>
+    <span class="n">sframe</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sframe</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="s">&quot;_&quot;</span> <span class="o">+</span> \
+                      <span class="n">start_label_appendix</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">sframe</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">sframe</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span>
+    <span class="n">sframe</span> <span class="o">=</span> <span class="n">sframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]]</span>
+
+    <span class="n">eframe</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">eframe</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span>
+    <span class="n">eframe</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eframe</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="s">&quot;_&quot;</span> <span class="o">+</span> \
+                         <span class="n">end_label_appendix</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">eframe</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">eframe</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span>
+    <span class="n">eframe</span> <span class="o">=</span> <span class="n">eframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]]</span>
+
+    <span class="n">streamframe</span> <span class="o">=</span> <span class="n">sframe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eframe</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fillstep</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fillstep</span> <span class="o">&lt;</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">fframes</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">fillpoint</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">fillstep</span>
+                <span class="k">while</span> <span class="n">fillpoint</span> <span class="o">&lt;</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="n">fframes</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;time&#39;</span><span class="p">:</span> <span class="n">fillpoint</span><span class="p">,</span>
+                                    <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">frame</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">]})</span>
+                    <span class="n">fillpoint</span> <span class="o">+=</span> <span class="n">fillstep</span>
+                <span class="n">fframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fframes</span><span class="p">)</span>
+                <span class="n">fframe</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">fframe</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span>
+                <span class="n">streamframe</span> <span class="o">=</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]])</span>
+
+    <span class="n">streamframe</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">relative</span><span class="p">:</span>
+        <span class="n">streamframe</span><span class="o">.</span><span class="n">index</span> <span class="o">-=</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">streamframe</span>
+</div>
+<div class="viewcode-block" id="slice_streamframe_on_intervals"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.slice_streamframe_on_intervals">[docs]</a><span class="k">def</span> <span class="nf">slice_streamframe_on_intervals</span><span class="p">(</span><span class="n">streamframe</span><span class="p">,</span> <span class="n">intervalframe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a sliced streamFrame.</span>
+
+<span class="sd">    Slice a streamframe&#39;s index on the intervals of the intervalframe,</span>
+<span class="sd">    regardless of the text. HINT: Intervalframe should not have</span>
+<span class="sd">    empty intervals.</span>
+<span class="sd">    The intervalframe gives the needed intervals from the &#39;original&#39;</span>
+<span class="sd">    streamframe, to be included in the new, sliced streamframe.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    streamFrame     --   The streamFrame that contains the data.</span>
+<span class="sd">    intervalFrame   --   The intervalFrame that contains the intervals,</span>
+<span class="sd">                         needed for the sliced streamFrame.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_index</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intervalframe</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">this_slice</span> <span class="o">=</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+        <span class="n">this_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">this_slice</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">new_index</span> <span class="o">+=</span> <span class="n">this_index</span>
+    <span class="k">return</span> <span class="n">streamframe</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">new_index</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="slice_intervalframe_by_time"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.slice_intervalframe_by_time">[docs]</a><span class="k">def</span> <span class="nf">slice_intervalframe_by_time</span><span class="p">(</span><span class="n">intervalframe</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span>
+                                <span class="n">method</span><span class="o">=</span><span class="s">&#39;truncate&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a temporal slice of an intervalframe</span>
+
+<span class="sd">    Slice an intervalframe, so that only intervals within the</span>
+<span class="sd">    limits defined will be kept, regardless of the text labels</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    intervalframe -- the input intervalframe to be sliced</span>
+<span class="sd">    start_time, end_time -- define a time region</span>
+
+<span class="sd">    Keyword arguments:</span>
+<span class="sd">    method -- Defines how to deal with intervals that cross the</span>
+<span class="sd">              temporal boundaries. Possible values:</span>
+<span class="sd">        &#39;truncate&#39; (default): Cut the intervals at the boundaries</span>
+<span class="sd">        &#39;include&#39;: Include intervals crossing the boundaries</span>
+<span class="sd">        &#39;exclude&#39;: Exclude intervals crossing the boundaries</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s">&#39;include&#39;</span><span class="p">:</span>
+        <span class="n">newframe</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">start_time</span><span class="p">]</span>
+        <span class="n">newframe</span> <span class="o">=</span> <span class="n">newframe</span><span class="p">[</span><span class="n">newframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s">&#39;exclude&#39;</span><span class="p">:</span>
+        <span class="n">newframe</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start_time</span><span class="p">]</span>
+        <span class="n">newframe</span> <span class="o">=</span> <span class="n">newframe</span><span class="p">[</span><span class="n">newframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">end_time</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s">&#39;truncate&#39;</span><span class="p">:</span>
+        <span class="n">newframe</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">start_time</span><span class="p">]</span>
+        <span class="n">newframe</span> <span class="o">=</span> <span class="n">newframe</span><span class="p">[</span><span class="n">newframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">newframe</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">newframe</span>
+        <span class="k">if</span> <span class="n">newframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">start_time</span><span class="p">:</span>
+            <span class="n">newframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_time</span>
+        <span class="k">if</span> <span class="n">newframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">end_time</span><span class="p">:</span>
+            <span class="n">newframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_time</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;method must be one of &#39;include&#39;, &#39;exclude&#39;, &#39;truncate&#39;&quot;</span>
+        <span class="k">return</span>
+
+    <span class="k">return</span> <span class="n">newframe</span>
+</div>
+<div class="viewcode-block" id="slice_pointframe_by_time"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.slice_pointframe_by_time">[docs]</a><span class="k">def</span> <span class="nf">slice_pointframe_by_time</span><span class="p">(</span><span class="n">pointframe</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a temporal slice of a pointframe</span>
+
+<span class="sd">    Slice a pointframe, so that only points within the</span>
+<span class="sd">    limits defined will be kept, regardless of the text labels</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    pointframe -- the input pointframe to be sliced</span>
+<span class="sd">    start_time, end_time -- define a time region</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pointframe</span><span class="p">[</span><span class="n">pointframe</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">start_time</span> \
+                                                 <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">end_time</span><span class="p">)]</span>
+</div>
+<div class="viewcode-block" id="convert_times_of_tier"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.convert_times_of_tier">[docs]</a><span class="k">def</span> <span class="nf">convert_times_of_tier</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert the times of a tier using a specified function</span>
+
+<span class="sd">    tier --- a tier, either intervalframe or point tier</span>
+
+<span class="sd">    An IntervalFrame is a Pandas DataFrame that represents a Praat interval</span>
+<span class="sd">    tier. The columns must be [&#39;start_time&#39;, &#39;end_time&#39;, text&#39;]. A PointTier</span>
+<span class="sd">    is a Pandas DataFrame that represents a Praat point tier. The columns must</span>
+<span class="sd">    be [&#39;time&#39;, &#39;mark&#39;].</span>
+
+<span class="sd">    function -- all times will be replaced by the output of this function. A</span>
+<span class="sd">                lamda function should be used, e.g. lambda x: int(1000 * x)</span>
+<span class="sd">                converts from (float) seconds to (int) milliseconds.</span>
+<span class="sd">                Conversely, lambda x: float(x)/1000 ( or x / 1000. ) converts</span>
+<span class="sd">                back to (float) seconds.</span>
+<span class="sd">                It is possible to do custom conversions such as shifts, etc.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">tier</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">column</span><span class="p">:</span>
+            <span class="n">tier</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">tier</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="convert_times_of_tiers"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.convert_times_of_tiers">[docs]</a><span class="k">def</span> <span class="nf">convert_times_of_tiers</span><span class="p">(</span><span class="n">tierdict</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert the times of all tiers in a dictionary using a specified</span>
+<span class="sd">        function</span>
+
+<span class="sd">    tierdict  --- a dictionary of tiers, either intervalframes or point tiers</span>
+
+<span class="sd">    An IntervalFrame is a Pandas DataFrame that represents a Praat interval</span>
+<span class="sd">    tier. The columns must be [&#39;start_time&#39;, &#39;end_time&#39;, text&#39;]. A PointTier</span>
+<span class="sd">    is a Pandas DataFrame that represents a Praat point tier. The columns must</span>
+<span class="sd">    be [&#39;time&#39;, &#39;mark&#39;].</span>
+
+<span class="sd">    function -- all times will be replaced by the output of this function. A</span>
+<span class="sd">                lamda function should be used, e.g. lambda x: int(1000 * x)</span>
+<span class="sd">                converts from (float) seconds to (int) milliseconds.</span>
+<span class="sd">                Conversely, lambda x: float(x)/1000 ( or x / 1000. ) converts</span>
+<span class="sd">                back to (float) seconds.</span>
+<span class="sd">                It is possible to do custom conversions such as shifts, etc.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">tier</span> <span class="ow">in</span> <span class="n">tierdict</span><span class="p">:</span>
+        <span class="n">convert_times_of_tier</span><span class="p">(</span><span class="n">tierdict</span><span class="p">[</span><span class="n">tier</span><span class="p">],</span> <span class="n">function</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="shift_tier"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.shift_tier">[docs]</a><span class="k">def</span> <span class="nf">shift_tier</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Shift a tier by a specified time offset</span>
+
+<span class="sd">    tier  --- a tier, either an intervalframes or a point tier</span>
+
+<span class="sd">    An IntervalFrame is a Pandas DataFrame that represents a Praat interval</span>
+<span class="sd">    tier. The columns must be [&#39;start_time&#39;, &#39;end_time&#39;, text&#39;]. A PointTier</span>
+<span class="sd">    is a Pandas DataFrame that represents a Praat point tier. The columns must</span>
+<span class="sd">    be [&#39;time&#39;, &#39;mark&#39;].</span>
+
+<span class="sd">    offset -- amount of time to shift the textgrid by in seconds. Can also be</span>
+<span class="sd">    negative</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">convert_times_of_tier</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="shift_tiers"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.shift_tiers">[docs]</a><span class="k">def</span> <span class="nf">shift_tiers</span><span class="p">(</span><span class="n">tierdict</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Shift all tiers in a dictionary by a specified time offset</span>
+
+<span class="sd">    tierdict  --- a dictionary of tiers, either intervalframes or point tiers</span>
+
+<span class="sd">    An IntervalFrame is a Pandas DataFrame that represents a Praat interval</span>
+<span class="sd">    tier. The columns must be [&#39;start_time&#39;, &#39;end_time&#39;, text&#39;]. A PointTier</span>
+<span class="sd">    is a Pandas DataFrame that represents a Praat point tier. The columns must</span>
+<span class="sd">    be [&#39;time&#39;, &#39;mark&#39;]</span>
+
+<span class="sd">    offset -- amount of time to shift the textgrid by in seconds. Can also be</span>
+<span class="sd">    negative</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">convert_times_of_tiers</span><span class="p">(</span><span class="n">tierdict</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="get_tier_type"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.get_tier_type">[docs]</a><span class="k">def</span> <span class="nf">get_tier_type</span><span class="p">(</span><span class="n">tier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Discover the type of a tier</span>
+
+<span class="sd">    A tier can be one of IntevalTier or PointTier. Discovery is</span>
+<span class="sd">    based on the presence of a particular column ordering and</span>
+<span class="sd">    naming.</span>
+
+<span class="sd">    For IntervalTiers (or IntervalFrames) the columns are</span>
+<span class="sd">    [&#39;start_time&#39;, &#39;end_time&#39;, &#39;text&#39;] in that order. The times</span>
+<span class="sd">    are in seconds (and should be floats, but this is not strictly</span>
+<span class="sd">    enforced)</span>
+
+<span class="sd">    For PointTiers (or PointFrames) the columns are [&#39;time&#39;, &#39;mark&#39;],</span>
+<span class="sd">    with the time again in seconds.</span>
+
+<span class="sd">    Both need to be instances of pandas.DataFrame</span>
+
+<span class="sd">    The function returns the string &#39;interval&#39; or &#39;point&#39;, depending</span>
+<span class="sd">    on the type of tier, or None if no conditions are satified</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">tier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;start_time&#39;</span> <span class="ow">and</span> <span class="n">tier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;end_time&#39;</span> \
+                           <span class="ow">and</span> <span class="n">tier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;text&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;interval&#39;</span>
+    <span class="k">elif</span> <span class="n">tier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;time&#39;</span> <span class="ow">and</span> <span class="n">tier</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;mark&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;point&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="get_tier_boundaries"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.get_tier_boundaries">[docs]</a><span class="k">def</span> <span class="nf">get_tier_boundaries</span><span class="p">(</span><span class="n">tier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get the minimum and maximum times of this tier</span>
+
+<span class="sd">    Returns a tuple (min, max) with the minimum and maximum</span>
+<span class="sd">    times of the tier.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">get_tier_type</span><span class="p">(</span><span class="n">tier</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;interval&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tier</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tier</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tier</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">get_tier_type</span><span class="p">(</span><span class="n">tier</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;point&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tier</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tier</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tier</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="join_intervals_by_label"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.join_intervals_by_label">[docs]</a><span class="k">def</span> <span class="nf">join_intervals_by_label</span><span class="p">(</span><span class="n">intervalframe</span><span class="p">,</span> <span class="n">maximum_gap</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s">&quot;inf&quot;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; Join near-adjacent intervals with the same label</span>
+
+<span class="sd">    When (near) adjacent intervals in an intervalframe have the same label,</span>
+<span class="sd">    they are concatenated into a single interval, starting at the start time</span>
+<span class="sd">    of the first interval and ending at the end time of the adjacent interval</span>
+
+<span class="sd">    If more than two adjacent intervals have the same label, the function</span>
+<span class="sd">    chains them all together (the end time of last interval in the chain</span>
+<span class="sd">    will be the end time of the new, single interval)</span>
+
+<span class="sd">    WARNING: By default, this function does not check if the intervals</span>
+<span class="sd">    are adjacent temporally. It only checks the labels. You can use the</span>
+<span class="sd">    maximum_gap kwarg to add temporal constraints to the joining</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    intervalframe  -- An IntervalFrame: Pandas Dataframe with a standard</span>
+<span class="sd">                      index and columns &#39;start_time&#39;, &#39;end_time&#39; (floats)</span>
+<span class="sd">                      and &#39;text&#39; (can be of any type but is normally</span>
+<span class="sd">                      str or unicode)</span>
+
+<span class="sd">    kwargs:</span>
+
+<span class="sd">    maximum_gap -- Do not join intervals that are more apart than this gap</span>
+<span class="sd">                   (in seconds). If None (default), the gap is ignored and</span>
+<span class="sd">                   all interval are joined</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_intervals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">new_text</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">new_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">new_end</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intervalframe</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">en</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c">#make sure a new interval is always created at the start</span>
+        <span class="k">if</span> <span class="n">new_text</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_start</span> <span class="o">=</span> <span class="n">st</span>
+            <span class="n">new_end</span> <span class="o">=</span> <span class="n">en</span>
+            <span class="n">new_text</span> <span class="o">=</span> <span class="n">text</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">text</span> <span class="o">!=</span> <span class="n">new_text</span> <span class="ow">or</span> <span class="p">(</span><span class="n">st</span> <span class="o">-</span> <span class="n">new_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">maximum_gap</span><span class="p">:</span>
+            <span class="n">new_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">new_start</span><span class="p">,</span>
+                                  <span class="s">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">new_end</span><span class="p">,</span>
+                                  <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="n">new_text</span><span class="p">})</span>
+            <span class="n">new_start</span> <span class="o">=</span> <span class="n">st</span>
+            <span class="n">new_text</span> <span class="o">=</span> <span class="n">text</span>
+
+        <span class="n">new_end</span> <span class="o">=</span> <span class="n">en</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">new_intervals</span><span class="p">)</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">]]</span>
+</div>
+<div class="viewcode-block" id="join_intervals_by_time"><a class="viewcode-back" href="../../mumodo/Analysis.html#mumodo.analysis.join_intervals_by_time">[docs]</a><span class="k">def</span> <span class="nf">join_intervals_by_time</span><span class="p">(</span><span class="n">intervalframe</span><span class="p">,</span> <span class="n">minimum_gap</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">concat_delimiter</span><span class="o">=</span><span class="s">&quot; &quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Join near-adjacent intervals by time</span>
+
+<span class="sd">    When adjacent intervals in an intervalframe are close to each other,</span>
+<span class="sd">    they are concatenated in to a single interval, starting at the start</span>
+<span class="sd">    time of the first interval and ending at the end time of the</span>
+<span class="sd">    adjacent interval.</span>
+
+<span class="sd">    If more than two adjacent intervals are near each other, the function</span>
+<span class="sd">    chains them all together (the end time of last interval in the chain</span>
+<span class="sd">    will be the end time of the new, single interval)</span>
+
+<span class="sd">    The closeness is defined by the minimum_gap kwarg. By default, only</span>
+<span class="sd">    directly adjacent intervals (that share a boundary) are concatenated</span>
+<span class="sd">    The labels of the concatenated intervals are also concatenated,</span>
+<span class="sd">    separated by a configurable delimiter (by default a space).</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    intervalframe  -- An IntervalFrame: Pandas Dataframe with a standard</span>
+<span class="sd">                      index and columns &#39;start_time&#39;, &#39;end_time&#39; (floats)</span>
+<span class="sd">                      and &#39;text&#39; (can be of any type but is normally str</span>
+<span class="sd">                      or unicode)</span>
+
+<span class="sd">    kwargs:</span>
+
+<span class="sd">    minimum_gap -- Do not join intervals that are more apart than this</span>
+<span class="sd">                   gap (in seconds).</span>
+
+<span class="sd">    concat_delimiter -- A string inserted between the concatenated interval</span>
+<span class="sd">                        labels</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_intervals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">new_text</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">new_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">new_end</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intervalframe</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">en</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">intervalframe</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c">#make sure a new interval is always created at the start</span>
+        <span class="k">if</span> <span class="n">new_text</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_start</span> <span class="o">=</span> <span class="n">st</span>
+            <span class="n">new_end</span> <span class="o">=</span> <span class="n">en</span>
+            <span class="n">new_text</span> <span class="o">=</span> <span class="n">text</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span>  <span class="p">(</span><span class="n">st</span> <span class="o">-</span> <span class="n">new_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">minimum_gap</span><span class="p">:</span>
+            <span class="n">new_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">new_start</span><span class="p">,</span>
+                                  <span class="s">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">new_end</span><span class="p">,</span>
+                                  <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="n">new_text</span><span class="p">})</span>
+            <span class="n">new_start</span> <span class="o">=</span> <span class="n">st</span>
+            <span class="n">new_text</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_text</span> <span class="o">=</span> <span class="n">new_text</span> <span class="o">+</span> <span class="n">concat_delimiter</span> <span class="o">+</span> <span class="n">text</span>
+
+        <span class="n">new_end</span> <span class="o">=</span> <span class="n">en</span>
+
+    <span class="c">#finally, add the last interval</span>
+    <span class="k">if</span> <span class="n">new_end</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">new_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">new_start</span><span class="p">,</span>
+                              <span class="s">&#39;end_time&#39;</span><span class="p">:</span> <span class="n">new_end</span><span class="p">,</span>
+                              <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="n">new_text</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">new_intervals</span><span class="p">)</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;start_time&#39;</span><span class="p">,</span> <span class="s">&#39;end_time&#39;</span><span class="p">,</span> <span class="s">&#39;text&#39;</span><span class="p">]]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">mumodo 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dialogue Systems Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

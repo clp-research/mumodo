@@ -1,0 +1,15 @@
+,start_time,end_time,text
+0,1.3000000000000003,1.8600000000000003,Hello
+1,2.8800000000000003,3.5,I 'm Spyros
+2,4.86,8.28,"Here in the Dialogue Systems Group, in the University of Bielefeld, in Germany,"
+3,8.5,10.4,"We have developed Mumodo, and Venice"
+4,11.58,11.84,<CLAP>
+5,14.1,17.220000000000002,"Well, right now we are being recorded by a camera, a microphone"
+6,17.540000000000003,18.840314236706252,and a Microsoft Kinect sensor
+7,19.3,21.1,But how will we get the data from Kinect?
+8,27.700000000000003,31.480000000000004,"We are using this timecode to synchronize the data that comes from Venice,"
+9,31.62,32.86,With the audio and video
+10,33.76,34.0,<CLAP>
+11,37.4,41.3,"We can process the data that comes from Venice, using the Mumodo Python package"
+12,47.6,47.82,<CLAP>
+13,48.94,49.66,Goodbye
