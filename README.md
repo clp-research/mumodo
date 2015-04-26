@@ -132,3 +132,7 @@ NOTE: You should no longer use the "-pylab" and "inline" arguments when
      %matplotlib inline
      import numpy as np
      import matplotilb.pylab as plt
+
+UPDATE 25.04.2015 The notebooks have been tested with IPython 3.1, and
+                  matplotlib 1.4.3.3 with no problems
+                  All packages and notebooks tested against pandas 0.16.0-2
