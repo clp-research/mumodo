@@ -1,4 +1,4 @@
-import unittest, math
+import unittest, math, os
 from mumodo.xiofile import XIOFile, xiofile_quickcopy
 
 class XioTest(unittest.TestCase):
@@ -31,19 +31,14 @@ class XioTest(unittest.TestCase):
         #Test result of copy, by loading the copy
         self.k = XIOFile('data/newtypes.xio.gz', 'r', indexing=True)
         #Test of an un-compressed file
-#<<<<<<< Updated upstream
         self.n = XIOFile('data/types.xio', indexing=True)
         #File to specifically test line ranges
         self.o = XIOFile('data/linestest.xio.gz', indexing=True)
         #Similar for unindexed mode
         self.p = XIOFile('data/linestest.xio.gz')
-##=======
         self.n = XIOFile('data/types.xio', indexing=True)
         self.q = XIOFile('data/parsing5.xio.gz', indexing=True)
         self.nr = XIOFile('data/unreadable.xio.gz')
-
-
-##>>>>>>> Stashed changes
 
     def test_xiofile_indexed(self):
         self.failUnlessEqual(str(type(self.f)),
@@ -374,6 +369,11 @@ class XioTest(unittest.TestCase):
 
 
         self.failUnlessEqual(self.p.xio_quicksearch(6001), (True, 6001))
+
+    def tearDown(self):
+        os.system('rm data/newtypes.xio.gz')
+        os.system('rm data/trywriting.xio.gz')
+        os.system('rm data/trywriting2.xio.gz')
 
 if __name__ == "__main__":
     unittest.main()

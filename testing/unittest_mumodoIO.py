@@ -1,5 +1,5 @@
 import unittest
-import tgt
+import tgt, os
 from mumodo.mumodoIO import quantize, open_streamframe_from_xiofile, \
                             save_streamframe_to_xiofile, quantize, \
                             open_intervalframe_from_textgrid, \
@@ -23,7 +23,7 @@ class MumodoTest(unittest.TestCase):
                                                timestamp_offset=10)
 
         self.f2 = open_streamframe_from_xiofile('data/fseeksmaller.xio.gz',
-                                                "lab-labtop/irioKinect", 
+                                                "lab-labtop/irioKinect",
                                                 window_size=5, with_fields=[],
                                                 without_fields=[],
                                                 discard_duplicates=True,
@@ -47,11 +47,11 @@ class MumodoTest(unittest.TestCase):
                                                 start_time=0, end_time=13,
                                                 relative=True)
 
-        save_streamframe_to_xiofile({"lab-labtop/irioKinect 2": self.f}, 
+        save_streamframe_to_xiofile({"lab-labtop/irioKinect 2": self.f},
                                     'data/sf_to_xio.xio.gz')
 
         save_streamframe_to_xiofile({"lab-labtop/irioKinect 2": self.f,
-                                     "lab-labtop/irioKinect": self.f2}, 
+                                     "lab-labtop/irioKinect": self.f2},
                                     'data/sf_to_xio2.xio.gz')
 
         self.rsn = open_streamframe_from_xiofile('data/fseeksmaller.xio.gz',
@@ -154,6 +154,10 @@ class MumodoTest(unittest.TestCase):
         self.failUnlessEqual(self.ic2.keys()[0], '38.4')
 
         self.failUnlessEqual(self.ic2['38.4'].ix[0]['text'], 'ragt')
+
+    def tearDown(self):
+        os.system('rm data/sf_to_xio.xio.gz')
+        os.system('rm data/sf_to_xio2.xio.gz')
 
 if __name__ == "__main__":
     unittest.main()
