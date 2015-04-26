@@ -55,7 +55,7 @@ setup(
                    'sampledata/test.txt',
                    'sampledata/test.wav',
                    'sampledata/test.xio.gz',
-                   'sampledata/black.jpg'
+                   'sampledata/black.jpg',
                    'sampledata/testimage.png'])],
 
     maintainer='Dialogue Systems Group, Bielfeld University',
