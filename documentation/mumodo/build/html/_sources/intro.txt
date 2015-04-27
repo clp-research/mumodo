@@ -22,7 +22,7 @@ Get mumodo from github or install with pip. Please check the readme file for det
 The Data Model
 ==============
 
-Multimodal analysis in mumodo uses a data model in which information is stored (mostly) in two types of objects: 
+Multimodal analysis in mumodo uses a data model in which information is stored (mostly) in two types of objects:
 
 1. The StreamFrame, which is a time-indexed pandas DataFrame of typed events or groups of events (frames)
 
@@ -34,7 +34,7 @@ Mumodo Parts
 
 Mumodo consists of the following parts:
 
-1. MumodoIO 
+1. MumodoIO
 
 This part of mumodo handles input/output of data into StreamFrames and IntervalFrames. Widely used formats such as CSV and Praat textgrid are upported. In addition, mumdodo natively supports more specialized formats, such as XIO and inc_reco.
 
@@ -60,13 +60,22 @@ The Notebooks
 
 Mumodo documentation is split into two parts. If you are looking for a detailed documentation of all the functions and classes, you are in the right place. However, a more high-level, tutorial-like documentation of the usage can be found in the form of IPython notebooks. Please look in the readme for instructions on how to install the notebooks and their sample data into a workspace folder (can be done automatically). The following notebooks are available:
 
-* Basic Data Types - learn about the basic data types of mumodo
-* Basic IO - learn how to import/export data from common and mumodo-specific file formats into your notebook as basic data types 
-* Doing Analysis with mumodo - basic walkthrough some of the analysis functions
-* Plotting functions - some examples of plotting functions
-* RealTrackingData - an example analyis using real motion capture data
-* Computing Offset - synchronize diverse data streams
-* Managing Corpora and Resources with mumodo - an introduction to the corpus management part of mumodo
-* Working with mumodo Slices - more advanced mumodo corpus tricks
+* `Basic Data Types`_ - learn about the basic data types of mumodo
+* `Basic IO`_ - learn how to import/export data from common and mumodo-specific file formats into your notebook as basic data types
+* `Doing Analysis with mumodo`_ - basic walkthrough some of the analysis functions
+* `Plotting functions`_ - some examples of plotting functions
+* `RealTrackingData`_ - an example analyis using real motion capture data
+* `Computing Offset`_ - synchronize diverse data streams
+* `Managing Corpora and Resources with mumodo`_ - an introduction to the corpus management part of mumodo
+* `Working with mumodo Slices`_ - more advanced mumodo corpus tricks
 
+
+.. _`Basic Data Types`: http://nbviewer.ipython.org/github/dsg-bielefeld/mumodo/blob/master/notebooks/BasicDataTypes.ipynb
+.. _`Basic IO`: http://nbviewer.ipython.org/github/dsg-bielefeld/mumodo/blob/master/notebooks/BasicIO.ipynb
+.. _`Doing Analysis with mumodo`: http://nbviewer.ipython.org/github/dsg-bielefeld/mumodo/blob/master/notebooks/DoingAnalysisWithMumodo.ipynb
+.. _`Plotting functions`: http://nbviewer.ipython.org/github/dsg-bielefeld/mumodo/blob/master/notebooks/PlottingFunctions.ipynb
+.. _`RealTrackingData`: http://nbviewer.ipython.org/github/dsg-bielefeld/mumodo/blob/master/notebooks/RealTrackingData.ipynb
+.. _`Computing Offset`: http://nbviewer.ipython.org/github/dsg-bielefeld/mumodo/blob/master/notebooks/ComputingOffset.ipynb
+.. _`Managing Corpora and Resources with mumodo`: http://nbviewer.ipython.org/github/dsg-bielefeld/mumodo/blob/master/notebooks/ManagingCorporaAndResourcesWithMumodo.ipynb
+.. _`Working with mumodo Slices`: http://nbviewer.ipython.org/github/dsg-bielefeld/mumodo/blob/master/notebooks/WorkingWithMumodoSlices.ipynb
 
