@@ -135,16 +135,16 @@ def __draw_tier__(ax, renderer, tier, **kwargs):
     ax.set_xlim(kwargs['xmin'], kwargs['xmax'])
     y0, y1 = kwargs['ymin'], kwargs['ymax']
 
-    if isinstance(kwargs['edgecolor'], str):
+    if isinstance(kwargs['edgecolor'], basestring):
         ecolor = kwargs['edgecolor']
     else:
         ecolor = 'w'
 
     for i in tier.index:
-        if isinstance(kwargs['tiercolor'], str):
+        if isinstance(kwargs['tiercolor'], basestring):
             fcolor = kwargs['tiercolor']
         elif isinstance(kwargs['tiercolor'], dict):
-            if tier['text'][i] not in list(kwargs['tiercolor'].keys()):
+            if tier['text'][i] not in kwargs['tiercolor'].keys():
                 fcolor = 'black'
             else:
                 fcolor = kwargs['tiercolor'][tier['text'][i]]
@@ -231,13 +231,13 @@ def plot_reco(**kwargs):
         max_time = max(kwargs['max_history'], current_time)
     else:
         min_time = 0
-        max_time = max([float(k) for k in list(intervalframe.keys())])
+        max_time = max([float(k) for k in intervalframe.keys()])
 
     min_time = int(min_time)
     max_time = int(max_time + 1)
 
     updates = []
-    for key in list(intervalframe.keys()):
+    for key in intervalframe.keys():
         if float(key) <= current_time:
             updates.append(float(key))
 
@@ -256,11 +256,11 @@ def plot_reco(**kwargs):
                               tier,
                               xmin=min_time,
                               xmax=max_time,
-                              xticks=list(range(min_time, max_time + 1,
-                                           kwargs['tickspacing'])),
-                              xlabels=list(range(min_time,
+                              xticks=range(min_time, max_time + 1,
+                                           kwargs['tickspacing']),
+                              xlabels=range(min_time,
                                             max_time + 1,
-                                            kwargs['tickspacing'])),
+                                            kwargs['tickspacing']),
                               tierkey='',
                               tiercolor='w', edgecolor='b', ymin=0.3, ymax=0.7,
                               textkwargs={'color': 'k',
@@ -278,8 +278,8 @@ def plot_reco(**kwargs):
                 ax.plot([last_time], [0.9], 'D', color='grey', markersize=10)
 
         if kwargs['printing']:
-            print("update at:", u)
-            print(intervalframe[str(u)])
+            print "update at:", u
+            print intervalframe[str(u)]
     else:
         ax.set_yticks([])
         ax.set_xlim(0, max_time)
@@ -367,7 +367,7 @@ def plot_annotations(tierdict, time_begin=None, time_end=None, tierorder=None,
     #determine tiers to draw and the order
     thekeys = []
     if tierorder == None:
-        thekeys = list(tierdict.keys())
+        thekeys = tierdict.keys()
     else:
         thekeys = tierorder
 
@@ -420,7 +420,7 @@ def plot_annotations(tierdict, time_begin=None, time_end=None, tierorder=None,
             #Add subplots
             ax = fig.add_subplot(number_of_lines * len(thekeys), 1,
                                  line * len(thekeys) + tiernumber + 1)
-            xticks = list(range(int(t1), int(t2) + 1, tickspacing))
+            xticks = range(int(t1), int(t2) + 1, tickspacing)
             if tiernumber == len(thekeys)-1:
                 xlabels = xticks
             else:

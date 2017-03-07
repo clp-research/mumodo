@@ -192,14 +192,14 @@ def invert_intervalframe(inversion, st=None, en=None, label=None,
 
     """
 
-    if 'min_boundary_threshold' not in list(kwargs.keys()):
+    if 'min_boundary_threshold' not in kwargs.keys():
         min_boundary_threshold = 0.000001
     else:
         min_boundary_threshold = kwargs['min_boundary_threshold']
 
     if len(inversion) == 0 or (inversion.columns != ['start_time', 'end_time',
                                                      'text']).all():
-        print("empty intervalframe or wrong shape")
+        print "empty intervalframe or wrong shape"
         return
 
     tf = inversion.copy()
@@ -316,20 +316,20 @@ def create_streamframe_from_intervalframe(frame, relative=False,
 
     if len(frame) == 0 or (frame.columns != ['start_time', 'end_time',
                                              'text']).all():
-        print("empty intervalframe or wrong shape")
+        print "empty intervalframe or wrong shape"
         return
 
     sframe = frame.copy()
     sframe['time'] = sframe['start_time']
     sframe['value'] = sframe['text'].map(lambda x: x + "_" + \
-                      start_label_appendix if isinstance(x, str) else x)
+                      start_label_appendix if isinstance(x, basestring) else x)
     sframe.index = sframe['time']
     sframe = sframe.ix[:, ['value']]
 
     eframe = frame.copy()
     eframe['time'] = eframe['end_time']
     eframe['value'] = eframe['text'].map(lambda x: x + "_" + \
-                         end_label_appendix if isinstance(x, str) else x)
+                         end_label_appendix if isinstance(x, basestring) else x)
     eframe.index = eframe['time']
     eframe = eframe.ix[:, ['value']]
 
@@ -412,7 +412,7 @@ def slice_intervalframe_by_time(intervalframe, start_time, end_time,
         if newframe['end_time'].iat[-1] > end_time:
             newframe['end_time'].iat[-1] = end_time
     else:
-        print("method must be one of 'include', 'exclude', 'truncate'")
+        print "method must be one of 'include', 'exclude', 'truncate'"
         return
 
     return newframe

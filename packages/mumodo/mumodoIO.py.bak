@@ -108,8 +108,8 @@ def open_streamframe_from_xiofile(filepath, sensorname, window_size=5,
         stream.index -= infile.min_time
         stream.index += timestamp_offset
     else:
-        print("non-int offset in input: raw timestamps from the file will be" +\
-               " used")
+        print "non-int offset in input: raw timestamps from the file will be" +\
+               " used"
     infile.xiofile_close()
     stream.index.name = None
     return stream
@@ -127,7 +127,7 @@ def save_streamframe_to_xiofile(framedict, filepath):
 
     #create a joined streamframe
     frame = None
-    for key in list(framedict.keys()):
+    for key in framedict.keys():
         if len(framedict[key]) < 1:
             continue
         sensorframe = framedict[key].copy(deep=True)
@@ -138,7 +138,7 @@ def save_streamframe_to_xiofile(framedict, filepath):
             frame = frame.append(sensorframe)
 
     if len(frame) < 1:
-        print("invalid data!")
+        print "invalid data!"
         return
 
     frame.sort_index(inplace=True)
@@ -230,10 +230,10 @@ def save_intervalframe_to_textgrid(framedict, filepath, encoding='utf-8'):
     """
 
     if len(framedict) < 1:
-        print("invalid data!")
+        print "invalid data!"
         return
     mytextgrid = tgt.TextGrid()
-    for tier_name in list(framedict.keys()):
+    for tier_name in framedict.keys():
         newtier = framedict[tier_name]
         if len(newtier.columns) == 3:
             mytier = tgt.IntervalTier(name=tier_name)

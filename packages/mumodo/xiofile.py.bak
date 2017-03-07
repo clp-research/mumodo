@@ -99,13 +99,13 @@ class XIOFile(object):
             with open(path) as f:
                 self.is_gzipped = (f.read(2) == '\x1f\x8b')
             if self.is_gzipped:
-                print('opening compressed file ...')
+                print 'opening compressed file ...'
                 self.f = gzip.open(path)
             else:
-                print('opening un-compressed file ...')
+                print 'opening un-compressed file ...'
                 self.f = open(path)
             if self.indexed == False:
-                print('opening file without indexing')
+                print 'opening file without indexing'
                 # Skip the header lines
                 for _ in range(self.headerlines):
                     self.f.readline()
@@ -118,7 +118,7 @@ class XIOFile(object):
                 if self.xio_parseline(line)['time'] >= 0:
                     self.min_time = self.xio_parseline(line)['time']
                 else:
-                    print('no valid lines found!')
+                    print 'no valid lines found!'
                 #exit the constructor here if not indexing
                 return
             self.xio_index(maxlines)
@@ -128,10 +128,10 @@ class XIOFile(object):
                 self.xioformat = fileformat
                 self.xio_writeheader()
             else:
-                print("unsupported file format.")
-                print(" Only 'legacy' and 'venice' allowed")
+                print "unsupported file format."
+                print " Only 'legacy' and 'venice' allowed"
         else:
-            print("unsupported mode. Only 'r' and 'w' allowed")
+            print "unsupported mode. Only 'r' and 'w' allowed"
 
 
 
@@ -149,7 +149,7 @@ class XIOFile(object):
         offset = 0 #cumulative byte offset
         toffset = 0 #last timestamp that was indexed
         tcurrent = 0 #current timestamp
-        print('indexing ...')
+        print 'indexing ...'
         for i, line in enumerate(self.f):
             #do not look at the header lines. indexing starts
             #from the first line after the headerlines
@@ -164,7 +164,7 @@ class XIOFile(object):
                 parsedline = self.xio_parseline(line)
                 tcurrent = parsedline['time']
                 if tcurrent == -1:
-                    print('unable to parse line ', i, ' ', line)
+                    print 'unable to parse line ', i, ' ', line
                 elif not hasattr(self, 'min_time'):
                     self.min_time = tcurrent
                 if tcurrent - toffset >= 1000:
@@ -183,12 +183,12 @@ class XIOFile(object):
             if (i - self.headerlines) % 1000000 == 0:
                 linecount = (i - self.headerlines) / 1000000
                 if linecount > 0:
-                    print(linecount, 'million lines')
+                    print linecount, 'million lines'
             #first two and last line do not contain data
             self.max_lines = i - self.headerlines - 1
         #self.min_time = self.xio_parseline_lineno(0)['time']
         self.max_time = self.xio_parseline_lineno(self.max_lines)['time']
-        print('done! (indexed ' + str(self.max_lines + 1) + ' lines)')
+        print 'done! (indexed ' + str(self.max_lines + 1) + ' lines)'
 
 
     def xio_quicklinegen(self, start_time, end_time, parsed=True,
@@ -235,7 +235,7 @@ class XIOFile(object):
 
             if tcurrent < 0:
                 if errors.index(on_errors) > 0:
-                    print("line " + str(i - self.headerlines) + " not parseable")
+                    print "line " + str(i - self.headerlines) + " not parseable"
                 if errors.index(on_errors) > 1:
                     break
                 continue  #for clarity
@@ -533,7 +533,7 @@ class XIOFile(object):
                 #errors = ['ignore', 'report', 'stop']
                 if tcurrent < 0:
                     if errors.index(on_errors) > 0:
-                        print("line " + str(i) + " not parseable")
+                        print "line " + str(i) + " not parseable"
                     if errors.index(on_errors) > 1:
                         break
 
@@ -578,7 +578,7 @@ class XIOFile(object):
                     yield parsedline if parsed else line
                 else:
                     if errors.index(on_errors) > 0:
-                        print("unparseable line: " + line)
+                        print "unparseable line: " + line
                     if errors.index(on_errors) > 1:
                         break
 

@@ -124,11 +124,11 @@ class Resource(object):
 
     def __load__(self):
         if self.__filename__ is None:
-            print("No filename has been linked to this resource.")
+            print "No filename has been linked to this resource."
             return -1
 
         if not os.path.isfile(self.get_filepath()):
-            print("The specified file does not exist")
+            print "The specified file does not exist"
             return -1
         return 0
 
@@ -175,7 +175,7 @@ class Resource(object):
 
     def get_filepath(self):
         if self.__path_prefix__ is None or not isinstance(self.__path_prefix__,
-                                                          str):
+                                                          basestring):
             filepath = self.__filename__
         else:
             filepath = os.path.join(self.__path_prefix__, self.__filename__)
@@ -215,8 +215,8 @@ class CSVResource(Resource):
            "kwargs: {}\n".format(self.__kwargs__)
 
     def __toyaml__(self):
-        return dict(list(super(CSVResource, self).__toyaml__().items()) + \
-           list({'kwargs': self.__kwargs__}.items()))
+        return dict(super(CSVResource, self).__toyaml__().items() + \
+           {'kwargs': self.__kwargs__}.items())
 
     def __load__(self):
         if super(CSVResource, self).__load__() < 0:
@@ -235,7 +235,7 @@ class CSVResource(Resource):
         """
         if self.__load__() < 0:
             return -1
-        print(self.__cached_object__)
+        print self.__cached_object__
 
     def get_table(self):
         """ Get the DataFrame object
@@ -278,7 +278,7 @@ class BaseAVResource(Resource):
 
         """
         if self.__player__ is None:
-            print("no player has been set - cannot show video")
+            print "no player has been set - cannot show video"
             return -1
 
         if self.__load__() < 0:
@@ -295,7 +295,7 @@ class BaseAVResource(Resource):
 
         """
         if self.__load__() < 0:
-            print("No slice can be returned.")
+            print "No slice can be returned."
             return
         return self.__cached_object__.subclip(t1, t2)
 
@@ -365,8 +365,8 @@ class VideoResource(BaseAVResource):
            "player: {}\nchannel: {}\n".format(self.__player__, self.__channel__)
 
     def __toyaml__(self):
-        return dict(list(super(VideoResource, self).__toyaml__().items()) + \
-           list({'player': self.__player__, 'channel': self.__channel__}.items()))
+        return dict(super(VideoResource, self).__toyaml__().items() + \
+           {'player': self.__player__, 'channel': self.__channel__}.items())
 
     def __load__(self):
         if super(VideoResource, self).__load__() < 0:
@@ -382,7 +382,7 @@ class VideoResource(BaseAVResource):
 
         """
         if self.__load__() < 0:
-            print("No video can be returned.")
+            print "No video can be returned."
             return
         return self.__cached_object__
 
@@ -418,8 +418,8 @@ class AudioResource(BaseAVResource):
            "player: {}\nchannel: {}\n".format(self.__player__, self.__channel__)
 
     def __toyaml__(self):
-        return dict(list(super(AudioResource, self).__toyaml__().items()) + \
-           list({'player': self.__player__, 'channel': self.__channel__}.items()))
+        return dict(super(AudioResource, self).__toyaml__().items() + \
+           {'player': self.__player__, 'channel': self.__channel__}.items())
 
     def __load__(self):
         if super(AudioResource, self).__load__() < 0:
@@ -435,7 +435,7 @@ class AudioResource(BaseAVResource):
 
         """
         if self.__load__() < 0:
-            print("No audio can be returned.")
+            print "No audio can be returned."
             return
         return self.__cached_object__
 
@@ -459,11 +459,11 @@ class BaseStreamResource(Resource):
     def show(self):
         if self.__load__() < 0:
             return
-        print(self.__cached_object__)
+        print self.__cached_object__
 
     def get_streamframe(self):
         if self.__load__() < 0:
-            print("No StreamFrame  can be returned.")
+            print "No StreamFrame  can be returned."
             return
         return self.__cached_object__
 
@@ -504,20 +504,20 @@ class XIOStreamResource(BaseStreamResource):
                                                  self.__kwargs__)
 
     def __toyaml__(self):
-        return dict(list(super(XIOStreamResource, self).__toyaml__().items()) + \
-           list({'sensorname': self.__sensorname__,
-            'kwargs': self.__kwargs__}.items()))
+        return dict(super(XIOStreamResource, self).__toyaml__().items() + \
+           {'sensorname': self.__sensorname__,
+            'kwargs': self.__kwargs__}.items())
 
     def __load__(self):
         if super(XIOStreamResource, self).__load__() < 0:
             return -1
         if self.__sensorname__ is None:
-            print("No sensorname has been set.")
-            print("No StreamFrame can be created.")
+            print "No sensorname has been set."
+            print "No StreamFrame can be created."
             return -1
         if self.__cached_object__ is None:
-            print("Parsing XIO file (will be done only once).")
-            print("Please wait ...")
+            print "Parsing XIO file (will be done only once)."
+            print "Please wait ..."
             self.__cached_object__ = open_streamframe_from_xiofile\
                                      (self.get_filepath(),
                                       self.__sensorname__,
@@ -552,8 +552,8 @@ class CSVStreamResource(BaseStreamResource):
            "kwargs: {}\n".format(self.__kwargs__)
 
     def __toyaml__(self):
-        return dict(list(super(CSVStreamResource, self).__toyaml__().items()) + \
-           list({'kwargs': self.__kwargs__}.items()))
+        return dict(super(CSVStreamResource, self).__toyaml__().items() + \
+           {'kwargs': self.__kwargs__}.items())
 
     def __load__(self):
         if super(CSVStreamResource, self).__load__() < 0:
@@ -608,7 +608,7 @@ class BaseTierResource(Resource):
     def show(self):
         if self.__load__() < 0:
             return
-        print(self.__cached_object__)
+        print self.__cached_object__
 
     def get_tier(self):
         if self.__load__() < 0:
@@ -638,15 +638,15 @@ class TextGridTierResource(BaseTierResource):
            "tiername: {}\n".format(self.__tiername__)
 
     def __toyaml__(self):
-        return dict(list(super(TextGridTierResource, self).__toyaml__().items()) + \
-           list({'tiername': self.__tiername__}.items()))
+        return dict(super(TextGridTierResource, self).__toyaml__().items() + \
+           {'tiername': self.__tiername__}.items())
 
     def __load__(self):
         if super(TextGridTierResource, self).__load__() < 0:
             return -1
         if self.__tiername__ is None:
-            print("No tiername has been set.")
-            print("No TierFrame can be created.")
+            print "No tiername has been set."
+            print "No TierFrame can be created."
             return -1
         if self.__cached_object__ is None:
             self.__cached_object__ = open_intervalframe_from_textgrid\
@@ -694,8 +694,8 @@ class CSVTierResource(BaseTierResource):
            "kwargs: {}\n".format(self.__kwargs__)
 
     def __toyaml__(self):
-        return dict(list(super(CSVTierResource, self).__toyaml__().items()) + \
-           list({'kwargs': self.__kwargs__}.items()))
+        return dict(super(CSVTierResource, self).__toyaml__().items() + \
+           {'kwargs': self.__kwargs__}.items())
 
     def __load__(self):
         if super(CSVTierResource, self).__load__() < 0:
@@ -805,8 +805,8 @@ class TextResource(Resource):
            "encoding: {}\n".format(self.__encoding__)
 
     def __toyaml__(self):
-        return dict(list(super(TextResource, self).__toyaml__().items()) + \
-           list({'encoding': self.__encoding__}.items()))
+        return dict(super(TextResource, self).__toyaml__().items() + \
+           {'encoding': self.__encoding__}.items())
 
     def show(self):
         """ Show text
@@ -818,7 +818,7 @@ class TextResource(Resource):
             return -1
         self.__cached_object__.seek(0)
         for line in self.__cached_object__:
-            print(line)
+            print line
 
     def get_encoding(self):
         """ Get the encoding of this text resource
@@ -958,7 +958,7 @@ class Mumodo(object):
                                            self.__localpath__,
                                            self.__files__,
                                            self.__ID__,
-                                           list(self.__resources__.keys()))
+                                           self.__resources__.keys())
 
     def __toyaml__(self):
         return {'name': self.__name__, 'description': self.__description__,
@@ -979,7 +979,7 @@ class Mumodo(object):
 
         """
         if len(self.__resources__) <= 0:
-            print("No resources have been defined yet!")
+            print "No resources have been defined yet!"
             return
         if item in self.__resources__:
             return self.__resources__[item]
@@ -991,7 +991,7 @@ class Mumodo(object):
         resources with specific names or types
 
         """
-        return (r for r in list(self.__resources__.values()))
+        return (r for r in self.__resources__.values())
 
     def add_resource(self, resource):
         """ Add a resource to this mumodo
@@ -1005,7 +1005,7 @@ class Mumodo(object):
         if isinstance(resource, Resource):
             rname = resource.get_name()
             if rname is None or rname in self.__resources__:
-                print("Resource must have a unique name!")
+                print "Resource must have a unique name!"
                 return -1
             self.__resources__[rname] = resource
             resource.set_path_prefix(self.__localpath__)
@@ -1027,7 +1027,7 @@ class Mumodo(object):
         to look up the file associated with that resource.
         """
         self.__localpath__ = path
-        for r in list(self.__resources__.values()):
+        for r in self.__resources__.values():
             r.set_path_prefix(path)
 
     def get_name(self):
@@ -1093,7 +1093,7 @@ def build_mumodo(stream):
                 kwargs = yaml.load(blockbuffer)
                 blockbuffer = ''
             #Create the object here
-            if object_type in list(keys.keys()):
+            if object_type in keys.keys():
                 obj = keys[object_type](**kwargs)
 
                 #build the object tree
@@ -1126,7 +1126,7 @@ def read_mumodo_from_file(filepath, encoding='utf-8'):
 
     """
     if not os.path.isfile(filepath):
-        print("file does not exist!")
+        print "file does not exist!"
         return
 
     inser = ""
